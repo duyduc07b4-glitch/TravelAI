@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Travel Companion — Local Prototype</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
+    --text:#e8eaed; --muted:#9aa3b2; --accent:#5b9cf6; --accent2:#7ee0c9;
+    --warn:#f6a15b; --danger:#f65b5b; --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg); color:var(--text); min-height:100vh;
+  }
+  header{
+    padding:20px 24px; border-bottom:1px solid var(--border);
+    display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
+    position:sticky; top:0; background:rgba(15,17,21,0.95); backdrop-filter:blur(6px); z-index:10;
+  }
+  header h1{font-size:18px; margin:0; font-weight:600;}
+  header h1 span{color:var(--muted); font-weight:400; font-size:13px; display:block; margin-top:2px;}
+  .apikey-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
+  input[type=password], input[type=text], input[type=number], textarea, select{
+    background:var(--panel2); border:1px solid var(--border); color:var(--text);
+    border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit;
+  }
+  input:focus, textarea:focus, select:focus{outline:1px solid var(--accent); border-color:var(--accent);}
+  button{
+    background:var(--accent); color:#0b1220; border:none; border-radius:8px;
+    padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  button.secondary{background:var(--panel2); color:var(--text); border:1px solid var(--border);}
+  button:disabled{opacity:0.5; cursor:not-allowed;}
+  button.small{padding:5px 10px; font-size:12px;}
+  .status-dot{width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px;}
+  .status-ok{background:var(--accent2);}
+  .status-off{background:var(--danger);}
+  .status-warn{background:var(--warn);}
+
+  main{max-width:960px; margin:0 auto; padding:20px 24px 80px;}
+  nav.tabs{display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:0;}
+  nav.tabs button{
+    background:transparent; color:var(--muted); border:none; border-bottom:2px solid transparent;
+    border-radius:0; padding:10px 14px; font-weight:500;
+  }
+  nav.tabs button.active{color:var(--text); border-bottom-color:var(--accent);}
+
+  .panel{display:none;}
+  .panel.active{display:block; animation:fade .15s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
+
+  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:16px;}
+  .card h3{margin:0 0 14px; font-size:15px;}
+  .field{margin-bottom:12px;}
+  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px;}
+  .field input, .field select{width:100%;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
+  textarea{width:100%; min-height:70px; resize:vertical; line-height:1.5;}
+
+  .member-row{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
+  .member-row input{flex:1;}
+
+  .result{margin-top:16px;}
+  .result-box{background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px; white-space:pre-wrap; font-size:13.5px; line-height:1.65;}
+  .result-box.empty{color:var(--muted); font-style:italic;}
+  .day-block{margin-bottom:14px;}
+  .day-block h4{margin:0 0 8px; color:var(--accent2); font-size:14px;}
+  .day-block ul{margin:0; padding-left:20px;}
+  .day-block li{margin-bottom:4px;}
+  .map-link{color:var(--accent); text-decoration:none; font-size:12px; white-space:nowrap; margin-left:4px;}
+  .map-link:hover{text-decoration:underline;}
+  .warn-badge{color:var(--warn); font-size:11px; white-space:nowrap; margin-left:4px; cursor:help;}
+  .summary-note{margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); color:var(--muted); font-size:13px;}
+
+  table.score-table{width:100%; border-collapse:collapse; margin-top:8px;}
+  table.score-table th, table.score-table td{border:1px solid var(--border); padding:8px 10px; text-align:left; font-size:13px;}
+  table.score-table th{background:var(--panel2); color:var(--muted); font-weight:500;}
+
+  .loading{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px;}
+  .spinner{width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .error-box{background:rgba(246,91,91,0.1); border:1px solid var(--danger); color:#ffb3b3; border-radius:10px; padding:12px 14px; font-size:13px; margin-top:12px;}
+
+  .mic-area{display:flex; flex-direction:column; align-items:center; gap:16px; padding:30px 0;}
+  .mic-btn{
+    width:76px; height:76px; border-radius:50%; background:var(--accent); border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:28px; transition:transform .15s;
+  }
+  .mic-btn.recording{background:var(--danger); animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(246,91,91,0.5);} 70%{box-shadow:0 0 0 18px rgba(246,91,91,0);} 100%{box-shadow:0 0 0 0 rgba(246,91,91,0);}}
+  .mic-hint{color:var(--muted); font-size:12px;}
+  .chat-log{display:flex; flex-direction:column; gap:10px; margin-top:6px;}
+  .msg{max-width:80%; padding:10px 13px; border-radius:12px; font-size:13.5px; line-height:1.5;}
+  .msg.user{align-self:flex-end; background:var(--accent); color:#0b1220;}
+  .msg.ai{align-self:flex-start; background:var(--panel2); border:1px solid var(--border); white-space:pre-wrap;}
+
+  .hint{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.7;}
+  .hint code{background:var(--panel2); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent2); font-size:11.5px;}
+  .badge{display:inline-block; background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:11px; color:var(--muted); margin-left:6px;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>AI Travel Companion <span>Local prototype · AI chạy trên máy bạn qua Ollama · dùng được cả từ điện thoại trong cùng mạng</span></h1>
+  <div class="apikey-row">
+    <span id="statusDot" class="status-dot status-off"></span>
+    <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
+    <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
+    <button class="secondary small" id="loadModelBtn">Kiểm tra kết nối</button>
+  </div>
+</header>
+<div style="max-width:960px; margin:0 auto; padding:0 24px;">
+  <div class="hint" id="loadProgress">
+    Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miễn phí, chạy hoàn toàn offline). Sau khi cài: mở Terminal chạy <code>ollama pull llama3.2</code> để tải model, rồi bấm "Kiểm tra kết nối".
+    Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.
+  </div>
+</div>
+
+<main>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="planner">🗺️ Lịch trình</button>
+    <button class="tab-btn" data-tab="group">👥 Group Matching</button>
+    <button class="tab-btn" data-tab="voice">🎙️ Trợ lý giọng nói</button>
+    <button class="tab-btn" data-tab="heal">🌧️ Self-Healing</button>
+    <button class="tab-btn" data-tab="camera">📷 Camera AI</button>
+  </nav>
+
+  <!-- TAB 1: Dynamic Trip Planning -->
+  <section class="panel active" id="panel-planner">
+    <div class="card">
+      <h3>Tạo lịch trình tự động</h3>
+      <div class="row2">
+        <div class="field"><label>Điểm đến</label><input type="text" id="p-dest" placeholder="Okinawa"></div>
+        <div class="field"><label>Số ngày</label><input type="number" id="p-days" value="4" min="1" max="14"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Ngân sách (yên / tổng)</label><input type="number" id="p-budget" placeholder="80000"></div>
+        <div class="field"><label>Thành phần nhóm</label><input type="text" id="p-group" placeholder="Vợ chồng + 1 bé 5 tuổi"></div>
+      </div>
+      <div class="field"><label>Ghi chú thêm (phương tiện, sở thích...)</label><input type="text" id="p-notes" placeholder="Thuê xe, thích hải sản, thích biển"></div>
+      <button id="p-run">Tạo lịch trình</button>
+      <div class="result" id="p-result"></div>
+    </div>
+  </section>
+
+  <!-- TAB 2: Group Matching -->
+  <section class="panel" id="panel-group">
+    <div class="card">
+      <h3>Chấm điểm địa điểm cho cả nhóm</h3>
+      <div class="field"><label>Địa điểm cần đánh giá</label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
+      <div class="field"><label>Thành viên & sở thích</label>
+        <div id="g-members"></div>
+        <button type="button" class="secondary small" id="g-addMember">+ Thêm thành viên</button>
+      </div>
+      <button id="g-run">Chấm điểm phù hợp</button>
+      <div class="result" id="g-result"></div>
+      <div class="chat-log" id="g-debate" style="margin-top:14px;"></div>
+    </div>
+  </section>
+
+  <!-- TAB 3: Voice Assistant -->
+  <section class="panel" id="panel-voice">
+    <div class="card">
+      <h3>Trợ lý du lịch bằng giọng nói <span class="badge" id="voiceSupport"></span></h3>
+      <div class="field">
+        <label>Giọng đọc</label>
+        <select id="v-voice" style="width:100%;"></select>
+        <div class="hint" id="v-voiceHint"></div>
+      </div>
+      <div class="mic-area">
+        <button class="mic-btn" id="v-mic">🎤</button>
+        <div class="mic-hint" id="v-hint">Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")</div>
+      </div>
+      <div class="field"><label>Hoặc gõ câu hỏi</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="v-text" placeholder="Tìm nơi ngắm hoàng hôn đẹp gần đây" style="flex:1;">
+          <button id="v-send" class="secondary">Gửi</button>
+        </div>
+      </div>
+      <div class="chat-log" id="v-log"></div>
+    </div>
+  </section>
+
+  <!-- TAB 4: Self-Healing Itinerary -->
+  <section class="panel" id="panel-heal">
+    <div class="card">
+      <h3>Lịch trình tự thay đổi</h3>
+      <div class="field"><label>Lịch trình hiện tại (mỗi dòng 1 hoạt động)</label>
+        <textarea id="h-itin">Beach
+Sunset viewing
+Outdoor BBQ
+Dinner ngoài trời</textarea>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Điểm đến (để lấy thời tiết thật)</label><input type="text" id="h-dest" placeholder="Okinawa"></div>
+        <div class="field"><label>Tình huống bất ngờ</label><input type="text" id="h-event" placeholder="Buổi sáng mưa lớn"></div>
+      </div>
+      <button type="button" class="secondary small" id="h-weather">🌦️ Lấy thời tiết thật</button>
+      <div class="hint" id="h-weatherStatus"></div>
+      <div style="height:10px;"></div>
+      <button id="h-run">Cập nhật lịch trình</button>
+      <div class="result" id="h-result"></div>
+    </div>
+  </section>
+
+  <!-- TAB 5: Camera AI -->
+  <section class="panel" id="panel-camera">
+    <div class="card">
+      <h3>AI hiểu qua camera</h3>
+      <div class="row2">
+        <div class="field"><label>Chế độ</label>
+          <select id="c-mode">
+            <option value="food">🍜 Món ăn</option>
+            <option value="landmark">🏯 Địa danh</option>
+          </select>
+        </div>
+        <div class="field"><label>Vision model (Ollama)</label><input type="text" id="c-model" placeholder="moondream" value="moondream"></div>
+      </div>
+      <div class="hint">Model mặc định <code>moondream</code> nhẹ, chạy nhanh trên local nhưng nhận diện còn thô. Muốn chính xác hơn: <code>ollama pull llama3.2-vision</code> rồi đổi ô model.</div>
+      <div class="field" style="margin-top:12px;">
+        <label>Chụp hoặc chọn ảnh</label>
+        <input type="file" id="c-file" accept="image/*" capture="environment">
+      </div>
+      <img id="c-preview" style="display:none; max-width:100%; border-radius:10px; margin:10px 0; border:1px solid var(--border);">
+      <button id="c-run" disabled>Phân tích ảnh</button>
+      <div class="result" id="c-result"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ---------- Ollama connection (AI chạy trên máy chủ Ollama, gọi qua mạng LAN) ----------
+const serverUrlInput = document.getElementById('serverUrl');
+const modelSelect = document.getElementById('modelSelect');
+const statusDot = document.getElementById('statusDot');
+const loadProgress = document.getElementById('loadProgress');
+const loadModelBtn = document.getElementById('loadModelBtn');
+const defaultHint = loadProgress.innerHTML;
+
+const savedUrl = localStorage.getItem('ollama_url');
+const savedModel = localStorage.getItem('ollama_model');
+serverUrlInput.value = savedUrl || 'http://localhost:11434';
+modelSelect.value = savedModel || 'llama3.2';
+
+function ollamaBase() {
+  return (serverUrlInput.value.trim() || 'http://localhost:11434').replace(/\/+$/, '');
+}
+
+function setStatus(state, text) {
+  statusDot.className = 'status-dot ' + (state === 'ready' ? 'status-ok' : state === 'loading' ? 'status-warn' : 'status-off');
+  if (text) loadProgress.innerHTML = text; else loadProgress.innerHTML = defaultHint;
+}
+
+loadModelBtn.addEventListener('click', checkConnection);
+
+async function checkConnection() {
+  localStorage.setItem('ollama_url', serverUrlInput.value.trim());
+  localStorage.setItem('ollama_model', modelSelect.value.trim());
+  loadModelBtn.disabled = true;
+  setStatus('loading', 'Đang kết nối tới Ollama...');
+  try {
+    const res = await fetch(`${ollamaBase()}/api/tags`);
+    if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
+    const data = await res.json();
+    const names = (data.models || []).map(m => m.name);
+    const model = modelSelect.value.trim();
+    if (names.length === 0) {
+      setStatus('off', '⚠️ Kết nối được nhưng chưa có model nào. Chạy: <code>ollama pull ' + (model || 'llama3.2') + '</code> rồi thử lại.');
+    } else if (!names.some(n => n === model || n.startsWith(model + ':'))) {
+      setStatus('off', `⚠️ Server có các model: ${names.join(', ')} — không thấy "${model}". Sửa lại tên model hoặc chạy <code>ollama pull ${model}</code>.`);
+    } else {
+      setStatus('ready', `✅ Đã kết nối Ollama, model "${model}" sẵn sàng — AI chạy trên máy này, hoàn toàn offline/miễn phí.`);
+    }
+  } catch (err) {
+    setStatus('off', `⚠️ Không kết nối được tới ${ollamaBase()}. Kiểm tra: Ollama đã chạy chưa, đúng địa chỉ IP chưa, và nếu gọi từ điện thoại/máy khác thì đã bật <code>OLLAMA_HOST=0.0.0.0</code> và <code>OLLAMA_ORIGINS=*</code> chưa. Lỗi: ${err.message}`);
+  } finally {
+    loadModelBtn.disabled = false;
+  }
+}
+
+// ---------- Tabs ----------
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- Local LLM call (Ollama server, chạy trên máy/mạng LAN, không cloud) ----------
+async function callClaude(system, userText, { json = false } = {}) {
+  const model = modelSelect.value.trim() || 'llama3.2';
+  const body = {
+    model,
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: userText }
+    ],
+    stream: false
+  };
+  if (json) body.format = 'json';
+
+  let res;
+  try {
+    res = await fetch(`${ollamaBase()}/api/chat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (err) {
+    throw new Error(`Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
+  }
+  if (!res.ok) {
+    let msg = res.status + ' ' + res.statusText;
+    try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  const text = data.message?.content || '';
+  if (json) {
+    const match = text.match(/\{[\s\S]*\}/);
+    const cleaned = (match ? match[0] : text).replace(/```json/gi, '').replace(/```/g, '').trim();
+    return JSON.parse(cleaned);
+  }
+  return text;
+}
+
+function setLoading(el, on, label = 'Đang hỏi AI...') {
+  if (on) el.innerHTML = `<div class="loading"><div class="spinner"></div>${label}</div>`;
+}
+function showError(el, err) {
+  el.innerHTML = `<div class="error-box">⚠️ ${err.message}</div>`;
+}
+
+// ---------- TAB 1: Trip Planner ----------
+document.getElementById('p-run').addEventListener('click', async () => {
+  const dest = document.getElementById('p-dest').value.trim() || 'Okinawa';
+  const days = document.getElementById('p-days').value || 4;
+  const budget = document.getElementById('p-budget').value || 'không giới hạn';
+  const group = document.getElementById('p-group').value.trim() || 'một mình';
+  const notes = document.getElementById('p-notes').value.trim();
+  const resultEl = document.getElementById('p-result');
+  setLoading(resultEl, true, 'Đang tạo lịch trình...');
+
+  const system = `Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ hay số điện thoại của bất kỳ quán/địa điểm nào — chỉ gợi ý tên, người dùng sẽ tự kiểm tra giờ mở cửa thật trên Maps trước khi đi. Trả lời DUY NHẤT bằng JSON hợp lệ, không kèm text hay markdown code fence nào khác, theo đúng schema:
+{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}`;
+  const user = `Lên lịch trình du lịch ${dest}, ${days} ngày. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}
+Tối ưu theo: quãng đường di chuyển, kẹt xe, thời tiết, chi phí, trải nghiệm phù hợp cả nhóm. Không cần đảm bảo giờ mở cửa vì bạn không có dữ liệu thời gian thực.`;
+
+  try {
+    const data = await callClaude(system, user, { json: true });
+    let html = '';
+    (data.days || []).forEach((d, i) => {
+      if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
+      const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest)}${venueWarning(a)}</li>`).join('');
+      html += `<div class="day-block"><h4>Day ${d.day || (i + 1)}</h4><ul>${items}</ul></div>`;
+    });
+    if (data.summary) html += `<div class="summary-note">${escapeHtml(data.summary)}</div>`;
+    html += `<div class="summary-note">📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong> (nhiều quán ở Nhật chỉ mở buổi tối) — luôn kiểm tra qua Maps trước khi đến, đừng tin trực tiếp thứ tự lịch trình.</div>`;
+    resultEl.innerHTML = `<div class="result-box">${html || 'Không có kết quả.'}</div>`;
+  } catch (err) { showError(resultEl, err); }
+});
+
+// ---------- TAB 2: Group Matching ----------
+const membersDiv = document.getElementById('g-members');
+function addMemberRow(name = '', pref = '') {
+  const row = document.createElement('div');
+  row.className = 'member-row';
+  row.innerHTML = `<input type="text" placeholder="Tên (VD: A)" class="g-name" value="${name}">
+    <input type="text" placeholder="Sở thích (VD: Hải sản, thích chụp ảnh)" class="g-pref" value="${pref}">
+    <button type="button" class="secondary small g-remove">✕</button>`;
+  row.querySelector('.g-remove').addEventListener('click', () => row.remove());
+  membersDiv.appendChild(row);
+}
+[['A','Hải sản'], ['B','Check-in, chụp ảnh'], ['C','Shopping'], ['D','Có trẻ em'], ['E','Orion Beer']].forEach(([n,p]) => addMemberRow(n,p));
+document.getElementById('g-addMember').addEventListener('click', () => addMemberRow());
+
+document.getElementById('g-run').addEventListener('click', async () => {
+  const place = document.getElementById('g-place').value.trim() || 'American Village';
+  const members = [...membersDiv.querySelectorAll('.member-row')].map(row => ({
+    name: row.querySelector('.g-name').value.trim(),
+    pref: row.querySelector('.g-pref').value.trim()
+  })).filter(m => m.name);
+  const resultEl = document.getElementById('g-result');
+  setLoading(resultEl, true, 'Đang chấm điểm...');
+
+  const system = `Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Trả lời DUY NHẤT bằng JSON hợp lệ theo schema:
+{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}
+Điểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).`;
+  const user = `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`;
+  const debateEl = document.getElementById('g-debate');
+  debateEl.innerHTML = '';
+
+  try {
+    const data = await callClaude(system, user, { json: true });
+    let html = `<table class="score-table"><thead><tr><th>Tiêu chí</th><th>Điểm</th></tr></thead><tbody>`;
+    (data.criteria || []).forEach(c => { html += `<tr><td>${escapeHtml(c.name)}</td><td>${c.score}/10</td></tr>`; });
+    html += `</tbody></table>`;
+    resultEl.innerHTML = `<div class="result-box">${html}</div>`;
+
+    (data.debate || []).forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'msg ai';
+      div.innerHTML = `<strong>${escapeHtml(d.name || '')}:</strong> ${escapeHtml(d.comment || '')}`;
+      debateEl.appendChild(div);
+    });
+    if (data.recommendation) {
+      const div = document.createElement('div');
+      div.className = 'msg user';
+      div.innerHTML = `<strong>🤖 AI chốt:</strong> ${escapeHtml(data.recommendation)}`;
+      debateEl.appendChild(div);
+    }
+  } catch (err) { showError(resultEl, err); }
+});
+
+// ---------- TAB 3: Voice Assistant ----------
+const vLog = document.getElementById('v-log');
+const micBtn = document.getElementById('v-mic');
+const vHint = document.getElementById('v-hint');
+let recognition = null;
+let recording = false;
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition) {
+  document.getElementById('voiceSupport').textContent = 'hỗ trợ trong trình duyệt này';
+  recognition = new SpeechRecognition();
+  recognition.lang = 'vi-VN';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  recognition.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    document.getElementById('v-text').value = transcript;
+    sendVoiceQuery(transcript);
+  };
+  recognition.onend = () => { recording = false; micBtn.classList.remove('recording'); vHint.textContent = 'Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")'; };
+  recognition.onerror = (e) => { recording = false; micBtn.classList.remove('recording'); vHint.textContent = 'Lỗi mic: ' + e.error; };
+} else {
+  document.getElementById('voiceSupport').textContent = 'trình duyệt không hỗ trợ — hãy gõ câu hỏi bên dưới';
+  micBtn.disabled = true;
+}
+
+// ---------- Chọn giọng đọc (giọng mặc định của trình duyệt thường robot, nghe chán) ----------
+const voiceSelect = document.getElementById('v-voice');
+const voiceHint = document.getElementById('v-voiceHint');
+let availableVoices = [];
+
+function populateVoices() {
+  availableVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
+  const viVoices = availableVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('vi'));
+  const list = viVoices.length ? viVoices : availableVoices;
+  const savedVoiceName = localStorage.getItem('voice_name');
+
+  voiceSelect.innerHTML = '';
+  if (list.length === 0) {
+    voiceSelect.innerHTML = '<option value="">(không có giọng đọc nào)</option>';
+    voiceHint.textContent = 'Trình duyệt chưa nạp xong danh sách giọng đọc, hoặc máy chưa cài giọng tiếng Việt nào.';
+    return;
+  }
+  list.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v.name;
+    opt.textContent = `${v.name} (${v.lang})`;
+    if (v.name === savedVoiceName) opt.selected = true;
+    voiceSelect.appendChild(opt);
+  });
+  if (!viVoices.length) {
+    voiceHint.innerHTML = 'Máy chưa có giọng tiếng Việt nào ngoài giọng mặc định, nên đang phát toàn bộ giọng có sẵn (có thể không đọc đúng tiếng Việt). Trên macOS: vào System Settings → Accessibility → Spoken Content → System Voice → tải thêm giọng tiếng Việt (chọn bản "Enhanced/Premium" để nghe tự nhiên hơn nhiều so với giọng mặc định).';
+  } else {
+    voiceHint.textContent = `Tìm thấy ${viVoices.length} giọng tiếng Việt. Nếu vẫn thấy robot, thử cài thêm giọng "Enhanced/Premium" trong Cài đặt hệ thống để có giọng tự nhiên hơn.`;
+  }
+}
+if (window.speechSynthesis) {
+  populateVoices();
+  window.speechSynthesis.onvoiceschanged = populateVoices;
+}
+voiceSelect.addEventListener('change', () => localStorage.setItem('voice_name', voiceSelect.value));
+
+micBtn.addEventListener('click', () => {
+  if (!recognition) return;
+  if (recording) { recognition.stop(); return; }
+  recording = true;
+  micBtn.classList.add('recording');
+  vHint.textContent = 'Đang nghe...';
+  recognition.start();
+});
+
+document.getElementById('v-send').addEventListener('click', () => {
+  const text = document.getElementById('v-text').value.trim();
+  if (text) sendVoiceQuery(text);
+});
+document.getElementById('v-text').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') document.getElementById('v-send').click();
+});
+
+async function sendVoiceQuery(text) {
+  addMsg('user', text);
+  document.getElementById('v-text').value = '';
+  const thinking = addMsg('ai', '...');
+  const system = `Bạn là trợ lý du lịch AI bằng giọng nói, thân thiện, trả lời ngắn gọn (2-4 câu), thực tế, như đang đề xuất trực tiếp cho người dùng đang ở gần đó (nhà hàng, địa điểm ngắm cảnh...). Trả lời bằng tiếng Việt, không dùng markdown.`;
+  try {
+    const reply = await callClaude(system, text);
+    thinking.textContent = reply;
+    speak(reply);
+  } catch (err) {
+    thinking.textContent = '⚠️ ' + err.message;
+  }
+}
+
+function addMsg(role, text) {
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.textContent = text;
+  vLog.appendChild(div);
+  vLog.scrollTop = vLog.scrollHeight;
+  return div;
+}
+
+function speak(text) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  const chosen = availableVoices.find(v => v.name === voiceSelect.value);
+  if (chosen) { utter.voice = chosen; utter.lang = chosen.lang; }
+  else { utter.lang = 'vi-VN'; }
+  utter.rate = 1.02;
+  utter.pitch = 1.0;
+  window.speechSynthesis.speak(utter);
+}
+
+// ---------- TAB 4: Self-Healing Itinerary ----------
+const WEATHER_CODE_VI = {
+  0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
+  45: 'sương mù', 48: 'sương mù đóng băng',
+  51: 'mưa phùn nhẹ', 53: 'mưa phùn vừa', 55: 'mưa phùn dày',
+  61: 'mưa nhẹ', 63: 'mưa vừa', 65: 'mưa to',
+  71: 'tuyết nhẹ', 73: 'tuyết vừa', 75: 'tuyết to',
+  80: 'mưa rào nhẹ', 81: 'mưa rào vừa', 82: 'mưa rào dữ dội',
+  95: 'giông bão', 96: 'giông kèm mưa đá nhẹ', 99: 'giông kèm mưa đá to'
+};
+
+document.getElementById('h-weather').addEventListener('click', async () => {
+  const dest = document.getElementById('h-dest').value.trim();
+  const statusEl = document.getElementById('h-weatherStatus');
+  if (!dest) { statusEl.textContent = '⚠️ Nhập điểm đến trước.'; return; }
+  statusEl.textContent = 'Đang tra vị trí và thời tiết thật...';
+  try {
+    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=vi&name=${encodeURIComponent(dest)}`);
+    const geo = await geoRes.json();
+    const place = geo.results && geo.results[0];
+    if (!place) { statusEl.textContent = `⚠️ Không tìm thấy vị trí "${dest}".`; return; }
+
+    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation`);
+    const w = await wRes.json();
+    const c = w.current;
+    const desc = WEATHER_CODE_VI[c.weather_code] || 'thời tiết không xác định';
+    const text = `Tại ${place.name}${place.country ? ', ' + place.country : ''} hiện đang ${desc}, ${c.temperature_2m}°C${c.precipitation > 0 ? `, lượng mưa ${c.precipitation}mm` : ''}.`;
+    document.getElementById('h-event').value = text;
+    statusEl.textContent = `✅ Dữ liệu thật từ Open-Meteo, cập nhật lúc ${c.time?.slice(11,16) || ''}.`;
+  } catch (err) {
+    statusEl.textContent = '⚠️ Không lấy được thời tiết: ' + err.message;
+  }
+});
+
+document.getElementById('h-run').addEventListener('click', async () => {
+  const itin = document.getElementById('h-itin').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const event = document.getElementById('h-event').value.trim() || 'Buổi sáng mưa lớn';
+  const resultEl = document.getElementById('h-result');
+  setLoading(resultEl, true, 'Đang cập nhật lịch trình...');
+
+  const system = `Bạn là AI Self-Healing Itinerary Engine. Khi có tình huống bất ngờ, tự động thay thế các hoạt động không còn phù hợp bằng lựa chọn thay thế hợp lý, giữ nguyên các hoạt động không bị ảnh hưởng. Trả lời DUY NHẤT bằng JSON theo schema:
+{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}`;
+  const user = `Lịch trình hiện tại:\n${itin.map(i => '- ' + i).join('\n')}\n\nTình huống: ${event}`;
+
+  try {
+    const data = await callClaude(system, user, { json: true });
+    let html = '';
+    if ((data.replacements || []).length) {
+      html += `<div class="day-block"><h4>Thay đổi</h4><ul>`;
+      data.replacements.forEach(r => {
+        html += `<li><strong>${escapeHtml(r.original)}</strong> → <strong>${escapeHtml(r.replacement)}</strong> — ${escapeHtml(r.reason || '')}</li>`;
+      });
+      html += `</ul></div>`;
+    }
+    if ((data.updated_itinerary || []).length) {
+      html += `<div class="day-block"><h4>Lịch trình mới</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a)}${venueWarning(a)}</li>`).join('')}</ul></div>`;
+    }
+    resultEl.innerHTML = `<div class="result-box">${html || 'Không có thay đổi.'}</div>`;
+  } catch (err) { showError(resultEl, err); }
+});
+
+// ---------- TAB 5: Camera AI ----------
+const cFile = document.getElementById('c-file');
+const cPreview = document.getElementById('c-preview');
+const cRun = document.getElementById('c-run');
+let cImageBase64 = null;
+
+cFile.addEventListener('change', () => {
+  const file = cFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    cImageBase64 = reader.result.split(',')[1];
+    cPreview.src = reader.result;
+    cPreview.style.display = 'block';
+    cRun.disabled = false;
+  };
+  reader.readAsDataURL(file);
+});
+
+cRun.addEventListener('click', async () => {
+  if (!cImageBase64) return;
+  const mode = document.getElementById('c-mode').value;
+  const visionModel = document.getElementById('c-model').value.trim() || 'moondream';
+  const resultEl = document.getElementById('c-result');
+
+  try {
+    // Bước 1: model vision mô tả ảnh — hỏi bằng tiếng Anh (moondream không hiểu tiếng Việt,
+    // trả lời rỗng nếu hỏi thẳng). Dùng 1 prompt trung lập, ngắn cho cả 2 chế độ: moondream
+    // trả rỗng một cách khó đoán với vài từ cụ thể như "place"/"landmark" trong câu hỏi dài —
+    // để phần chuyên biệt (món ăn/địa danh) cho bước 2 xử lý.
+    setLoading(resultEl, true, 'Đang nhìn ảnh (bước 1/2)...');
+    const captionPrompt = 'Describe this image in detail, mentioning any text you can see.';
+    const caption = await callVision(captionPrompt, cImageBase64, visionModel);
+    if (!caption || !caption.trim()) throw new Error(`Model vision "${visionModel}" không trả về mô tả nào cho ảnh này — thử ảnh khác hoặc đổi model.`);
+
+    // Bước 2: model text (Ollama, ô Model chính) viết lại thành câu trả lời tiếng Việt hữu ích.
+    setLoading(resultEl, true, 'Đang phân tích & viết câu trả lời (bước 2/2)...');
+    const system = mode === 'food'
+      ? `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.`
+      : `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.`;
+    const text = await callClaude(system, `Mô tả từ AI vision: "${caption}"`);
+    resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">⚠️ AI vision chạy local (${escapeHtml(visionModel)}) dễ nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.</div>`;
+  } catch (err) { showError(resultEl, err); }
+});
+
+async function callVision(prompt, imageBase64, model) {
+  let res;
+  try {
+    res = await fetch(`${ollamaBase()}/api/chat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt, images: [imageBase64] }],
+        stream: false
+      })
+    });
+  } catch (err) {
+    throw new Error(`Không gọi được tới ${ollamaBase()}. Kiểm tra Ollama đang chạy chưa.`);
+  }
+  if (!res.ok) {
+    let msg = res.status + ' ' + res.statusText;
+    try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
+    if (/not found/i.test(msg)) msg += ` — có thể chưa tải model. Chạy: ollama pull ${model}`;
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  return data.message?.content || '(không có phản hồi)';
+}
+
+// ---------- utils ----------
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function mapLink(place, context) {
+  const q = encodeURIComponent(context ? `${place}, ${context}` : place);
+  return `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" class="map-link">📍 Xem bản đồ</a>`;
+}
+const VENUE_KEYWORDS = ['ăn trưa','ăn tối','ăn sáng','nhà hàng','quán ','café','cafe','lunch','dinner','breakfast','restaurant','bar','beer','izakaya','shop','store','mall','shopping'];
+function venueWarning(text) {
+  const t = text.toLowerCase();
+  if (VENUE_KEYWORDS.some(k => t.includes(k))) {
+    return ' <span class="warn-badge" title="AI không có dữ liệu thời gian thực, giờ mở cửa có thể sai">⚠️ chưa xác minh giờ mở cửa</span>';
+  }
+  return '';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<meta charset="UTF-8">
+<title>AI Travel Companion Setup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --paper:#f3f5f3;
+    --paper-raised:#ffffff;
+    --ink:#10201d;
+    --ink-soft:#4c5d59;
+    --accent:#0e7c7b;
+    --accent-strong:#095857;
+    --accent-soft:#dceeec;
+    --amber:#8a5a10;
+    --amber-soft:#f3e6d0;
+    --line:#d7dedb;
+    --code-bg:#0f1e1c;
+    --code-ink:#d9f2ee;
+    --code-accent:#7ee0c9;
+    --radius:10px;
+    --serif-mono:'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --sans:'Karla', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0b1413;
+      --paper-raised:#111f1d;
+      --ink:#e7f1ee;
+      --ink-soft:#9fb4af;
+      --accent:#4fd8d3;
+      --accent-strong:#7ee0c9;
+      --accent-soft:#123330;
+      --amber:#e8b165;
+      --amber-soft:#2e2415;
+      --line:#1e2c2a;
+      --code-bg:#060e0d;
+      --code-ink:#d9f2ee;
+      --code-accent:#7ee0c9;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0b1413;
+    --paper-raised:#111f1d;
+    --ink:#e7f1ee;
+    --ink-soft:#9fb4af;
+    --accent:#4fd8d3;
+    --accent-strong:#7ee0c9;
+    --accent-soft:#123330;
+    --amber:#e8b165;
+    --amber-soft:#2e2415;
+    --line:#1e2c2a;
+    --code-bg:#060e0d;
+    --code-ink:#d9f2ee;
+    --code-accent:#7ee0c9;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:var(--sans); line-height:1.6; font-size:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent-soft); color:var(--accent-strong);}
+
+  a{color:var(--accent-strong);}
+  :root[data-theme="dark"] a, :root:not([data-theme="light"]) a{color:var(--accent);}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  .wrap{max-width:700px; margin:0 auto; padding:0 24px 100px;}
+
+  header.hero{padding:56px 24px 28px; max-width:700px; margin:0 auto;}
+  .eyebrow{
+    font-family:var(--serif-mono); font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--accent-strong); font-weight:600; margin:0 0 14px;
+  }
+  h1{
+    font-family:var(--serif-mono); font-size:clamp(28px,5vw,40px); font-weight:700;
+    margin:0 0 12px; letter-spacing:-0.01em; text-wrap:balance; line-height:1.12;
+  }
+  .lede{font-size:17px; color:var(--ink-soft); max-width:52ch; margin:0; text-wrap:balance;}
+
+  /* OS toggle */
+  .os-bar{
+    position:sticky; top:0; z-index:20; background:var(--paper);
+    border-bottom:1px solid var(--line); padding:14px 24px;
+    backdrop-filter:blur(6px);
+  }
+  .os-toggle{
+    max-width:700px; margin:0 auto; display:flex; gap:6px; background:var(--paper-raised);
+    border:1px solid var(--line); border-radius:999px; padding:4px; width:fit-content;
+  }
+  .os-toggle button{
+    font-family:var(--sans); font-weight:600; font-size:14px; border:none; background:transparent;
+    color:var(--ink-soft); padding:8px 18px; border-radius:999px; cursor:pointer;
+    display:flex; align-items:center; gap:7px; transition:background .15s, color .15s;
+  }
+  .os-toggle button.active{background:var(--accent); color:var(--paper-raised);}
+  :root[data-theme="dark"] .os-toggle button.active, :root:not([data-theme="light"]) .os-toggle button.active{color:#04211f;}
+
+  body[data-os="mac"] [data-only="win"]{display:none;}
+  body[data-os="win"] [data-only="mac"]{display:none;}
+
+  section{margin:52px 0;}
+  h2{
+    font-family:var(--serif-mono); font-size:13px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--ink-soft); font-weight:600; margin:0 0 20px; display:flex; align-items:center; gap:10px;
+  }
+  h2::after{content:""; flex:1; height:1px; background:var(--line);}
+
+  h3{font-family:var(--sans); font-size:19px; font-weight:700; margin:0 0 8px; text-wrap:balance;}
+  p{margin:0 0 14px;}
+
+  /* prereq list */
+  .prereqs{list-style:none; margin:0; padding:0; display:grid; gap:10px;}
+  .prereqs li{
+    display:flex; gap:12px; align-items:flex-start; padding:14px 16px; background:var(--paper-raised);
+    border:1px solid var(--line); border-radius:var(--radius); font-size:15px;
+  }
+  .prereqs li svg{flex:none; margin-top:2px; width:18px; height:18px; color:var(--accent);}
+
+  /* steps */
+  .step{display:grid; grid-template-columns:40px 1fr; gap:16px; margin-bottom:36px;}
+  .step:last-child{margin-bottom:0;}
+  .step-num{
+    font-family:var(--serif-mono); font-weight:700; font-size:15px; color:var(--accent-strong);
+    background:var(--accent-soft); width:40px; height:40px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .step-body{padding-top:4px;}
+
+  code.inline{
+    font-family:var(--serif-mono); font-size:0.88em; background:var(--accent-soft); color:var(--accent-strong);
+    padding:2px 6px; border-radius:5px;
+  }
+
+  pre{
+    background:var(--code-bg); color:var(--code-ink); border-radius:var(--radius);
+    padding:16px 18px; overflow-x:auto; margin:12px 0 0; border:1px solid rgba(255,255,255,0.06);
+  }
+  pre .tag{
+    display:block; font-family:var(--serif-mono); font-size:10.5px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--code-accent); opacity:0.75; margin-bottom:8px;
+  }
+  code{font-family:var(--serif-mono); font-size:13.5px; line-height:1.7; font-variant-numeric:tabular-nums;}
+
+  .file-list{
+    display:grid; gap:8px; margin:14px 0 0; padding:14px 16px; background:var(--paper-raised);
+    border:1px solid var(--line); border-radius:var(--radius); font-family:var(--serif-mono); font-size:13.5px;
+  }
+  .file-list div{display:flex; gap:10px;}
+  .file-list span.name{color:var(--accent-strong); font-weight:600; min-width:150px;}
+  .file-list span.desc{color:var(--ink-soft); font-family:var(--sans);}
+
+  .callout{
+    display:flex; gap:12px; padding:14px 16px; border-radius:var(--radius); margin-top:14px;
+    background:var(--amber-soft); border:1px solid color-mix(in srgb, var(--amber) 35%, transparent);
+    font-size:14.5px;
+  }
+  .callout svg{flex:none; width:18px; height:18px; color:var(--amber); margin-top:1px;}
+  .callout strong{color:var(--amber);}
+
+  /* diagram */
+  .diagram{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+    padding:28px 20px; margin:16px 0;
+  }
+  .diagram svg{width:100%; height:auto; display:block;}
+  .diagram text{font-family:var(--sans); fill:var(--ink);}
+  .diagram .label{font-size:12px; fill:var(--ink-soft);}
+  .diagram .node-bg{fill:var(--accent-soft); stroke:var(--accent); stroke-width:1.4;}
+  .diagram .line{stroke:var(--ink-soft); stroke-width:1.4; stroke-dasharray:4 4;}
+
+  details{
+    background:var(--paper-raised); border:1px solid var(--line); border-radius:var(--radius);
+    margin-bottom:10px; overflow:hidden;
+  }
+  summary{
+    padding:14px 16px; font-weight:600; cursor:pointer; list-style:none; display:flex;
+    align-items:center; justify-content:space-between; gap:12px; font-size:15px;
+  }
+  summary::-webkit-details-marker{display:none;}
+  summary::after{content:"+"; font-family:var(--serif-mono); color:var(--ink-soft); font-size:18px;}
+  details[open] summary::after{content:"–";}
+  details .answer{padding:0 16px 16px; color:var(--ink-soft); font-size:14.5px;}
+  .badge{
+    font-family:var(--serif-mono); font-size:10px; letter-spacing:0.06em; text-transform:uppercase;
+    background:var(--accent-soft); color:var(--accent-strong); padding:2px 7px; border-radius:5px; font-weight:600;
+  }
+
+  footer{
+    max-width:700px; margin:0 auto; padding:32px 24px 60px; border-top:1px solid var(--line);
+    color:var(--ink-soft); font-size:13.5px; text-align:center;
+  }
+
+  @media (max-width:520px){
+    .step{grid-template-columns:32px 1fr;}
+    .step-num{width:32px; height:32px; font-size:13px;}
+    .file-list span.name{min-width:120px;}
+  }
+</style>
+
+<header class="hero">
+  <p class="eyebrow">Hướng dẫn cài đặt nội bộ</p>
+  <h1>AI Travel Companion</h1>
+  <p class="lede">Trợ lý lập kế hoạch du lịch chạy AI hoàn toàn trên máy của bạn — không cloud, không tài khoản, không thể phát sinh chi phí. Làm theo các bước dưới đây, mất khoảng 10 phút.</p>
+</header>
+
+<div class="os-bar">
+  <div class="os-toggle" id="osToggle">
+    <button data-os="mac" id="btn-mac">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.5 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.82M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      macOS
+    </button>
+    <button data-os="win" id="btn-win">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 5.5l7.5-1v7.3H3zm0 13l7.5 1v-7.2H3zm8.4-8v7.4L21 19V10.5zm0-1.1L21 5v8.4h-9.6z"/></svg>
+      Windows
+    </button>
+  </div>
+</div>
+
+<main class="wrap">
+
+<section>
+  <h2>Cần gì trước khi bắt đầu</h2>
+  <ul class="prereqs">
+    <li>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      <div>Trình duyệt <strong>Chrome</strong> hoặc <strong>Edge</strong> bản gần đây (Firefox/Safari chưa hỗ trợ tốt các API cần dùng)</div>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      <div>Khoảng <strong>2 GB</strong> dung lượng trống ổ đĩa cho model AI</div>
+    </li>
+    <li>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      <div>Mạng internet <strong>chỉ để tải lần đầu</strong> — sau đó AI chạy hoàn toàn offline</div>
+    </li>
+    <li data-only="win">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+      <div><strong>Python</strong> đã cài (chỉ để mở giao diện qua server local — xem bước 3)</div>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2>Bước 1 — Nhận bộ file dự án</h2>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <p>Xin 1 thư mục gồm 3 file sau từ người gửi cho bạn (Slack, Drive, USB đều được), lưu chung 1 chỗ trên máy — ví dụ ra Desktop:</p>
+      <div class="file-list">
+        <div><span class="name">app.html</span><span class="desc">giao diện chính</span></div>
+        <div><span class="name">start-mac.command</span><span class="desc">khởi chạy nhanh — macOS</span></div>
+        <div><span class="name">start-windows.bat</span><span class="desc">khởi chạy nhanh — Windows</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Bước 2 — Cài AI chạy local (Ollama)</h2>
+
+  <div class="step" data-only="mac">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Cài Ollama</h3>
+      <p>Vào <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a>, tải bản macOS, mở file <code class="inline">.dmg</code> và kéo vào Applications. Mở app Ollama một lần — icon sẽ nằm ở thanh menu trên cùng, chạy nền tự động từ đó.</p>
+      <p>Sau đó mở <strong>Terminal</strong> và tải model AI:</p>
+      <pre><span class="tag">Terminal</span><code>ollama pull llama3.2</code></pre>
+      <div class="callout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <div>Tải khoảng <strong>2GB</strong>, mất vài phút tùy mạng. Chỉ cần làm một lần.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step" data-only="win">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <h3>Cài Ollama</h3>
+      <p>Vào <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a>, tải bản Windows, chạy file <code class="inline">.exe</code> và làm theo trình cài đặt. Ollama sẽ tự chạy nền và nằm ở khay hệ thống (system tray) từ đó về sau.</p>
+      <p>Sau đó mở <strong>PowerShell</strong> hoặc <strong>Command Prompt</strong> và tải model AI:</p>
+      <pre><span class="tag">PowerShell</span><code>ollama pull llama3.2</code></pre>
+      <div class="callout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        <div>Tải khoảng <strong>2GB</strong>, mất vài phút tùy mạng. Chỉ cần làm một lần.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>Bước 3 — Khởi động & dùng thử</h2>
+
+  <div class="step" data-only="mac">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Mở app</h3>
+      <p>Double-click <code class="inline">start-mac.command</code>. Lần đầu macOS có thể chặn vì file chưa rõ nguồn gốc — chuột phải vào file → <strong>Open</strong> → xác nhận <strong>Open</strong> lần nữa.</p>
+      <p>Terminal sẽ mở và trình duyệt tự bật trang app.</p>
+    </div>
+  </div>
+
+  <div class="step" data-only="win">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <h3>Mở app</h3>
+      <p>Double-click <code class="inline">start-windows.bat</code>. Nếu Windows hiện cảnh báo "Windows protected your PC" (do file tải từ mạng), bấm <strong>More info</strong> → <strong>Run anyway</strong>.</p>
+      <p>Cửa sổ dòng lệnh sẽ mở và trình duyệt tự bật trang app.</p>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <h3>Kết nối AI</h3>
+      <p>Trong app, ở góc trên: ô Server để nguyên <code class="inline">http://localhost:11434</code>, ô model để <code class="inline">llama3.2</code>, bấm <strong>"Kiểm tra kết nối"</strong>. Chấm tròn chuyển xanh là xong — thử ngay tab "Lịch trình".</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <details>
+    <summary>Dùng được từ điện thoại trong cùng Wi-Fi <span class="badge">Tuỳ chọn</span></summary>
+    <div class="answer">
+      <p>AI chạy trên máy tính, điện thoại chỉ mở trang web và gọi sang qua mạng nội bộ — không cần tải gì trên điện thoại.</p>
+      <div class="diagram">
+        <svg viewBox="0 0 600 120">
+          <rect class="node-bg" x="20" y="35" width="110" height="50" rx="8"/>
+          <text x="75" y="55" text-anchor="middle" font-size="13" font-weight="600">Điện thoại</text>
+          <text x="75" y="72" text-anchor="middle" class="label">trình duyệt</text>
+
+          <line class="line" x1="130" y1="60" x2="235" y2="60"/>
+          <text x="182" y="50" text-anchor="middle" class="label">Wi-Fi</text>
+
+          <rect class="node-bg" x="245" y="35" width="110" height="50" rx="8"/>
+          <text x="300" y="55" text-anchor="middle" font-size="13" font-weight="600">Router</text>
+          <text x="300" y="72" text-anchor="middle" class="label">mạng nhà</text>
+
+          <line class="line" x1="355" y1="60" x2="460" y2="60"/>
+
+          <rect class="node-bg" x="470" y="35" width="110" height="50" rx="8"/>
+          <text x="525" y="55" text-anchor="middle" font-size="13" font-weight="600">Máy chủ</text>
+          <text x="525" y="72" text-anchor="middle" class="label">Ollama chạy đây</text>
+        </svg>
+      </div>
+      <p>Trên máy chạy Ollama, cần bật cho phép truy cập mạng + CORS:</p>
+      <pre data-only="mac"><span class="tag">Terminal — trước khi mở Ollama</span><code>launchctl setenv OLLAMA_HOST "0.0.0.0"
+launchctl setenv OLLAMA_ORIGINS "*"</code></pre>
+      <pre data-only="win"><span class="tag">PowerShell — rồi khởi động lại Ollama</span><code>setx OLLAMA_HOST "0.0.0.0"
+setx OLLAMA_ORIGINS "*"</code></pre>
+      <p>Khởi động lại Ollama, rồi tìm địa chỉ IP mạng LAN của máy đó (macOS: System Settings → Wi-Fi → Details; Windows: <code class="inline">ipconfig</code> trong cmd, xem dòng IPv4).</p>
+      <p>Trên điện thoại (cùng Wi-Fi), mở <code class="inline">http://[IP-máy]:8765/app.html</code>, rồi trong app đổi Server thành <code class="inline">http://[IP-máy]:11434</code>.</p>
+    </div>
+  </details>
+</section>
+
+<section>
+  <h2>Xử lý sự cố thường gặp</h2>
+
+  <details>
+    <summary>"Không kết nối được tới Ollama" <span class="badge">Cả hai hệ điều hành</span></summary>
+    <div class="answer">Kiểm tra Ollama có đang chạy không — macOS: icon trên thanh menu; Windows: icon ở khay hệ thống. Nếu không thấy, mở lại app Ollama rồi bấm "Kiểm tra kết nối" trong trang web lần nữa.</div>
+  </details>
+
+  <details>
+    <summary>App báo "không thấy model llama3.2"</summary>
+    <div class="answer">Model chưa tải xong hoặc gõ sai tên. Chạy lại <code class="inline">ollama pull llama3.2</code> và đợi đến khi thấy chữ "success".</div>
+  </details>
+
+  <details>
+    <summary>Trả lời rất chậm hoặc máy nóng/giật</summary>
+    <div class="answer">Máy cấu hình thấp sẽ chạy chậm hơn — đây là bình thường với AI chạy local. Có thể thử model nhẹ hơn: <code class="inline">ollama pull llama3.2:1b</code>, rồi đổi ô model trong app thành <code class="inline">llama3.2:1b</code>.</div>
+  </details>
+
+  <details>
+    <summary>Giọng đọc trong tab "Trợ lý giọng nói" nghe robot</summary>
+    <div class="answer">Đây là giọng đọc mặc định của hệ điều hành, app không kiểm soát được chất lượng. Trong app, thử đổi sang giọng khác ở ô "Giọng đọc" nếu có nhiều lựa chọn. Trên macOS có thể cài thêm giọng "Enhanced/Premium" tại System Settings → Accessibility → Spoken Content.</div>
+  </details>
+
+  <details>
+    <summary>Địa chỉ, giờ mở cửa, số điện thoại AI gợi ý có đáng tin không?</summary>
+    <div class="answer">Không nên tin tuyệt đối. AI chạy local không có dữ liệu thời gian thực, nên tên quán có thể đúng nhưng giờ mở cửa hay số điện thoại có thể sai. App luôn có nút "Xem bản đồ" cạnh mỗi địa điểm — bấm vào để xem thông tin thật trên Google Maps trước khi đi.</div>
+  </details>
+</section>
+
+</main>
+
+<footer>
+  AI Travel Companion — chạy 100% trên máy cá nhân, không gửi dữ liệu ra ngoài.
+</footer>
+
+<script>
+  const toggle = document.getElementById('osToggle');
+  const isWin = /Win/i.test(navigator.userAgent);
+  function setOS(os){
+    document.body.dataset.os = os;
+    document.getElementById('btn-mac').classList.toggle('active', os === 'mac');
+    document.getElementById('btn-win').classList.toggle('active', os === 'win');
+  }
+  toggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-os]');
+    if (btn) setOS(btn.dataset.os);
+  });
+  setOS(isWin ? 'win' : 'mac');
+</script>
