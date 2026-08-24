@@ -127,6 +127,7 @@
     <button class="tab-btn" data-tab="group">👥 Group Matching</button>
     <button class="tab-btn" data-tab="voice">🎙️ Trợ lý giọng nói</button>
     <button class="tab-btn" data-tab="heal">🌧️ Self-Healing</button>
+    <button class="tab-btn" data-tab="camera">📷 Camera AI</button>
   </nav>
 
   <!-- TAB 1: Dynamic Trip Planning -->
@@ -158,6 +159,7 @@
       </div>
       <button id="g-run">Chấm điểm phù hợp</button>
       <div class="result" id="g-result"></div>
+      <div class="chat-log" id="g-debate" style="margin-top:14px;"></div>
     </div>
   </section>
 
@@ -194,9 +196,39 @@ Sunset viewing
 Outdoor BBQ
 Dinner ngoài trời</textarea>
       </div>
-      <div class="field"><label>Tình huống bất ngờ</label><input type="text" id="h-event" placeholder="Buổi sáng mưa lớn"></div>
+      <div class="row2">
+        <div class="field"><label>Điểm đến (để lấy thời tiết thật)</label><input type="text" id="h-dest" placeholder="Okinawa"></div>
+        <div class="field"><label>Tình huống bất ngờ</label><input type="text" id="h-event" placeholder="Buổi sáng mưa lớn"></div>
+      </div>
+      <button type="button" class="secondary small" id="h-weather">🌦️ Lấy thời tiết thật</button>
+      <div class="hint" id="h-weatherStatus"></div>
+      <div style="height:10px;"></div>
       <button id="h-run">Cập nhật lịch trình</button>
       <div class="result" id="h-result"></div>
+    </div>
+  </section>
+
+  <!-- TAB 5: Camera AI -->
+  <section class="panel" id="panel-camera">
+    <div class="card">
+      <h3>AI hiểu qua camera</h3>
+      <div class="row2">
+        <div class="field"><label>Chế độ</label>
+          <select id="c-mode">
+            <option value="food">🍜 Món ăn</option>
+            <option value="landmark">🏯 Địa danh</option>
+          </select>
+        </div>
+        <div class="field"><label>Vision model (Ollama)</label><input type="text" id="c-model" placeholder="moondream" value="moondream"></div>
+      </div>
+      <div class="hint">Model mặc định <code>moondream</code> nhẹ, chạy nhanh trên local nhưng nhận diện còn thô. Muốn chính xác hơn: <code>ollama pull llama3.2-vision</code> rồi đổi ô model.</div>
+      <div class="field" style="margin-top:12px;">
+        <label>Chụp hoặc chọn ảnh</label>
+        <input type="file" id="c-file" accept="image/*" capture="environment">
+      </div>
+      <img id="c-preview" style="display:none; max-width:100%; border-radius:10px; margin:10px 0; border:1px solid var(--border);">
+      <button id="c-run" disabled>Phân tích ảnh</button>
+      <div class="result" id="c-result"></div>
     </div>
   </section>
 </main>
@@ -358,18 +390,32 @@ document.getElementById('g-run').addEventListener('click', async () => {
   const resultEl = document.getElementById('g-result');
   setLoading(resultEl, true, 'Đang chấm điểm...');
 
-  const system = `Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với từng tiêu chí đại diện cho sở thích của nhóm. Trả lời DUY NHẤT bằng JSON hợp lệ theo schema:
-{"criteria":[{"name":"Food","score":9}],"recommendation":"1-2 câu kết luận AI tối đa hóa hài lòng cả nhóm ra sao"}
-Điểm số theo thang 1-10. Suy ra tiêu chí từ sở thích của từng thành viên.`;
+  const system = `Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Trả lời DUY NHẤT bằng JSON hợp lệ theo schema:
+{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}
+Điểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).`;
   const user = `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`;
+  const debateEl = document.getElementById('g-debate');
+  debateEl.innerHTML = '';
 
   try {
     const data = await callClaude(system, user, { json: true });
     let html = `<table class="score-table"><thead><tr><th>Tiêu chí</th><th>Điểm</th></tr></thead><tbody>`;
     (data.criteria || []).forEach(c => { html += `<tr><td>${escapeHtml(c.name)}</td><td>${c.score}/10</td></tr>`; });
     html += `</tbody></table>`;
-    if (data.recommendation) html += `<div class="summary-note">${escapeHtml(data.recommendation)}</div>`;
     resultEl.innerHTML = `<div class="result-box">${html}</div>`;
+
+    (data.debate || []).forEach(d => {
+      const div = document.createElement('div');
+      div.className = 'msg ai';
+      div.innerHTML = `<strong>${escapeHtml(d.name || '')}:</strong> ${escapeHtml(d.comment || '')}`;
+      debateEl.appendChild(div);
+    });
+    if (data.recommendation) {
+      const div = document.createElement('div');
+      div.className = 'msg user';
+      div.innerHTML = `<strong>🤖 AI chốt:</strong> ${escapeHtml(data.recommendation)}`;
+      debateEl.appendChild(div);
+    }
   } catch (err) { showError(resultEl, err); }
 });
 
@@ -488,6 +534,39 @@ function speak(text) {
 }
 
 // ---------- TAB 4: Self-Healing Itinerary ----------
+const WEATHER_CODE_VI = {
+  0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
+  45: 'sương mù', 48: 'sương mù đóng băng',
+  51: 'mưa phùn nhẹ', 53: 'mưa phùn vừa', 55: 'mưa phùn dày',
+  61: 'mưa nhẹ', 63: 'mưa vừa', 65: 'mưa to',
+  71: 'tuyết nhẹ', 73: 'tuyết vừa', 75: 'tuyết to',
+  80: 'mưa rào nhẹ', 81: 'mưa rào vừa', 82: 'mưa rào dữ dội',
+  95: 'giông bão', 96: 'giông kèm mưa đá nhẹ', 99: 'giông kèm mưa đá to'
+};
+
+document.getElementById('h-weather').addEventListener('click', async () => {
+  const dest = document.getElementById('h-dest').value.trim();
+  const statusEl = document.getElementById('h-weatherStatus');
+  if (!dest) { statusEl.textContent = '⚠️ Nhập điểm đến trước.'; return; }
+  statusEl.textContent = 'Đang tra vị trí và thời tiết thật...';
+  try {
+    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=vi&name=${encodeURIComponent(dest)}`);
+    const geo = await geoRes.json();
+    const place = geo.results && geo.results[0];
+    if (!place) { statusEl.textContent = `⚠️ Không tìm thấy vị trí "${dest}".`; return; }
+
+    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation`);
+    const w = await wRes.json();
+    const c = w.current;
+    const desc = WEATHER_CODE_VI[c.weather_code] || 'thời tiết không xác định';
+    const text = `Tại ${place.name}${place.country ? ', ' + place.country : ''} hiện đang ${desc}, ${c.temperature_2m}°C${c.precipitation > 0 ? `, lượng mưa ${c.precipitation}mm` : ''}.`;
+    document.getElementById('h-event').value = text;
+    statusEl.textContent = `✅ Dữ liệu thật từ Open-Meteo, cập nhật lúc ${c.time?.slice(11,16) || ''}.`;
+  } catch (err) {
+    statusEl.textContent = '⚠️ Không lấy được thời tiết: ' + err.message;
+  }
+});
+
 document.getElementById('h-run').addEventListener('click', async () => {
   const itin = document.getElementById('h-itin').value.split('\n').map(s => s.trim()).filter(Boolean);
   const event = document.getElementById('h-event').value.trim() || 'Buổi sáng mưa lớn';
@@ -514,6 +593,76 @@ document.getElementById('h-run').addEventListener('click', async () => {
     resultEl.innerHTML = `<div class="result-box">${html || 'Không có thay đổi.'}</div>`;
   } catch (err) { showError(resultEl, err); }
 });
+
+// ---------- TAB 5: Camera AI ----------
+const cFile = document.getElementById('c-file');
+const cPreview = document.getElementById('c-preview');
+const cRun = document.getElementById('c-run');
+let cImageBase64 = null;
+
+cFile.addEventListener('change', () => {
+  const file = cFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    cImageBase64 = reader.result.split(',')[1];
+    cPreview.src = reader.result;
+    cPreview.style.display = 'block';
+    cRun.disabled = false;
+  };
+  reader.readAsDataURL(file);
+});
+
+cRun.addEventListener('click', async () => {
+  if (!cImageBase64) return;
+  const mode = document.getElementById('c-mode').value;
+  const visionModel = document.getElementById('c-model').value.trim() || 'moondream';
+  const resultEl = document.getElementById('c-result');
+
+  try {
+    // Bước 1: model vision mô tả ảnh — hỏi bằng tiếng Anh (moondream không hiểu tiếng Việt,
+    // trả lời rỗng nếu hỏi thẳng). Dùng 1 prompt trung lập, ngắn cho cả 2 chế độ: moondream
+    // trả rỗng một cách khó đoán với vài từ cụ thể như "place"/"landmark" trong câu hỏi dài —
+    // để phần chuyên biệt (món ăn/địa danh) cho bước 2 xử lý.
+    setLoading(resultEl, true, 'Đang nhìn ảnh (bước 1/2)...');
+    const captionPrompt = 'Describe this image in detail, mentioning any text you can see.';
+    const caption = await callVision(captionPrompt, cImageBase64, visionModel);
+    if (!caption || !caption.trim()) throw new Error(`Model vision "${visionModel}" không trả về mô tả nào cho ảnh này — thử ảnh khác hoặc đổi model.`);
+
+    // Bước 2: model text (Ollama, ô Model chính) viết lại thành câu trả lời tiếng Việt hữu ích.
+    setLoading(resultEl, true, 'Đang phân tích & viết câu trả lời (bước 2/2)...');
+    const system = mode === 'food'
+      ? `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.`
+      : `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.`;
+    const text = await callClaude(system, `Mô tả từ AI vision: "${caption}"`);
+    resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">⚠️ AI vision chạy local (${escapeHtml(visionModel)}) dễ nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.</div>`;
+  } catch (err) { showError(resultEl, err); }
+});
+
+async function callVision(prompt, imageBase64, model) {
+  let res;
+  try {
+    res = await fetch(`${ollamaBase()}/api/chat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: prompt, images: [imageBase64] }],
+        stream: false
+      })
+    });
+  } catch (err) {
+    throw new Error(`Không gọi được tới ${ollamaBase()}. Kiểm tra Ollama đang chạy chưa.`);
+  }
+  if (!res.ok) {
+    let msg = res.status + ' ' + res.statusText;
+    try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
+    if (/not found/i.test(msg)) msg += ` — có thể chưa tải model. Chạy: ollama pull ${model}`;
+    throw new Error(msg);
+  }
+  const data = await res.json();
+  return data.message?.content || '(không có phản hồi)';
+}
 
 // ---------- utils ----------
 function escapeHtml(str) {
