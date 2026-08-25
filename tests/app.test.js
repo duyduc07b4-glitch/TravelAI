@@ -4,6 +4,7 @@ const {
   escapeHtml, mapLink, venueWarning, weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
+  classifyIncident, buildSelfHealingPlan,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
 
@@ -206,17 +207,24 @@ describe('renderGroupScoreTableHtml', () => {
 });
 
 describe('renderHealHtml', () => {
-  test('renders replacements and the updated itinerary (vi)', () => {
+  test('renders replacements and updated days with highlights (vi)', () => {
     const html = renderHealHtml({
+      incident_summary: 'Thời tiết mưa to ở Okinawa',
+      severity: 'high',
+      context_summary: '4 ngày • ngân sách 120000 yên • nhóm: gia đình',
       replacements: [{ original: 'Beach', replacement: 'Aquarium', reason: 'mưa to' }],
-      updated_itinerary: ['Aquarium', 'Dinner ngoài trời']
+      updated_days: [{ day: 1, activities: [{ original: 'Beach', text: 'Aquarium', changed: true, reason: 'mưa to' }] }]
     }, 'vi');
+    assert.match(html, /Tình huống/);
+    assert.match(html, /Mức độ: high/);
+    assert.match(html, /Bám theo plan Tab 1/);
     assert.match(html, /Beach/);
     assert.match(html, /Aquarium/);
     assert.match(html, /mưa to/);
-    assert.match(html, /chưa xác minh giờ mở cửa/);
+    assert.match(html, /changed-item/);
+    assert.match(html, /reason-tag/);
   });
-  test('renders replacements in Japanese', () => {
+  test('renders fallback updated_itinerary in Japanese', () => {
     const html = renderHealHtml({
       replacements: [{ original: 'Beach', replacement: 'Aquarium', reason: '大雨のため' }],
       updated_itinerary: ['Aquarium']
@@ -227,6 +235,52 @@ describe('renderHealHtml', () => {
   test('falls back to a localized placeholder when nothing changed', () => {
     assert.equal(renderHealHtml({}, 'vi'), 'Không có thay đổi.');
     assert.equal(renderHealHtml({}, 'ja'), '変更はありません。');
+  });
+});
+
+describe('classifyIncident', () => {
+  test('classifies severe weather as high', () => {
+    assert.equal(classifyIncident('Mưa rất to và gió mạnh').severity, 'high');
+    assert.equal(classifyIncident('Typhoon warning near coast').type, 'storm');
+  });
+  test('keeps mild weather below high', () => {
+    assert.equal(classifyIncident('mưa nhẹ').severity, 'medium');
+    assert.equal(classifyIncident('trời nhiều mây').severity, 'low');
+  });
+});
+
+describe('buildSelfHealingPlan', () => {
+  test('keeps indoor/transit activities and only replaces weather-sensitive ones', () => {
+    const plan = buildSelfHealingPlan(
+      {
+        days: [
+          { day: 1, activities: ['Đi đến Naha Airport', 'Đi biển Sunset Beach', 'Ăn trưa tại nhà hàng Yunangi'] }
+        ]
+      },
+      ['Đi đến Naha Airport', 'Đi biển Sunset Beach', 'Ăn trưa tại nhà hàng Yunangi'],
+      'Mưa to kèm gió mạnh',
+      { days: 4, budget: '120000', group: 'gia đình có trẻ em', notes: 'thích biển' }
+    );
+
+    const day1 = plan.updated_days[0].activities;
+    assert.equal(day1[0].text, 'Đi đến Naha Airport');
+    assert.equal(day1[0].changed, false);
+    assert.equal(day1[2].text, 'Ăn trưa tại nhà hàng Yunangi');
+    assert.equal(day1[2].changed, false);
+    assert.equal(day1[1].changed, true);
+    assert.ok(plan.replacements.length >= 1);
+  });
+
+  test('returns unchanged plan when weather is not severe', () => {
+    const plan = buildSelfHealingPlan(
+      { days: [{ day: 1, activities: ['Sunset Beach', 'Museum'] }] },
+      ['Sunset Beach', 'Museum'],
+      'mưa nhẹ',
+      { days: 2, budget: '90000', group: '2 người', notes: '' }
+    );
+    assert.equal(plan.replacements.length, 0);
+    assert.equal(plan.updated_days[0].activities[0].changed, false);
+    assert.equal(plan.updated_days[0].activities[0].text, 'Sunset Beach');
   });
 });
 
