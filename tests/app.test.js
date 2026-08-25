@@ -64,6 +64,12 @@ describe('tr', () => {
     assert.equal(tr('ja', 'common.dayLabel', 3), '3日目');
     assert.equal(tr('en', 'common.dayLabel', 3), 'Day 3');
   });
+  test('supports a localized start-date field in planner translations', () => {
+    assert.equal(tr('vi', 'planner.startDateLabel'), 'Ngày bắt đầu');
+    assert.equal(tr('ja', 'planner.startDateLabel'), '開始日');
+    assert.equal(tr('en', 'planner.startDateLabel'), 'Start date');
+    assert.match(tr('vi', 'planner.userPrompt', 'Okinawa', 4, '2026-08-31', '80000', 'Vợ chồng', 'Thuê xe'), /2026-08-31/);
+  });
   test('falls back to vi when the key is missing in the requested language', () => {
     // 'xx' is not a supported language, so normalizeLang() coerces it to 'vi'.
     assert.equal(tr('xx', 'planner.runBtn'), 'Tạo lịch trình');
