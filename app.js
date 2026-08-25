@@ -55,6 +55,7 @@ const I18N = {
       title: 'Tạo lịch trình tự động',
       destLabel: 'Điểm đến',
       daysLabel: 'Số ngày',
+      startDateLabel: 'Ngày bắt đầu',
       budgetLabel: 'Ngân sách (yên / tổng)',
       budgetPlaceholder: '80000',
       groupLabel: 'Thành phần nhóm',
@@ -65,7 +66,7 @@ const I18N = {
       shareBtn: '📤 Chia sẻ',
       loading: 'Đang tạo lịch trình...',
       systemPrompt: 'Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. QUAN TRỌNG VỀ SỐ NGÀY: mảng "days" PHẢI có ĐỦ và ĐÚNG số ngày người dùng yêu cầu — không được rút gọn hay chỉ trả về 1 ngày nếu người dùng yêu cầu nhiều ngày hơn. Đánh số "day" liên tục từ 1 đến hết số ngày được yêu cầu, mỗi ngày một phần tử riêng trong mảng. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt), không kèm text hay markdown code fence nào khác. Ví dụ schema cho chuyến 2 ngày (số phần tử trong "days" phải khớp đúng số ngày người dùng thực sự yêu cầu, không phải cố định theo ví dụ này):\n{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Ăn trưa gần đó","Cape Manzamo","Ăn tối hải sản"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}',
-      userPrompt: (dest, days, budget, group, notes) => `Lên lịch trình du lịch ${dest}, ĐÚNG ${days} ngày — mảng "days" phải có đủ ${days} phần tử, đánh số day từ 1 đến ${days}, không được thiếu ngày nào. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực. Nhắc lại: PHẢI có đủ ${days} ngày trong kết quả.`
+      userPrompt: (dest, days, startDate, budget, group, notes) => `Lên lịch trình du lịch ${dest}, bắt đầu từ ngày ${startDate || 'chưa xác định'}, ĐÚNG ${days} ngày — mảng "days" phải có đủ ${days} phần tử, đánh số day từ 1 đến ${days}, không được thiếu ngày nào. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Nếu ${startDate} là ngày du lịch cụ thể, hãy tính đến ngày nghỉ lễ, cuối tuần hoặc thời điểm đi để chọn hoạt động phù hợp. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực. Nhắc lại: PHẢI có đủ ${days} ngày trong kết quả.`
     },
     group: {
       title: 'Chấm điểm địa điểm cho cả nhóm',
@@ -203,6 +204,7 @@ const I18N = {
       title: '旅程を自動作成',
       destLabel: '目的地',
       daysLabel: '日数',
+      startDateLabel: '開始日',
       budgetLabel: '予算（円・合計）',
       budgetPlaceholder: '80000',
       groupLabel: 'メンバー構成',
@@ -213,7 +215,7 @@ const I18N = {
       shareBtn: '📤 共有',
       loading: '旅程を作成中...',
       systemPrompt: 'あなたはAI Travel Companion、パーソナライズされた旅行プランニングアシスタントです。日数について重要：「days」配列には、ユーザーが要求した日数と必ず同じ数の要素を含めてください — ユーザーが複数日を要求した場合に1日分だけ返すことは禁止です。「day」は要求された日数の分だけ1から連番で振ってください（配列の要素ごとに1日）。各アクティビティにはGoogleマップで検索できる具体的な店名・施設名を含めてください（例：「昼食はランチのみ」ではなく「Yunangi Okinawan Cuisineで昼食」）。あなたはリアルタイム情報を持たないため、営業時間・住所・電話番号・実際の交通状況や移動距離を断定してはいけません — アクティビティの順序は一般的な妥当性（例：午後はビーチ、1日の終わりに夕日鑑賞）に基づく推測に留め、経路が最適化されている、または渋滞を確認したとは主張しないでください。必ずJSONのみで回答し（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）、それ以外のテキストやMarkdownのコードフェンスは付けないでください。2日間の旅行のスキーマ例（「days」の要素数は必ずユーザーが実際に要求した日数に合わせること。この例の日数に固定しないこと）：\n{"days":[{"day":1,"activities":["那覇空港","Yunangi Okinawan Cuisineで昼食","American Village","サンセットビーチ","Steak House 88で夕食"]},{"day":2,"activities":["美ら海水族館","近くで昼食","万座毛","海鮮の夕食"]}],"summary":"概算費用と主な注意点についての1〜2文。出発前に実際の営業時間を確認するよう促すこと"}',
-      userPrompt: (dest, days, budget, group, notes) => `${dest}への旅行プランを作成してください。日数は必ず${days}日間 — 「days」配列には${days}個の要素を含め、dayは1から${days}まで振ってください。欠けている日があってはいけません。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。念のため繰り返しますが、結果には必ず${days}日分すべてを含めてください。`
+      userPrompt: (dest, days, startDate, budget, group, notes) => `${dest}への旅行プランを作成してください。開始日は${startDate || '未指定'}、日数は必ず${days}日間 — 「days」配列には${days}個の要素を含め、dayは1から${days}まで振ってください。欠けている日があってはいけません。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n開始日${startDate || '未指定'}を踏まえて、連休・週末・祝日などの影響も考慮し、1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。念のため繰り返しますが、結果には必ず${days}日分すべてを含めてください。`
     },
     group: {
       title: 'グループ全員向けにスポットを採点',
@@ -351,6 +353,7 @@ const I18N = {
       title: 'Create an itinerary',
       destLabel: 'Destination',
       daysLabel: 'Number of days',
+      startDateLabel: 'Start date',
       budgetLabel: 'Budget (JPY / total)',
       budgetPlaceholder: '80000',
       groupLabel: 'Group composition',
@@ -361,7 +364,7 @@ const I18N = {
       shareBtn: '📤 Share',
       loading: 'Creating itinerary...',
       systemPrompt: 'You are AI Travel Companion, a personalized trip-planning assistant. IMPORTANT ABOUT DAY COUNT: the "days" array MUST contain exactly as many elements as the number of days the user asked for — never collapse a multi-day trip down to just 1 day. Number "day" consecutively from 1 through the requested number of days, one array element per day. Every activity should name a specific place/venue that can be looked up on Google Maps (e.g. "Lunch at Yunangi Okinawan Cuisine" instead of just "Lunch"). You have NO real-time data, so you must NOT assert opening hours, addresses, phone numbers, or real traffic conditions/travel distances for any place — the order of activities should only reflect general reasonable judgment (e.g. beach in the afternoon, sunset viewing at the end of the day), and you must not claim the route is optimized or that you checked real traffic. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English), with no other text or markdown code fences. Example schema for a 2-day trip (the number of elements in "days" must match whatever number of days the user actually asked for, not this example\'s count):\n{"days":[{"day":1,"activities":["Naha Airport","Lunch at Yunangi Okinawan Cuisine","American Village","Sunset Beach","Dinner at Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Lunch nearby","Cape Manzamo","Seafood dinner"]}],"summary":"1-2 sentences summarizing estimated cost and key notes, reminding the user to verify real opening hours before going"}',
-      userPrompt: (dest, days, budget, group, notes) => `Plan a trip to ${dest} for EXACTLY ${days} days — the "days" array must contain ${days} elements, numbered day 1 through ${days}, with no day missing. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nOrder activities sensibly through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and an experience that suits the whole group. You don't need to guarantee opening hours or exact travel distances since you have no real-time data. To be clear: the result must include all ${days} days.`
+      userPrompt: (dest, days, startDate, budget, group, notes) => `Plan a trip to ${dest} starting on ${startDate || 'an unspecified date'} for EXACTLY ${days} days — the "days" array must contain ${days} elements, numbered day 1 through ${days}, with no day missing. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nConsider holidays, weekends, and the time of year represented by ${startDate || 'the chosen trip start date'} when ordering activities through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and group-friendly experiences. Since you do not have real-time data, you do not need to guarantee opening hours or exact travel distances. To be clear: the result must include all ${days} days.`
     },
     group: {
       title: 'Score a place for the whole group',
@@ -1198,6 +1201,7 @@ function initApp() {
   // ---------- TAB 1: Trip Planner ----------
   const pDest = document.getElementById('p-dest');
   const pDays = document.getElementById('p-days');
+  const pStart = document.getElementById('p-start');
   const pBudget = document.getElementById('p-budget');
   const pGroup = document.getElementById('p-group');
   const pNotes = document.getElementById('p-notes');
@@ -1231,6 +1235,7 @@ function initApp() {
     return {
       destination: pDest.value.trim() || fallback.destination || tripState.destination || '',
       days: pDays.value || fallback.days || '',
+      startDate: pStart.value || fallback.startDate || '',
       budget: pBudget.value || fallback.budget || T('common.unlimitedBudget'),
       group: pGroup.value.trim() || fallback.group || T('common.soloTraveler'),
       notes: pNotes.value.trim() || fallback.notes || ''
@@ -1252,6 +1257,7 @@ function initApp() {
     tripState.plannerContext = {
       destination: context.destination || tripState.destination || '',
       days: context.days || '',
+      startDate: context.startDate || '',
       budget: context.budget || T('common.unlimitedBudget'),
       group: context.group || T('common.soloTraveler'),
       notes: context.notes || ''
@@ -1260,18 +1266,19 @@ function initApp() {
   }
 
   function plannerInputs() {
-    return { dest: pDest.value, days: pDays.value, budget: pBudget.value, group: pGroup.value, notes: pNotes.value };
+    return { dest: pDest.value, days: pDays.value, startDate: pStart.value, budget: pBudget.value, group: pGroup.value, notes: pNotes.value };
   }
   function savePlannerState(extra) {
     safeSave(STORAGE_KEYS.planner, Object.assign(plannerInputs(), extra));
   }
-  [pDest, pDays, pBudget, pGroup, pNotes].forEach(el => el.addEventListener('input', () => savePlannerState({})));
+  [pDest, pDays, pStart, pBudget, pGroup, pNotes].forEach(el => el.addEventListener('input', () => savePlannerState({})));
 
   (function restorePlanner() {
     const saved = safeLoad(STORAGE_KEYS.planner);
     if (!saved) return;
     if (saved.dest) pDest.value = saved.dest;
     if (saved.days) pDays.value = saved.days;
+    if (saved.startDate) pStart.value = saved.startDate;
     if (saved.budget) pBudget.value = saved.budget;
     if (saved.group) pGroup.value = saved.group;
     if (saved.notes) pNotes.value = saved.notes;
@@ -1279,6 +1286,7 @@ function initApp() {
       updateTripStateFromPlannerData(saved.data, {
         destination: saved.dest || '',
         days: saved.days || '',
+        startDate: saved.startDate || '',
         budget: saved.budget || '',
         group: saved.group || '',
         notes: saved.notes || ''
@@ -1291,17 +1299,18 @@ function initApp() {
   document.getElementById('p-run').addEventListener('click', async () => {
     const dest = pDest.value.trim() || 'Okinawa';
     const days = pDays.value || 4;
+    const startDate = pStart.value || '';
     const budget = pBudget.value || T('common.unlimitedBudget');
     const group = pGroup.value.trim() || T('common.soloTraveler');
     const notes = pNotes.value.trim();
     setLoading(pResult, true, T('planner.loading'));
 
     const system = T('planner.systemPrompt');
-    const user = tr(currentLang, 'planner.userPrompt', dest, days, budget, group, notes);
+    const user = tr(currentLang, 'planner.userPrompt', dest, days, startDate, budget, group, notes);
 
     try {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
-      updateTripStateFromPlannerData(data, { destination: dest, days, budget, group, notes });
+      updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
