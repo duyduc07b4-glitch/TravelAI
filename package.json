@@ -1,0 +1,9 @@
+{
+  "name": "ai-travel-companion",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Travel Companion — local prototype (no build step; app.html/app.js/style.css are served as static files)",
+  "scripts": {
+    "test": "node --test"
+  }
+}
