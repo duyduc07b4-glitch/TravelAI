@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const {
   escapeHtml, mapLink, venueWarning, weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
-  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
+  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   classifyIncident, buildSelfHealingPlan,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
@@ -208,6 +208,41 @@ describe('renderPlannerHtml', () => {
   test('does not warn when no requestedDays is given (e.g. restoring old saved state)', () => {
     const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Beach'] }] }, 'Okinawa', 'vi');
     assert.doesNotMatch(html, /error-box/);
+  });
+});
+
+describe('formatPlannerShareText', () => {
+  const data = {
+    days: [
+      { day: 1, activities: ['Naha Airport', 'Lunch at Yunangi'] },
+      { day: 2, activities: ['Churaumi Aquarium'] }
+    ],
+    summary: 'Estimated cost: 80000 JPY.'
+  };
+  test('produces plain text with no HTML markup (vi)', () => {
+    const text = formatPlannerShareText(data, 'Okinawa', 'vi');
+    assert.doesNotMatch(text, /<[a-z]/i);
+    assert.match(text, /Okinawa/);
+    assert.match(text, /Naha Airport/);
+    assert.match(text, /Churaumi Aquarium/);
+    assert.match(text, /Estimated cost: 80000 JPY\./);
+    assert.match(text, /Tạo bằng AI Travel Companion/);
+  });
+  test('localizes the day labels and attribution line (ja)', () => {
+    const text = formatPlannerShareText(data, 'Okinawa', 'ja');
+    assert.match(text, /1日目/);
+    assert.match(text, /2日目/);
+    assert.match(text, /AI Travel Companionで作成/);
+  });
+  test('skips malformed day entries instead of throwing', () => {
+    const text = formatPlannerShareText({ days: [null, { day: 2, activities: [] }, { day: 3, activities: ['Beach'] }] }, 'X', 'en');
+    assert.doesNotMatch(text, /Day 2/);
+    assert.match(text, /Day 3/);
+  });
+  test('omits the summary line when there is no summary', () => {
+    const text = formatPlannerShareText({ days: [{ day: 1, activities: ['Beach'] }] }, 'X', 'en');
+    assert.match(text, /Beach/);
+    assert.match(text, /Made with AI Travel Companion/);
   });
 });
 

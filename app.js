@@ -32,6 +32,9 @@ const I18N = {
       noChange: 'Không có thay đổi.',
       dayCountMismatch: (actual, requested) => `⚠️ Bạn yêu cầu ${requested} ngày nhưng AI chỉ tạo được ${actual} ngày — model có thể quá nhỏ để giữ đúng số ngày dài. Thử bấm "Tạo lịch trình" lại lần nữa, hoặc đổi sang model mạnh hơn (VD: llama3.1, qwen2.5).`,
       aiFinal: '🤖 AI chốt:',
+      copied: '✅ Đã copy lịch trình vào clipboard!',
+      shareFailed: '⚠️ Không tự copy được — hãy chọn và copy đoạn văn bản dưới đây.',
+      sharedVia: 'Tạo bằng AI Travel Companion 🗺️',
       criteriaHeader: 'Tiêu chí',
       scoreHeader: 'Điểm',
       changesHeader: 'Thay đổi',
@@ -59,6 +62,7 @@ const I18N = {
       notesLabel: 'Ghi chú thêm (phương tiện, sở thích...)',
       notesPlaceholder: 'Thuê xe, thích hải sản, thích biển',
       runBtn: 'Tạo lịch trình',
+      shareBtn: '📤 Chia sẻ',
       loading: 'Đang tạo lịch trình...',
       systemPrompt: 'Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. QUAN TRỌNG VỀ SỐ NGÀY: mảng "days" PHẢI có ĐỦ và ĐÚNG số ngày người dùng yêu cầu — không được rút gọn hay chỉ trả về 1 ngày nếu người dùng yêu cầu nhiều ngày hơn. Đánh số "day" liên tục từ 1 đến hết số ngày được yêu cầu, mỗi ngày một phần tử riêng trong mảng. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt), không kèm text hay markdown code fence nào khác. Ví dụ schema cho chuyến 2 ngày (số phần tử trong "days" phải khớp đúng số ngày người dùng thực sự yêu cầu, không phải cố định theo ví dụ này):\n{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Ăn trưa gần đó","Cape Manzamo","Ăn tối hải sản"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}',
       userPrompt: (dest, days, budget, group, notes) => `Lên lịch trình du lịch ${dest}, ĐÚNG ${days} ngày — mảng "days" phải có đủ ${days} phần tử, đánh số day từ 1 đến ${days}, không được thiếu ngày nào. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực. Nhắc lại: PHẢI có đủ ${days} ngày trong kết quả.`
@@ -176,6 +180,9 @@ const I18N = {
       noChange: '変更はありません。',
       dayCountMismatch: (actual, requested) => `⚠️ ${requested}日間を指定しましたが、AIは${actual}日分しか作成しませんでした — モデルが小さく、長い日数を正しく保持できない可能性があります。もう一度「旅程を作成」を試すか、より強力なモデル（例：llama3.1、qwen2.5）に変更してください。`,
       aiFinal: '🤖 AIの結論：',
+      copied: '✅ 旅程をクリップボードにコピーしました！',
+      shareFailed: '⚠️ 自動コピーできませんでした — 下のテキストを選択してコピーしてください。',
+      sharedVia: 'AI Travel Companionで作成 🗺️',
       criteriaHeader: '項目',
       scoreHeader: 'スコア',
       changesHeader: '変更点',
@@ -203,6 +210,7 @@ const I18N = {
       notesLabel: '補足（交通手段・好みなど）',
       notesPlaceholder: 'レンタカー希望、魚介類が好き、海が好き',
       runBtn: '旅程を作成',
+      shareBtn: '📤 共有',
       loading: '旅程を作成中...',
       systemPrompt: 'あなたはAI Travel Companion、パーソナライズされた旅行プランニングアシスタントです。日数について重要：「days」配列には、ユーザーが要求した日数と必ず同じ数の要素を含めてください — ユーザーが複数日を要求した場合に1日分だけ返すことは禁止です。「day」は要求された日数の分だけ1から連番で振ってください（配列の要素ごとに1日）。各アクティビティにはGoogleマップで検索できる具体的な店名・施設名を含めてください（例：「昼食はランチのみ」ではなく「Yunangi Okinawan Cuisineで昼食」）。あなたはリアルタイム情報を持たないため、営業時間・住所・電話番号・実際の交通状況や移動距離を断定してはいけません — アクティビティの順序は一般的な妥当性（例：午後はビーチ、1日の終わりに夕日鑑賞）に基づく推測に留め、経路が最適化されている、または渋滞を確認したとは主張しないでください。必ずJSONのみで回答し（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）、それ以外のテキストやMarkdownのコードフェンスは付けないでください。2日間の旅行のスキーマ例（「days」の要素数は必ずユーザーが実際に要求した日数に合わせること。この例の日数に固定しないこと）：\n{"days":[{"day":1,"activities":["那覇空港","Yunangi Okinawan Cuisineで昼食","American Village","サンセットビーチ","Steak House 88で夕食"]},{"day":2,"activities":["美ら海水族館","近くで昼食","万座毛","海鮮の夕食"]}],"summary":"概算費用と主な注意点についての1〜2文。出発前に実際の営業時間を確認するよう促すこと"}',
       userPrompt: (dest, days, budget, group, notes) => `${dest}への旅行プランを作成してください。日数は必ず${days}日間 — 「days」配列には${days}個の要素を含め、dayは1から${days}まで振ってください。欠けている日があってはいけません。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。念のため繰り返しますが、結果には必ず${days}日分すべてを含めてください。`
@@ -320,6 +328,9 @@ const I18N = {
       noChange: 'No changes.',
       dayCountMismatch: (actual, requested) => `⚠️ You asked for ${requested} days but the AI only generated ${actual} — the model might be too small to hold onto a long day count. Try clicking "Create itinerary" again, or switch to a stronger model (e.g. llama3.1, qwen2.5).`,
       aiFinal: '🤖 AI\'s call:',
+      copied: '✅ Itinerary copied to clipboard!',
+      shareFailed: '⚠️ Could not auto-copy — select and copy the text below manually.',
+      sharedVia: 'Made with AI Travel Companion 🗺️',
       criteriaHeader: 'Criteria',
       scoreHeader: 'Score',
       changesHeader: 'Changes',
@@ -347,6 +358,7 @@ const I18N = {
       notesLabel: 'Notes (transport, preferences...)',
       notesPlaceholder: 'Renting a car, love seafood, love the beach',
       runBtn: 'Create itinerary',
+      shareBtn: '📤 Share',
       loading: 'Creating itinerary...',
       systemPrompt: 'You are AI Travel Companion, a personalized trip-planning assistant. IMPORTANT ABOUT DAY COUNT: the "days" array MUST contain exactly as many elements as the number of days the user asked for — never collapse a multi-day trip down to just 1 day. Number "day" consecutively from 1 through the requested number of days, one array element per day. Every activity should name a specific place/venue that can be looked up on Google Maps (e.g. "Lunch at Yunangi Okinawan Cuisine" instead of just "Lunch"). You have NO real-time data, so you must NOT assert opening hours, addresses, phone numbers, or real traffic conditions/travel distances for any place — the order of activities should only reflect general reasonable judgment (e.g. beach in the afternoon, sunset viewing at the end of the day), and you must not claim the route is optimized or that you checked real traffic. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English), with no other text or markdown code fences. Example schema for a 2-day trip (the number of elements in "days" must match whatever number of days the user actually asked for, not this example\'s count):\n{"days":[{"day":1,"activities":["Naha Airport","Lunch at Yunangi Okinawan Cuisine","American Village","Sunset Beach","Dinner at Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Lunch nearby","Cape Manzamo","Seafood dinner"]}],"summary":"1-2 sentences summarizing estimated cost and key notes, reminding the user to verify real opening hours before going"}',
       userPrompt: (dest, days, budget, group, notes) => `Plan a trip to ${dest} for EXACTLY ${days} days — the "days" array must contain ${days} elements, numbered day 1 through ${days}, with no day missing. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nOrder activities sensibly through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and an experience that suits the whole group. You don't need to guarantee opening hours or exact travel distances since you have no real-time data. To be clear: the result must include all ${days} days.`
@@ -564,6 +576,24 @@ function renderPlannerHtml(data, dest, lang, requestedDays) {
   if (data.summary) html += `<div class="summary-note">${escapeHtml(data.summary)}</div>`;
   html += `<div class="summary-note">${tr(lang, 'common.plannerDisclaimer')}</div>`;
   return html;
+}
+
+/** Plain-text version of a planner itinerary, for sharing/copying (no HTML markup). */
+function formatPlannerShareText(data, dest, lang) {
+  const lines = [`🗺️ ${dest}`];
+  (data.days || []).forEach((d, i) => {
+    if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
+    lines.push('');
+    lines.push(String(tr(lang, 'common.dayLabel', d.day || (i + 1))));
+    d.activities.forEach(a => lines.push(`- ${a}`));
+  });
+  if (data.summary) {
+    lines.push('');
+    lines.push(data.summary);
+  }
+  lines.push('');
+  lines.push(tr(lang, 'common.sharedVia'));
+  return lines.join('\n');
 }
 
 function renderGroupScoreTableHtml(data, lang) {
@@ -901,7 +931,7 @@ const AppCore = {
   escapeHtml, mapLink, venueWarning,
   weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
-  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
+  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   dedupePlanItems, flattenActivities, normalizeHealedText,
   classifyIncident, isSevereWeatherIncident, classifyActivity,
   parseBudgetNumber, buildPlannerContextSummary, buildSelfHealingPlan,
@@ -1111,6 +1141,60 @@ function initApp() {
     el.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(err.message)}</div>`;
   }
 
+  /**
+   * Copies text to the clipboard. Tries the modern async Clipboard API first, but that
+   * API only works in a "secure context" (HTTPS, or http://localhost) — it's unavailable
+   * when this app is opened from a phone via a plain-http LAN IP, which the README lists
+   * as a supported way to use the app. document.execCommand('copy') via a hidden textarea
+   * is deprecated but has no such restriction, so it's kept as the fallback.
+   */
+  async function copyTextRobust(text) {
+    if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText) {
+      try { await navigator.clipboard.writeText(text); return true; } catch (e) { /* fall through */ }
+    }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (ok) return true;
+    } catch (e) { /* fall through */ }
+    return false;
+  }
+
+  /** Tries the native share sheet first (great on phones), falls back to copying. */
+  async function shareOrCopy(text, title) {
+    if (navigator.share) {
+      try {
+        await navigator.share({ text, title });
+        return 'shared';
+      } catch (err) {
+        if (err.name === 'AbortError') return 'cancelled';
+        // any other share error (e.g. no share target) — fall through to copy
+      }
+    }
+    return (await copyTextRobust(text)) ? 'copied' : 'failed';
+  }
+
+  /** Last-resort fallback: show the text in a selected, read-only textarea for manual copy. */
+  function showManualCopyBox(container, text, message) {
+    container.innerHTML = `<div>${escapeHtml(message)}</div>`;
+    const ta = document.createElement('textarea');
+    ta.readOnly = true;
+    ta.value = text;
+    ta.style.width = '100%';
+    ta.style.minHeight = '120px';
+    ta.style.marginTop = '6px';
+    container.appendChild(ta);
+    ta.focus();
+    ta.select();
+  }
+
   // ---------- TAB 1: Trip Planner ----------
   const pDest = document.getElementById('p-dest');
   const pDays = document.getElementById('p-days');
@@ -1118,6 +1202,29 @@ function initApp() {
   const pGroup = document.getElementById('p-group');
   const pNotes = document.getElementById('p-notes');
   const pResult = document.getElementById('p-result');
+  const pShare = document.getElementById('p-share');
+  const pShareFeedback = document.getElementById('p-shareFeedback');
+  let lastPlannerShare = null;
+
+  function updatePlannerShareState(data, dest) {
+    const hasContent = (data.days || []).some(d => d && Array.isArray(d.activities) && d.activities.length);
+    lastPlannerShare = hasContent ? { data, dest } : null;
+    pShare.style.display = hasContent ? '' : 'none';
+    pShareFeedback.innerHTML = '';
+  }
+
+  pShare.addEventListener('click', async () => {
+    if (!lastPlannerShare) return;
+    const text = formatPlannerShareText(lastPlannerShare.data, lastPlannerShare.dest, currentLang);
+    pShareFeedback.innerHTML = '';
+    const result = await shareOrCopy(text, T('planner.title'));
+    if (result === 'copied') {
+      pShareFeedback.textContent = T('common.copied');
+    } else if (result === 'failed') {
+      showManualCopyBox(pShareFeedback, text, T('common.shareFailed'));
+    }
+    // 'shared' (native share sheet handled it) and 'cancelled' (user dismissed it) need no feedback.
+  });
 
   function getPlannerContext() {
     const fallback = tripState.plannerContext || {};
@@ -1177,6 +1284,7 @@ function initApp() {
         notes: saved.notes || ''
       });
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(saved.data, saved.dest || '', currentLang, saved.days)}</div>`;
+      updatePlannerShareState(saved.data, saved.dest || '');
     }
   })();
 
@@ -1195,8 +1303,9 @@ function initApp() {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
       updateTripStateFromPlannerData(data, { destination: dest, days, budget, group, notes });
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}</div>`;
+      updatePlannerShareState(data, dest);
       savePlannerState({ data });
-    } catch (err) { showError(pResult, err); }
+    } catch (err) { showError(pResult, err); pShare.style.display = 'none'; }
   });
 
   // ---------- TAB 2: Group Matching ----------
