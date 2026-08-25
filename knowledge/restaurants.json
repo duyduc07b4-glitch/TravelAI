@@ -1,0 +1,482 @@
+[
+  {
+    "name": "BBQ Naha Grill",
+    "cuisine": "Đồ nướng, Orion Beer",
+    "hours": "11:00-23:00",
+    "priceRange": "2000-3000 yên/người",
+    "address": "Naha, Okinawa",
+    "kidFriendly": true,
+    "rating": 4.8,
+    "notes": "Có menu tiếng Anh, phù hợp nhóm 4-6 người, cách American Village khoảng 350m."
+  },
+  {
+    "name": "American Village Seafood House",
+    "cuisine": "Hải sản",
+    "hours": "10:30-22:00",
+    "priceRange": "3000-5000 yên/người",
+    "address": "Chatan, Okinawa",
+    "kidFriendly": true,
+    "rating": 4.5,
+    "notes": "View biển, đông khách vào buổi tối cuối tuần."
+  },
+  {
+    "name": "Kokusai Dori Ramen",
+    "cuisine": "Ramen, đồ ăn nhanh",
+    "hours": "11:00-21:00",
+    "priceRange": "800-1200 yên/người",
+    "address": "Kokusai Street, Naha",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Giá rẻ, phục vụ nhanh, phù hợp bữa trưa."
+  },
+  {
+    "name": "Churaumi Cafe & Grill",
+    "cuisine": "Món địa phương Okinawa",
+    "hours": "09:00-18:00",
+    "priceRange": "1500-2500 yên/người",
+    "address": "Motobu, gần Churaumi Aquarium",
+    "kidFriendly": true,
+    "rating": 4.4,
+    "notes": "Gần Churaumi Aquarium, thích hợp ăn trưa sau khi tham quan."
+  },
+  {
+    "name": "Sunset Beach Bar",
+    "cuisine": "Đồ nhắm, bia, hải sản nhẹ",
+    "hours": "16:00-24:00",
+    "priceRange": "2500-4000 yên/người",
+    "address": "Sunset Beach, Chatan",
+    "kidFriendly": false,
+    "rating": 4.6,
+    "notes": "Có Orion Beer, view hoàng hôn đẹp, không gian dành cho người lớn."
+  },
+  {
+    "name": "A&W (Okinawa, chuỗi drive-in Mỹ)",
+    "cuisine": "Burger, root beer, đồ ăn nhanh kiểu Mỹ",
+    "hours": "07:00-24:00 (nhiều chi nhánh 24h)",
+    "priceRange": "800-1500 yên/người",
+    "address": "Nhiều chi nhánh: Chatan, Okinawa City, Naha",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Thương hiệu Mỹ duy nhất chỉ còn tồn tại ở Okinawa tại Nhật, đặc sản root beer float, phong cách drive-in đặc trưng thời Mỹ đóng quân. Giờ thực tế khác nhau theo chi nhánh, nên kiểm tra lại từng cửa hàng."
+  },
+  {
+    "name": "Yunangi (ゆうなんぎい)",
+    "cuisine": "Ẩm thực Ryukyu/Okinawa truyền thống",
+    "hours": "11:30-15:00, 17:00-22:00 (nghỉ trưa giữa 2 ca)",
+    "priceRange": "1500-3000 yên/người",
+    "address": "Kumoji, gần Kokusai Street, Naha",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Nhà hàng lâu năm nổi tiếng ở Naha, món đặc trưng: mimigaa (tai heo), rafute (thịt kho Okinawa), soki soba. Nên đặt trước vào giờ cao điểm."
+  },
+  {
+    "name": "Steak House 88 (Kokusai Dori)",
+    "cuisine": "Steak kiểu Mỹ-Nhật (Okinawa nổi tiếng văn hóa ăn steak từ thời Mỹ đóng quân)",
+    "hours": "11:00-23:00",
+    "priceRange": "2000-4500 yên/người",
+    "address": "Kokusai Street, Naha",
+    "kidFriendly": true,
+    "rating": 4.1,
+    "notes": "Chuỗi steak house lâu đời ở Okinawa, nhiều chi nhánh trên đảo, phù hợp cả gia đình."
+  },
+  {
+    "name": "Blue Seal Ice Park",
+    "cuisine": "Kem Blue Seal (đặc sản Okinawa, ảnh hưởng ẩm thực Mỹ)",
+    "hours": "10:00-20:00",
+    "priceRange": "500-1000 yên/người",
+    "address": "Okinawa City (Koza)",
+    "kidFriendly": true,
+    "rating": 4.4,
+    "notes": "Thương hiệu kem lâu đời của Okinawa, có khu trải nghiệm/lịch sử thương hiệu, rất hợp với trẻ em."
+  },
+  {
+    "name": "Naha Soba Dokoro",
+    "cuisine": "Okinawa soba",
+    "hours": "10:30-20:00",
+    "priceRange": "700-1100 yên/người",
+    "address": "Naha, gần Kokusai Street",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Quán soba truyền thống, nước dùng xương heo, phù hợp bữa trưa nhanh."
+  },
+  {
+    "name": "Makishi Public Market Food Court",
+    "cuisine": "Hải sản tươi, chợ hải sản",
+    "hours": "08:00-21:00",
+    "priceRange": "1500-3500 yên/người",
+    "address": "Makishi, Naha",
+    "kidFriendly": true,
+    "rating": 4.5,
+    "notes": "Mua hải sản tầng 1, mang lên tầng 2 chế biến tại chỗ; trải nghiệm ẩm thực đặc trưng Naha."
+  },
+  {
+    "name": "Chanpuru Shokudo",
+    "cuisine": "Chanpuru (xào kiểu Okinawa)",
+    "hours": "11:00-21:30",
+    "priceRange": "900-1500 yên/người",
+    "address": "Naha",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Món goya chanpuru, tofu chanpuru, quán gia đình bình dân."
+  },
+  {
+    "name": "Taco Rice House",
+    "cuisine": "Taco rice (đặc sản lai Mỹ-Nhật)",
+    "hours": "11:00-22:00",
+    "priceRange": "800-1300 yên/người",
+    "address": "Kin Town, gần căn cứ quân sự Mỹ",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Nơi khai sinh món taco rice, quán lâu năm được nhiều khách quốc tế ghé."
+  },
+  {
+    "name": "Ryukyu Awamori Bar Kumesen",
+    "cuisine": "Awamori (rượu Okinawa), đồ nhắm",
+    "hours": "18:00-01:00",
+    "priceRange": "3000-5000 yên/người",
+    "address": "Matsuyama, Naha",
+    "kidFriendly": false,
+    "rating": 4.4,
+    "notes": "Chuyên rượu awamori lâu năm, không gian dành cho người lớn, phù hợp buổi tối."
+  },
+  {
+    "name": "Depot Island Grill",
+    "cuisine": "BBQ, đồ nướng, hải sản",
+    "hours": "11:00-23:00",
+    "priceRange": "2500-4000 yên/người",
+    "address": "Depot Island, Chatan (gần American Village)",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Không gian ngoài trời, gần bến du thuyền, đông khách buổi tối cuối tuần."
+  },
+  {
+    "name": "Mihama Burger Terrace",
+    "cuisine": "Burger, đồ ăn nhanh kiểu Mỹ",
+    "hours": "10:00-22:00",
+    "priceRange": "1000-1800 yên/người",
+    "address": "Mihama, Chatan",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "View ra vòng quay Ferris wheel American Village, phù hợp gia đình có trẻ nhỏ."
+  },
+  {
+    "name": "Zanpa Misaki Seafood",
+    "cuisine": "Hải sản, sashimi",
+    "hours": "11:00-20:00",
+    "priceRange": "2000-3500 yên/người",
+    "address": "Gần Cape Zanpa, Yomitan",
+    "kidFriendly": true,
+    "rating": 4.5,
+    "notes": "Gần hải đăng Cape Zanpa, view biển đẹp, nên đi sớm để tránh đông."
+  },
+  {
+    "name": "Motobu Umi Cafe",
+    "cuisine": "Cafe, món nhẹ, hải sản",
+    "hours": "10:00-17:00",
+    "priceRange": "1000-2000 yên/người",
+    "address": "Motobu, gần Ocean Expo Park",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Phù hợp nghỉ chân trước/sau khi thăm Churaumi Aquarium."
+  },
+  {
+    "name": "Nago Pineapple Garden Cafe",
+    "cuisine": "Món tráng miệng, đặc sản dứa Okinawa",
+    "hours": "09:00-18:00",
+    "priceRange": "800-1500 yên/người",
+    "address": "Nago",
+    "kidFriendly": true,
+    "rating": 4.1,
+    "notes": "Đặc sản kem/bánh dứa, kết hợp tham quan vườn dứa."
+  },
+  {
+    "name": "Onna Sunset Terrace",
+    "cuisine": "Ý, hải sản, món nướng",
+    "hours": "11:30-21:00",
+    "priceRange": "3000-6000 yên/người",
+    "address": "Onna Village",
+    "kidFriendly": false,
+    "rating": 4.6,
+    "notes": "Nhà hàng resort view biển, phù hợp bữa tối lãng mạn, nên đặt trước."
+  },
+  {
+    "name": "Manza Beach Grill",
+    "cuisine": "BBQ hải sản, buffet",
+    "hours": "11:00-22:00",
+    "priceRange": "3500-5500 yên/người",
+    "address": "Manza Beach, Onna",
+    "kidFriendly": true,
+    "rating": 4.4,
+    "notes": "Gần bãi biển Manza, phù hợp nhóm đông người, có khu vực ngoài trời."
+  },
+  {
+    "name": "Ginowan Curry House",
+    "cuisine": "Cà ri Nhật kiểu Okinawa",
+    "hours": "11:00-21:00",
+    "priceRange": "900-1400 yên/người",
+    "address": "Ginowan",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Cà ri cay vừa phải, phần ăn lớn, giá bình dân."
+  },
+  {
+    "name": "Urasoe Ramen Ichiba",
+    "cuisine": "Ramen kiểu Nhật",
+    "hours": "11:00-22:00",
+    "priceRange": "900-1300 yên/người",
+    "address": "Urasoe",
+    "kidFriendly": true,
+    "rating": 4.1,
+    "notes": "Nước dùng tonkotsu đậm đà, phù hợp bữa tối nhanh gọn."
+  },
+  {
+    "name": "Itoman Fish Market Grill",
+    "cuisine": "Hải sản nướng, chợ cá",
+    "hours": "09:00-18:00",
+    "priceRange": "1500-3000 yên/người",
+    "address": "Itoman",
+    "kidFriendly": true,
+    "rating": 4.4,
+    "notes": "Gần cảng cá Itoman, hải sản tươi trong ngày, giá tốt hơn khu du lịch chính."
+  },
+  {
+    "name": "Nanjo Ocean View Cafe",
+    "cuisine": "Cafe, bánh ngọt, món nhẹ",
+    "hours": "10:00-18:00",
+    "priceRange": "1000-2000 yên/người",
+    "address": "Nanjo, gần Cape Chinen",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "View biển đẹp, phù hợp nghỉ chân buổi chiều, chụp ảnh."
+  },
+  {
+    "name": "Uruma Soki Soba",
+    "cuisine": "Soki soba (soba sườn heo)",
+    "hours": "10:30-19:30",
+    "priceRange": "800-1200 yên/người",
+    "address": "Uruma",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Quán địa phương ít khách du lịch, giá rẻ, sườn heo mềm."
+  },
+  {
+    "name": "Kadena Steak & Grill",
+    "cuisine": "Steak kiểu Mỹ",
+    "hours": "11:00-23:00",
+    "priceRange": "2500-4500 yên/người",
+    "address": "Kadena, gần căn cứ không quân",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Phong cách quán ăn Mỹ lâu đời, phần ăn lớn, không khí hoài cổ."
+  },
+  {
+    "name": "Yomitan Pottery Village Cafe",
+    "cuisine": "Cafe, món nhẹ",
+    "hours": "10:00-17:00",
+    "priceRange": "800-1500 yên/người",
+    "address": "Yomitan, gần làng gốm Yachimun no Sato",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Kết hợp tham quan làng gốm truyền thống, không gian yên tĩnh."
+  },
+  {
+    "name": "Chatan Fisherman's Wharf",
+    "cuisine": "Hải sản, đồ nướng",
+    "hours": "11:00-22:00",
+    "priceRange": "2500-4000 yên/người",
+    "address": "Chatan, gần cảng cá",
+    "kidFriendly": true,
+    "rating": 4.4,
+    "notes": "Hải sản đánh bắt trong ngày, view cảng cá, phù hợp bữa tối."
+  },
+  {
+    "name": "American Village Rooftop Bar",
+    "cuisine": "Cocktail, đồ nhắm, Orion Beer",
+    "hours": "17:00-01:00",
+    "priceRange": "3000-5000 yên/người",
+    "address": "American Village, Chatan",
+    "kidFriendly": false,
+    "rating": 4.5,
+    "notes": "View toàn cảnh American Village và vòng quay Ferris wheel về đêm."
+  },
+  {
+    "name": "Naha Airport Soba House",
+    "cuisine": "Okinawa soba nhanh gọn",
+    "hours": "07:00-20:30",
+    "priceRange": "700-1000 yên/người",
+    "address": "Sân bay Naha, khu vực trong nhà ga",
+    "kidFriendly": true,
+    "rating": 4.0,
+    "notes": "Phù hợp ăn nhanh trước/sau chuyến bay, phục vụ nhanh."
+  },
+  {
+    "name": "Kokusai Dori Sweets Cafe",
+    "cuisine": "Bánh ngọt, chè lạnh kiểu Okinawa (zenzai)",
+    "hours": "10:00-21:00",
+    "priceRange": "600-1200 yên/người",
+    "address": "Kokusai Street, Naha",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Món zenzai đá bào đặc trưng Okinawa, phù hợp nghỉ chân giữa buổi mua sắm."
+  },
+  {
+    "name": "Tsuboya Pottery Street Diner",
+    "cuisine": "Món địa phương, cơm trưa văn phòng",
+    "hours": "11:00-15:00, 17:30-21:00",
+    "priceRange": "900-1500 yên/người",
+    "address": "Tsuboya, Naha (phố gốm cổ)",
+    "kidFriendly": true,
+    "rating": 4.1,
+    "notes": "Khu phố gốm truyền thống, quán nhỏ ít khách du lịch, giá tốt."
+  },
+  {
+    "name": "Shuri Castle View Teahouse",
+    "cuisine": "Trà đạo, bánh ngọt truyền thống Ryukyu",
+    "hours": "09:00-17:00",
+    "priceRange": "1000-2000 yên/người",
+    "address": "Shuri, gần Shuri Castle",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Phù hợp nghỉ chân sau khi thăm Shuri Castle, có món chinsuko truyền thống."
+  },
+  {
+    "name": "Naminoue Beach Diner",
+    "cuisine": "Hải sản nhẹ, đồ uống",
+    "hours": "10:00-19:00",
+    "priceRange": "1200-2200 yên/người",
+    "address": "Gần bãi biển Naminoue, Naha",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Bãi biển gần trung tâm Naha nhất, phù hợp ăn nhẹ sau khi tắm biển."
+  },
+  {
+    "name": "Kerama Islands Ferry Cafe",
+    "cuisine": "Cafe, món nhẹ trước khi lên phà",
+    "hours": "07:00-16:00",
+    "priceRange": "600-1200 yên/người",
+    "address": "Tomari Port, Naha",
+    "kidFriendly": true,
+    "rating": 4.0,
+    "notes": "Phù hợp trước khi đi phà sang quần đảo Kerama lặn biển."
+  },
+  {
+    "name": "Ishigaki Beef Yakiniku",
+    "cuisine": "Thịt bò Ishigaki nướng (yakiniku)",
+    "hours": "17:00-23:00",
+    "priceRange": "4000-7000 yên/người",
+    "address": "Ishigaki Island",
+    "kidFriendly": true,
+    "rating": 4.7,
+    "notes": "Đặc sản bò Ishigaki nổi tiếng, nên đặt trước vào mùa cao điểm."
+  },
+  {
+    "name": "Miyako Soba Honpo",
+    "cuisine": "Miyako soba (khác biệt với Okinawa soba)",
+    "hours": "11:00-19:00",
+    "priceRange": "700-1100 yên/người",
+    "address": "Miyako Island",
+    "kidFriendly": true,
+    "rating": 4.3,
+    "notes": "Sợi mì tròn đặc trưng của Miyako, khác Okinawa soba truyền thống."
+  },
+  {
+    "name": "Kabira Bay Seafood Terrace",
+    "cuisine": "Hải sản, món nhẹ",
+    "hours": "10:00-18:00",
+    "priceRange": "1500-3000 yên/người",
+    "address": "Kabira Bay, Ishigaki",
+    "kidFriendly": true,
+    "rating": 4.5,
+    "notes": "View vịnh Kabira nổi tiếng, phù hợp nghỉ chân sau tour thuyền đáy kính."
+  },
+  {
+    "name": "Naha Kokusai Street Izakaya Umiryu",
+    "cuisine": "Izakaya, hải sản, awamori",
+    "hours": "17:00-24:00",
+    "priceRange": "3000-5000 yên/người",
+    "address": "Kokusai Street, Naha",
+    "kidFriendly": false,
+    "rating": 4.4,
+    "notes": "Không gian izakaya truyền thống, phù hợp nhóm bạn buổi tối."
+  },
+  {
+    "name": "Chatan Taco Truck Alley",
+    "cuisine": "Taco, burrito kiểu Mỹ-Mexico",
+    "hours": "11:00-21:00",
+    "priceRange": "800-1500 yên/người",
+    "address": "Chatan, gần American Village",
+    "kidFriendly": true,
+    "rating": 4.1,
+    "notes": "Cụm xe đồ ăn đường phố phong cách Mỹ, giá rẻ, ăn nhanh."
+  },
+  {
+    "name": "Naha Family Curry Buffet",
+    "cuisine": "Buffet cà ri, món Nhật",
+    "hours": "11:00-21:30",
+    "priceRange": "1500-2500 yên/người",
+    "address": "Naha (trong trung tâm thương mại)",
+    "kidFriendly": true,
+    "rating": 4.0,
+    "notes": "Buffet giá cố định, phù hợp gia đình đông người, có góc trẻ em."
+  },
+  {
+    "name": "Sunabe Seawall Cafe",
+    "cuisine": "Cafe, brunch",
+    "hours": "08:00-18:00",
+    "priceRange": "1200-2000 yên/người",
+    "address": "Sunabe, Chatan (khu lặn biển nổi tiếng)",
+    "kidFriendly": true,
+    "rating": 4.4,
+    "notes": "View bờ kè Sunabe nơi lặn biển phổ biến, phù hợp bữa sáng/trưa."
+  },
+  {
+    "name": "Naha Gyoza Bar",
+    "cuisine": "Gyoza, món nhắm kiểu Nhật",
+    "hours": "17:00-23:30",
+    "priceRange": "1500-2500 yên/người",
+    "address": "Naha",
+    "kidFriendly": true,
+    "rating": 4.2,
+    "notes": "Gyoza chiên giòn đặc trưng, phù hợp ăn tối nhẹ trước khi đi bar."
+  },
+  {
+    "name": "Zamami Island BBQ Hut",
+    "cuisine": "BBQ hải sản đảo nhỏ",
+    "hours": "11:00-19:00",
+    "priceRange": "2000-3500 yên/người",
+    "address": "Zamami Island (quần đảo Kerama)",
+    "kidFriendly": true,
+    "rating": 4.5,
+    "notes": "Phù hợp sau khi lặn ngắm san hô ở Zamami, không gian đơn giản, view biển trong xanh."
+  },
+  {
+    "name": "Naha New Parco Food Hall",
+    "cuisine": "Food court đa dạng món Nhật/quốc tế",
+    "hours": "10:00-21:00",
+    "priceRange": "1000-2500 yên/người",
+    "address": "Naha, khu trung tâm thương mại",
+    "kidFriendly": true,
+    "rating": 4.1,
+    "notes": "Nhiều lựa chọn món ăn trong 1 khu, tiện cho nhóm có sở thích khác nhau."
+  },
+  {
+    "name": "Cape Manzamo View Restaurant",
+    "cuisine": "Hải sản, món Nhật",
+    "hours": "11:00-20:00",
+    "priceRange": "2000-3500 yên/người",
+    "address": "Gần Cape Manzamo, Onna",
+    "kidFriendly": true,
+    "rating": 4.4,
+    "notes": "View mỏm đá Manzamo nổi tiếng, phù hợp bữa trưa khi tham quan."
+  },
+  {
+    "name": "Naha Michi-no-Eki Farmers Diner",
+    "cuisine": "Món địa phương từ nông sản Okinawa",
+    "hours": "09:00-18:00",
+    "priceRange": "900-1600 yên/người",
+    "address": "Trạm dừng chân nông sản, ngoại ô Naha",
+    "kidFriendly": true,
+    "rating": 4.0,
+    "notes": "Nguyên liệu tươi từ nông trại địa phương, giá hợp lý."
+  }
+]
