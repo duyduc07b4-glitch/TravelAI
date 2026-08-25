@@ -20,17 +20,17 @@
 </header>
 <div style="max-width:960px; margin:0 auto; padding:0 24px;">
   <div class="hint" id="loadProgress">
-    Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miềE phí, chạy hoàn toàn offline). Sau khi cài: mềETerminal chạy <code>ollama pull llama3.2</code> đềEtải model, rồi bấm "Kiểm tra kết nối".
-    Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ềEô Server bằng địa chềEIP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mềEtrang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.
+    Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miễn phí, chạy hoàn toàn offline). Sau khi cài: mở Terminal chạy <code>ollama pull llama3.2</code> để tải model, rồi bấm "Kiểm tra kết nối".
+    Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.
   </div>
 </div>
 
 <main>
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="planner">🗺�E�ELịch trình</button>
+    <button class="tab-btn active" data-tab="planner">🗺️ Lịch trình</button>
     <button class="tab-btn" data-tab="group">👥 Group Matching</button>
-    <button class="tab-btn" data-tab="voice">🎙�E�ETrợ lý giọng nói</button>
-    <button class="tab-btn" data-tab="heal">🌧�E�ESelf-Healing</button>
+    <button class="tab-btn" data-tab="voice">🎙️ Trợ lý giọng nói</button>
+    <button class="tab-btn" data-tab="heal">🌧️ Self-Healing</button>
     <button class="tab-btn" data-tab="camera">📷 Camera AI</button>
   </nav>
 
@@ -40,13 +40,13 @@
       <h3>Tạo lịch trình tự động</h3>
       <div class="row2">
         <div class="field"><label>Điểm đến</label><input type="text" id="p-dest" placeholder="Okinawa"></div>
-        <div class="field"><label>SềEngày</label><input type="number" id="p-days" value="4" min="1" max="14"></div>
+        <div class="field"><label>Số ngày</label><input type="number" id="p-days" value="4" min="1" max="14"></div>
       </div>
       <div class="row3">
         <div class="field"><label>Ngày khởi hành</label><input type="date" id="p-start"></div>
-        <div class="field"><label>Nhịp đềE/label>
+        <div class="field"><label>Nhịp độ</label>
           <select id="p-pace">
-            <option value="thoai mai">Thoải mái (ít điểm hơn, nghềEnhiều hơn)</option>
+            <option value="thoai mai">Thoải mái (ít điểm hơn, nghỉ ngơi nhiều hơn)</option>
             <option value="can bang" selected>Cân bằng</option>
             <option value="day dac">Dày đặc (nhiều điểm tham quan)</option>
           </select>
@@ -57,7 +57,7 @@
         <div class="field"><label>Ngân sách (yên / tổng)</label><input type="number" id="p-budget" placeholder="80000"></div>
         <div class="field"><label>Thành phần nhóm</label><input type="text" id="p-group" placeholder="Vợ chồng + 1 bé 5 tuổi"></div>
       </div>
-      <div class="field"><label>Ghi chú thêm (phương tiện, sềEthích...)</label><input type="text" id="p-notes" placeholder="Thuê xe, thích hải sản, thích biển"></div>
+      <div class="field"><label>Ghi chú thêm (phương tiện, sở thích...)</label><input type="text" id="p-notes" placeholder="Thuê xe, thích hải sản, thích biển"></div>
       <button id="p-run">Tạo lịch trình</button>
       <div class="result" id="p-result"></div>
     </div>
@@ -68,7 +68,7 @@
     <div class="card">
       <h3>Chấm điểm địa điểm cho cả nhóm</h3>
       <div class="field"><label>Địa điểm cần đánh giá</label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
-      <div class="field"><label>Thành viên & sềEthích</label>
+      <div class="field"><label>Thành viên & sở thích</label>
         <div id="g-members"></div>
         <button type="button" class="secondary small" id="g-addMember">+ Thêm thành viên</button>
       </div>
@@ -89,7 +89,7 @@
       </div>
       <div class="mic-area">
         <button class="mic-btn" id="v-mic">🎤</button>
-        <div class="mic-hint" id="v-hint">Nhấn đềEnói (VD: "Tôi muốn ăn sushi gần đây")</div>
+        <div class="mic-hint" id="v-hint">Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")</div>
       </div>
       <div class="field"><label>Hoặc gõ câu hỏi</label>
         <div style="display:flex; gap:8px;">
@@ -112,10 +112,10 @@ Outdoor BBQ
 Dinner ngoài trời</textarea>
       </div>
       <div class="row2">
-        <div class="field"><label>Điểm đến (đềElấy thời tiết thật)</label><input type="text" id="h-dest" placeholder="Okinawa"></div>
-        <div class="field"><label>Tình huống bất ngềE/label><input type="text" id="h-event" placeholder="Buổi sáng mưa lớn"></div>
+        <div class="field"><label>Điểm đến (để lấy thời tiết thật)</label><input type="text" id="h-dest" placeholder="Okinawa"></div>
+        <div class="field"><label>Tình huống bất ngờ</label><input type="text" id="h-event" placeholder="Buổi sáng mưa lớn"></div>
       </div>
-      <button type="button" class="secondary small" id="h-weather">🌦�E�ELấy thời tiết thật</button>
+      <button type="button" class="secondary small" id="h-weather">🌦️ Lấy thời tiết thật</button>
       <div class="hint" id="h-weatherStatus"></div>
       <div style="height:10px;"></div>
       <button id="h-run">Cập nhật lịch trình</button>
@@ -128,7 +128,7 @@ Dinner ngoài trời</textarea>
     <div class="card">
       <h3>AI hiểu qua camera</h3>
       <div class="row2">
-        <div class="field"><label>Chế đềE/label>
+        <div class="field"><label>Chế độ</label>
           <select id="c-mode">
             <option value="food">🍜 Món ăn</option>
             <option value="landmark">🏯 Địa danh</option>
