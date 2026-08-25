@@ -598,7 +598,7 @@ function classifyIncident(eventText) {
   let type = 'default';
   let severity = 'low';
 
-  if (/bão|giông|typhoon|lụt|flood|hurricane|台風|暴風雨|雷雨/.test(text)) {
+  if (/bão|giông|typhoon|lụt|flood|hurricane|台風|暴風雨|雷雨/.test(text) || (rainy && windy && /(mưa to|mưa lớn|heavy rain|rainstorm|torrential|豪雨|大雨|gió lớn|gió mạnh|strong wind|暴風|強風)/.test(text))) {
     type = 'storm';
     severity = 'high';
   } else if (rainy && /(mưa rất to|mưa to|mưa lớn|heavy rain|rainstorm|torrential|mưa dông|豪雨|大雨)/.test(text)) {
@@ -656,7 +656,8 @@ function shouldReplaceActivity(item, info, incident) {
   if (!isSevereWeatherIncident(incident)) return false;
   const text = normalizeHealedText(item);
   const seaTransit = /boat|cruise|ferry|港|船/.test(text);
-  const outdoorFood = /bbq|barbecue|picnic|outdoor dining|grill/.test(text);
+  const hasIndoorFoodCue = /nhà hàng|quán|restaurant|café|cafe|izakaya|food hall|indoor/.test(text);
+  const outdoorFood = /bbq|barbecue|picnic|outdoor dining|grill/.test(text) && !hasIndoorFoodCue;
   if (info.category === 'transit' && !seaTransit) return false;
   if (info.category === 'food' && !outdoorFood) return false;
   return info.category === 'outdoor' || seaTransit || outdoorFood;
@@ -699,13 +700,28 @@ function rankReplacementCandidates(candidates, original, context, incidentType) 
 
 function getReplacementCandidates(original, context, incidentType, info) {
   const text = normalizeHealedText(original);
-  const outdoorPool = ['Aquarium', 'Museum', 'Indoor Market', 'Food Hall', 'Café', 'Indoor Activity', 'Arcade', 'Cinema', 'Shopping Mall'];
+  const scenicPool = ['Aquarium', 'Museum', 'Indoor Market', 'Shopping Mall', 'Café', 'Cinema'];
+  const outdoorPool = ['Museum', 'Aquarium', 'Indoor Activity', 'Indoor Market', 'Café', 'Cinema', 'Arcade', 'Shopping Mall'];
   const foodPool = ['Food Hall', 'Restaurant', 'Café', 'Indoor Market', 'Museum', 'Aquarium', 'Indoor Activity', 'Cinema'];
   const defaultPool = ['Museum', 'Aquarium', 'Indoor Market', 'Food Hall', 'Café', 'Indoor Activity', 'Cinema', 'Arcade', 'Shopping Mall'];
   let pool = defaultPool;
-  if (/bbq|barbecue|picnic|grill|food/.test(text) || info.category === 'food') pool = foodPool;
-  else if (/beach|sunset|sea|ocean|snorkel|surf|boat|cruise|bay|viewpoint|park|hike|trail/.test(text) || info.category === 'outdoor') pool = outdoorPool;
+  if (/bbq|barbecue|picnic|grill|food|ăn|lunch|dinner|breakfast/.test(text) || info.category === 'food') pool = foodPool;
+  else if (/beach|sunset|sea|ocean|snorkel|surf|boat|cruise|bay|viewpoint|park|hike|trail|bãi biển|ngắm hoàng hôn|biển/.test(text)) pool = scenicPool;
+  else if (info.category === 'outdoor') pool = outdoorPool;
   return rankReplacementCandidates(pool, original, context, incidentType);
+}
+
+function formatReplacementActivity(original, replacement) {
+  const source = String(original || '').trim();
+  const target = String(replacement || '').trim();
+  const lower = normalizeHealedText(source);
+  if (!source || !target) return target || source;
+  if (/^đi đến\s+/i.test(source)) return source.replace(/^đi đến\s+/i, `Đi đến ${target} (thay thế cho) `);
+  if (/^visit\s+/i.test(source)) return source.replace(/^visit\s+/i, `Visit ${target} (instead of) `);
+  if (/^tham quan\s+/i.test(source)) return `Tham quan ${target}`;
+  if (/ăn|lunch|dinner|breakfast|restaurant|quán|nhà hàng/.test(lower)) return `Ăn tại ${target}`;
+  if (/ngắm|sunset|view|beach|biển/.test(lower)) return `Tham quan trong nhà tại ${target}`;
+  return `${target}`;
 }
 
 function summarizeIncident(eventText, incident) {
@@ -758,8 +774,9 @@ function buildSelfHealingPlan(planData, itin, eventText, context) {
             ? 'Mưa to khiến hoạt động ngoài trời không còn phù hợp'
             : 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế';
 
-      activities.push({ original: item, text: replacement, changed: true, reason });
-      replacements.push({ original: item, replacement, reason });
+      const replacementText = formatReplacementActivity(item, replacement);
+      activities.push({ original: item, text: replacementText, changed: true, reason });
+      replacements.push({ original: item, replacement: replacementText, reason });
     });
     updatedDays.push({ day: day.day || (index + 1), activities });
   });
