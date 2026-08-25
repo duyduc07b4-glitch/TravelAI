@@ -15,9 +15,10 @@
     <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
     <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
     <button class="secondary small" id="loadModelBtn" data-i18n="checkConnBtn"></button>
-    <div class="lang-switch" role="group" aria-label="Language / 言語">
+    <div class="lang-switch" role="group" aria-label="Language / 言語 / Ngôn ngữ">
       <button type="button" class="lang-btn" data-lang="vi">VI</button>
       <button type="button" class="lang-btn" data-lang="ja">JA</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
     </div>
   </div>
 </header>
@@ -133,6 +134,8 @@
     </div>
   </section>
 </main>
+
+<footer class="hint" style="max-width:960px; margin:0 auto; padding:0 24px 24px;" data-i18n="common.osmAttribution" data-i18n-html="1"></footer>
 
 <script src="app.js"></script>
 </body>

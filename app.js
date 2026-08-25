@@ -7,7 +7,7 @@
 'use strict';
 
 const DEFAULT_LANG = 'vi';
-const SUPPORTED_LANGS = ['vi', 'ja'];
+const SUPPORTED_LANGS = ['vi', 'ja', 'en'];
 
 // ---------- i18n dictionary ----------
 // Every leaf is either a string or a function(...) => string (for messages needing interpolation).
@@ -35,7 +35,23 @@ const I18N = {
       scoreHeader: 'Điểm',
       changesHeader: 'Thay đổi',
       newItineraryHeader: 'Lịch trình mới',
-      plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.'
+      plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.',
+      checkReal: '🔍 Kiểm tra thật',
+      checkingReal: 'Đang tra cứu OpenStreetMap...',
+      osmFound: (address, hours) => `✅ OSM: ${address}${hours ? ' · Giờ mở cửa: ' + hours : ' · Không có giờ mở cửa trong dữ liệu OSM'}`,
+      osmNotFound: '❌ Không tìm thấy trên OpenStreetMap — vẫn nên tự kiểm tra trực tiếp.',
+      osmError: (msg) => `⚠️ Lỗi khi tra cứu: ${msg}`,
+      osmAttribution: 'Dữ liệu "Kiểm tra thật" lấy từ <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--accent)">© cộng tác viên OpenStreetMap</a> — miễn phí nhưng không phải lúc nào cũng đầy đủ hoặc cập nhật.',
+      unlimitedBudget: 'không giới hạn',
+      soloTraveler: 'một mình'
+    },
+    errors: {
+      timeout: 'AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.',
+      cannotConnect: (base) => `Không gọi được tới ${base}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`,
+      visionCannotConnect: (base) => `Không gọi được tới ${base}. Kiểm tra Ollama đang chạy chưa.`,
+      modelNotFoundSuffix: (model) => ` — có thể chưa tải model. Chạy: ollama pull ${model}`,
+      noJson: 'AI không trả về dữ liệu dạng JSON như yêu cầu — model có thể quá nhỏ để tuân theo định dạng. Thử lại hoặc đổi sang model khác.',
+      malformedJson: 'AI trả về JSON không hợp lệ (bị lỗi cú pháp giữa chừng). Thử lại hoặc đổi sang model khác.'
     },
     planner: {
       title: 'Tạo lịch trình tự động',
@@ -168,7 +184,23 @@ const I18N = {
       scoreHeader: 'スコア',
       changesHeader: '変更点',
       newItineraryHeader: '新しい旅程',
-      plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ このAIはローカル動作でリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離はAIの一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。'
+      plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ このAIはローカル動作でリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離はAIの一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。',
+      checkReal: '🔍 実際に確認',
+      checkingReal: 'OpenStreetMapを確認中...',
+      osmFound: (address, hours) => `✅ OSM：${address}${hours ? ' ・営業時間：' + hours : ' ・OSMに営業時間データなし'}`,
+      osmNotFound: '❌ OpenStreetMapに見つかりませんでした — 現地で改めて確認してください。',
+      osmError: (msg) => `⚠️ 確認中にエラー：${msg}`,
+      osmAttribution: '「実際に確認」のデータは<a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--accent)">© OpenStreetMapコントリビューター</a>提供 — 無料ですが常に完全・最新とは限りません。',
+      unlimitedBudget: '無制限',
+      soloTraveler: '一人旅'
+    },
+    errors: {
+      timeout: 'AIが60秒以内に応答しませんでした — モデルの初回読み込みに時間がかかっているか、端末の負荷が高い可能性があります。再試行するか、より軽量なモデルに変更してください。',
+      cannotConnect: (base) => `${base} に接続できませんでした。右上の「接続確認」で診断してください。`,
+      visionCannotConnect: (base) => `${base} に接続できませんでした。Ollamaが起動しているか確認してください。`,
+      modelNotFoundSuffix: (model) => ` — モデルが未取得の可能性があります。実行：ollama pull ${model}`,
+      noJson: 'AIが要求されたJSON形式でデータを返しませんでした — モデルが小さすぎて形式に従えない可能性があります。再試行するか、別のモデルに変更してください。',
+      malformedJson: 'AIが返したJSONが不正な形式です（途中で構文エラー）。再試行するか、別のモデルに変更してください。'
     },
     planner: {
       title: '旅程を自動作成',
@@ -277,6 +309,155 @@ const I18N = {
     speechLang: 'ja-JP',
     speechVoicePrefix: 'ja',
     geocodeLang: 'ja'
+  },
+  en: {
+    appSubtitle: 'Local prototype · AI runs on your machine via Ollama · usable from your phone on the same network',
+    checkConnBtn: 'Check connection',
+    connect: {
+      defaultHint: 'You need <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> installed on this machine first (free, fully offline). After installing: open a terminal and run <code>ollama pull llama3.2</code> to fetch the model, then click "Check connection". To use it from your phone: your phone must be on the same Wi-Fi, replace <code>localhost</code> in the Server field with this machine\'s LAN IP address (e.g. <code>http://192.168.3.23:11434</code>), and open this page on your phone via <code>http://192.168.3.23:8765/app.html</code>.',
+      connecting: 'Connecting to Ollama...',
+      noModel: (model) => `⚠️ Connected, but no model is available yet. Run: <code>ollama pull ${model}</code> and try again.`,
+      modelMissing: (names, model) => `⚠️ The server has these models: ${names} — "${model}" wasn't found. Fix the model name or run <code>ollama pull ${model}</code>.`,
+      ready: (model) => `✅ Connected to Ollama, model "${model}" is ready — running fully offline/free on this machine.`,
+      failed: (base, err) => `⚠️ Couldn't connect to ${base}. Check that Ollama is running, the IP address is correct, and — if calling from a phone/other device — that <code>OLLAMA_HOST=0.0.0.0</code> and <code>OLLAMA_ORIGINS=*</code> are set. Error: ${err}`
+    },
+    tabs: { planner: '🗺️ Itinerary', group: '👥 Group Matching', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera AI' },
+    common: {
+      mapLink: '📍 View map',
+      venueWarning: '⚠️ hours not verified',
+      dayLabel: (n) => `Day ${n}`,
+      noResult: 'No results.',
+      noChange: 'No changes.',
+      aiFinal: '🤖 AI\'s call:',
+      criteriaHeader: 'Criteria',
+      scoreHeader: 'Score',
+      changesHeader: 'Changes',
+      newItineraryHeader: 'Updated itinerary',
+      plannerDisclaimer: '📍 Click "View map" to see the real address, opening hours, and phone number (if listed). ⚠️ This AI runs locally with no real-time data, so it <strong>cannot confirm whether a place is actually open at that time</strong>, and the ordering/distance between stops is just the AI\'s general guess — <strong>not based on real traffic or map data</strong>. Always double-check on Maps before you go.',
+      checkReal: '🔍 Verify real data',
+      checkingReal: 'Checking OpenStreetMap...',
+      osmFound: (address, hours) => `✅ OSM: ${address}${hours ? ' · Hours: ' + hours : ' · No opening-hours data on OSM'}`,
+      osmNotFound: '❌ Not found on OpenStreetMap — still worth checking in person.',
+      osmError: (msg) => `⚠️ Lookup error: ${msg}`,
+      osmAttribution: '"Verify real data" results come from <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--accent)">© OpenStreetMap contributors</a> — free, but not always complete or up to date.',
+      unlimitedBudget: 'unlimited',
+      soloTraveler: 'solo'
+    },
+    errors: {
+      timeout: "The AI didn't respond within 60 seconds — the model might be loading for the first time (slower than usual), or the machine is under heavy load. Try again, or switch to a lighter model.",
+      cannotConnect: (base) => `Couldn't reach ${base}. Click "Check connection" up top to diagnose.`,
+      visionCannotConnect: (base) => `Couldn't reach ${base}. Check that Ollama is running.`,
+      modelNotFoundSuffix: (model) => ` — the model might not be pulled yet. Run: ollama pull ${model}`,
+      noJson: "The AI didn't return the JSON it was asked for — the model might be too small to follow the format. Try again or switch to a different model.",
+      malformedJson: 'The AI returned invalid JSON (a syntax error partway through). Try again or switch to a different model.'
+    },
+    planner: {
+      title: 'Create an itinerary',
+      destLabel: 'Destination',
+      daysLabel: 'Number of days',
+      budgetLabel: 'Budget (JPY / total)',
+      budgetPlaceholder: '80000',
+      groupLabel: 'Group composition',
+      groupPlaceholder: 'Couple + 1 child (age 5)',
+      notesLabel: 'Notes (transport, preferences...)',
+      notesPlaceholder: 'Renting a car, love seafood, love the beach',
+      runBtn: 'Create itinerary',
+      loading: 'Creating itinerary...',
+      systemPrompt: 'You are AI Travel Companion, a personalized trip-planning assistant. Every activity should name a specific place/venue that can be looked up on Google Maps (e.g. "Lunch at Yunangi Okinawan Cuisine" instead of just "Lunch"). You have NO real-time data, so you must NOT assert opening hours, addresses, phone numbers, or real traffic conditions/travel distances for any place — the order of activities should only reflect general reasonable judgment (e.g. beach in the afternoon, sunset viewing at the end of the day), and you must not claim the route is optimized or that you checked real traffic. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English), with no other text or markdown code fences, matching this schema:\n{"days":[{"day":1,"activities":["Naha Airport","Lunch at Yunangi Okinawan Cuisine","American Village","Sunset Beach","Dinner at Steak House 88"]}],"summary":"1-2 sentences summarizing estimated cost and key notes, reminding the user to verify real opening hours before going"}',
+      userPrompt: (dest, days, budget, group, notes) => `Plan a ${days}-day trip to ${dest}. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nOrder activities sensibly through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and an experience that suits the whole group. You don't need to guarantee opening hours or exact travel distances since you have no real-time data.`
+    },
+    group: {
+      title: 'Score a place for the whole group',
+      placeLabel: 'Place to evaluate',
+      membersLabel: 'Members & preferences',
+      addMemberBtn: '+ Add member',
+      runBtn: 'Score fit',
+      loading: 'Scoring...',
+      memberNamePlaceholder: 'Name (e.g. A)',
+      memberPrefPlaceholder: 'Preference (e.g. seafood, loves photos)',
+      defaultMembers: [['A', 'Seafood'], ['B', 'Check-ins, photos'], ['C', 'Shopping'], ['D', 'Traveling with kids'], ['E', 'Orion Beer']],
+      systemPrompt: 'You are the AI Group Matching Engine. Assess how well a travel spot fits each group member\'s preferences, then briefly simulate each person\'s perspective like a real discussion before the AI settles on a recommendation. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"One sentence giving this person\'s perspective/concern about the place, in their own voice"}],"recommendation":"1-2 sentences where the AI settles on a compromise that works for the whole group, with a brief reason"}\nScore on a 1-10 scale, inferring criteria from each member\'s preferences. Each person in "debate" should have a different opinion reflecting their own preference (can be positive or negative depending on their taste).',
+      userPrompt: (place, members) => `Place: ${place}\nMembers and preferences:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`
+    },
+    voice: {
+      title: 'Voice travel assistant',
+      voiceLabel: 'Voice',
+      orTypeLabel: 'Or type your question',
+      textPlaceholder: 'Find a nice sunset spot nearby',
+      sendBtn: 'Send',
+      micHintDefault: 'Tap to speak (e.g. "I want sushi nearby")',
+      listening: 'Listening...',
+      heard: (t) => `Heard: "${t}"`,
+      hearing: (t) => `🎤 ${t} …`,
+      noMatch: "Couldn't understand — try again, speak clearly and slowly.",
+      notSupported: "this browser doesn't support it — type your question below instead",
+      supported: 'supported in this browser (needs internet for speech recognition)',
+      thinking: 'Thinking...',
+      thinkingTick: (s) => `Thinking... (${s}s)`,
+      noVoices: "The browser hasn't finished loading voices yet, or no suitable voice is installed.",
+      noNativeVoices: 'This device has no English voice besides the default one, so all available voices are shown (they may not read English correctly). On macOS: System Settings → Accessibility → Spoken Content → System Voice → add an English voice (pick an "Enhanced/Premium" one for a much more natural sound).',
+      voicesFound: (n) => `Found ${n} English voices. If it still sounds robotic, try adding an "Enhanced/Premium" voice in System Settings for a more natural sound.`,
+      recognitionErrors: {
+        'not-allowed': "Microphone access wasn't granted — allow the microphone for this page in your browser settings.",
+        'no-speech': "No speech detected — try speaking louder or closer to the mic.",
+        'audio-capture': 'No microphone found on this device.',
+        'network': "Network error — Chrome's speech recognition needs internet to work, check your connection.",
+        'aborted': 'Stopped listening.'
+      },
+      micErrorPrefix: 'Mic error: ',
+      systemPrompt: 'You are a friendly AI voice travel assistant. Answer briefly (2-4 sentences) and practically, as if recommending something directly to a user nearby (a restaurant, a scenic spot...). Reply in English, without markdown.'
+    },
+    heal: {
+      title: 'Self-healing itinerary',
+      itinLabel: 'Current itinerary (one activity per line)',
+      destLabel: 'Destination (to fetch real weather)',
+      eventLabel: 'Unexpected situation',
+      eventPlaceholder: 'Heavy rain in the morning',
+      weatherBtn: '🌦️ Fetch real weather',
+      runBtn: 'Update itinerary',
+      loading: 'Updating itinerary...',
+      defaultItinerary: 'Beach\nSunset viewing\nOutdoor BBQ\nOutdoor dinner',
+      defaultEvent: 'Heavy rain in the morning',
+      needDest: '⚠️ Enter a destination first.',
+      lookingUp: 'Looking up location and real weather...',
+      notFound: (dest) => `⚠️ Couldn't find a location for "${dest}".`,
+      weatherText: (place, country, desc, temp, precip) => `${place}${country ? ', ' + country : ''} currently has ${desc}, ${temp}°C${precip > 0 ? `, ${precip}mm of precipitation` : ''}.`,
+      weatherReady: (time) => `✅ Real data from Open-Meteo, updated at ${time}.`,
+      weatherError: (msg) => `⚠️ Couldn't fetch weather: ${msg}`,
+      systemPrompt: 'You are the AI Self-Healing Itinerary Engine. When an unexpected situation comes up, automatically replace activities that no longer fit with reasonable alternatives, keeping unaffected activities unchanged. Reply with ONLY JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
+      userPrompt: (itin, event) => `Current itinerary:\n${itin.map(i => '- ' + i).join('\n')}\n\nSituation: ${event}`
+    },
+    camera: {
+      title: 'AI understands via camera',
+      modeLabel: 'Mode',
+      modeFood: '🍜 Food',
+      modeLandmark: '🏯 Landmark',
+      visionModelLabel: 'Vision model (Ollama)',
+      modelHint: 'The default <code>moondream</code> model is lightweight and fast locally but recognition is rough. For better accuracy: <code>ollama pull llama3.2-vision</code> and change the model field.',
+      fileLabel: 'Take or choose a photo',
+      runBtn: 'Analyze image',
+      step1: 'Looking at the image (step 1/2)...',
+      step2: 'Analyzing and writing a reply (step 2/2)...',
+      noCaption: (model) => `The vision model "${model}" returned no description for this image — try a different image or model.`,
+      disclaimer: (model) => `⚠️ The local vision AI (${model}) can misidentify things easily, especially text in the image (menus, signs) and less common dishes/landmarks. Treat this as a reference suggestion, not a firm conclusion.`,
+      systemPromptFood: "You receive an English description (from a vision AI) of a photo of a dish. Based on it, write in English: 1) What this dish might be. 2) Visible ingredients. 3) 1-2 similar dishes worth trying. Do NOT make up exact prices/calories — if you mention them, clearly label them as estimates. If the description is too vague to guess, say plainly that you're not sure. Keep it brief, no markdown.",
+      systemPromptLandmark: "You receive an English description (from a vision AI) of a photo of a landmark/structure. Based on it, write in English: 1) What this landmark might be. 2) A bit of history/culture if you're confident about it. 3) Similar types of attractions likely nearby. If the description is too vague to identify, say plainly that you're not sure instead of guessing. Keep it brief, no markdown.",
+      userPrompt: (caption) => `Description from vision AI: "${caption}"`
+    },
+    weatherCodes: {
+      0: 'clear sky', 1: 'mainly clear', 2: 'partly cloudy', 3: 'overcast',
+      45: 'fog', 48: 'depositing rime fog',
+      51: 'light drizzle', 53: 'moderate drizzle', 55: 'dense drizzle',
+      61: 'light rain', 63: 'moderate rain', 65: 'heavy rain',
+      71: 'light snow', 73: 'moderate snow', 75: 'heavy snow',
+      80: 'light rain showers', 81: 'moderate rain showers', 82: 'violent rain showers',
+      95: 'thunderstorm', 96: 'thunderstorm with light hail', 99: 'thunderstorm with heavy hail',
+      unknown: 'unknown weather'
+    },
+    venueKeywords: ['lunch','dinner','breakfast','restaurant','cafe','bar','pub','izakaya','shop','store','mall','shopping','market','diner'],
+    speechLang: 'en-US',
+    speechVoicePrefix: 'en',
+    geocodeLang: 'en'
   }
 };
 
@@ -306,6 +487,15 @@ function escapeHtml(str) {
 function mapLink(place, context, lang) {
   const q = encodeURIComponent(context ? `${place}, ${context}` : place);
   return `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" class="map-link">${tr(lang, 'common.mapLink')}</a>`;
+}
+
+/**
+ * Renders a "check real data" button + an empty result slot next to it.
+ * The button is wired up via event delegation in initApp() (fetchRealPlaceData),
+ * since this needs a live network call, not something a pure render function can do.
+ */
+function checkPlaceButton(place, context, lang) {
+  return ` <button type="button" class="check-real-btn small secondary" data-place="${escapeHtml(place)}" data-context="${escapeHtml(context || '')}">${tr(lang, 'common.checkReal')}</button><span class="real-data"></span>`;
 }
 
 function venueWarning(text, lang) {
@@ -347,6 +537,17 @@ function findFirstJsonObject(text) {
 }
 
 /**
+ * Parses one line of Ollama's streaming NDJSON /api/chat response and returns
+ * the text delta it carries, or '' if the line is empty/unparseable/has no content.
+ */
+function extractChunkContent(line) {
+  if (!line || !line.trim()) return '';
+  let obj;
+  try { obj = JSON.parse(line); } catch (e) { return ''; }
+  return (obj && obj.message && obj.message.content) || '';
+}
+
+/**
  * Extracts and parses a JSON object from an LLM text response.
  * Throws a user-facing Error (localized) on failure, not a raw JSON.parse error.
  */
@@ -358,16 +559,12 @@ function extractJson(text, lang) {
 
   const found = findFirstJsonObject(stripped);
   if (!found) {
-    throw new Error(lang === 'ja'
-      ? 'AIが要求されたJSON形式でデータを返しませんでした — モデルが小さすぎて形式に従えない可能性があります。再試行するか、別のモデルに変更してください。'
-      : 'AI không trả về dữ liệu dạng JSON như yêu cầu — model có thể quá nhỏ để tuân theo định dạng. Thử lại hoặc đổi sang model khác.');
+    throw new Error(tr(lang, 'errors.noJson'));
   }
   try {
     return JSON.parse(found);
   } catch (e) {
-    throw new Error(lang === 'ja'
-      ? 'AIが返したJSONが不正な形式です（途中で構文エラー）。再試行するか、別のモデルに変更してください。'
-      : 'AI trả về JSON không hợp lệ (bị lỗi cú pháp giữa chừng). Thử lại hoặc đổi sang model khác.');
+    throw new Error(tr(lang, 'errors.malformedJson'));
   }
 }
 
@@ -377,7 +574,7 @@ function renderPlannerHtml(data, dest, lang) {
   let dayHtml = '';
   (data.days || []).forEach((d, i) => {
     if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
-    const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest, lang)}${venueWarning(a, lang)}</li>`).join('');
+    const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest, lang)}${checkPlaceButton(a, dest, lang)}${venueWarning(a, lang)}</li>`).join('');
     dayHtml += `<div class="day-block"><h4>${tr(lang, 'common.dayLabel', d.day || (i + 1))}</h4><ul>${items}</ul></div>`;
   });
   if (!dayHtml) return tr(lang, 'common.noResult');
@@ -387,10 +584,11 @@ function renderPlannerHtml(data, dest, lang) {
   return html;
 }
 
-function renderGroupScoreTableHtml(data, lang) {
+function renderGroupScoreTableHtml(data, lang, place) {
   let html = `<table class="score-table"><thead><tr><th>${tr(lang, 'common.criteriaHeader')}</th><th>${tr(lang, 'common.scoreHeader')}</th></tr></thead><tbody>`;
   (data.criteria || []).forEach(c => { html += `<tr><td>${escapeHtml(c.name)}</td><td>${c.score}/10</td></tr>`; });
   html += `</tbody></table>`;
+  if (place) html += `<div class="summary-note">${checkPlaceButton(place, undefined, lang)}</div>`;
   return html;
 }
 
@@ -404,7 +602,7 @@ function renderHealHtml(data, lang) {
     html += `</ul></div>`;
   }
   if ((data.updated_itinerary || []).length) {
-    html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
+    html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${checkPlaceButton(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
   }
   return html || tr(lang, 'common.noChange');
 }
@@ -453,7 +651,8 @@ const AppCore = {
   DEFAULT_LANG, SUPPORTED_LANGS, I18N, tr, normalizeLang,
   escapeHtml, mapLink, venueWarning,
   weatherDescription,
-  findFirstJsonObject, extractJson,
+  findFirstJsonObject, extractJson, extractChunkContent,
+  checkPlaceButton,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
 };
@@ -525,7 +724,7 @@ function initApp() {
       if (btn.dataset.lang === currentLang) return;
       currentLang = normalizeLang(btn.dataset.lang);
       safeSaveString(STORAGE_KEYS.lang, currentLang);
-      if (recognition) recognition.lang = T('speechLang') || (currentLang === 'ja' ? 'ja-JP' : 'vi-VN');
+      if (recognition) recognition.lang = T('speechLang');
       applyStaticTranslations();
     });
   });
@@ -566,7 +765,13 @@ function initApp() {
   });
 
   // ---------- Local LLM call (Ollama server, chạy trên máy/mạng LAN, không cloud) ----------
-  async function callClaude(system, userText, { json = false } = {}) {
+  /**
+   * Calls Ollama's /api/chat with streaming enabled so callers can show tokens as they
+   * arrive instead of a spinner-then-everything-at-once. The 60s timeout is a rolling
+   * "no new data" idle timeout (reset on every chunk), not a total-request cap — a
+   * response that's steadily streaming shouldn't be killed just because it's long.
+   */
+  async function callClaude(system, userText, { json = false, onChunk } = {}) {
     const model = modelSelect.value.trim() || 'llama3.2';
     const body = {
       model,
@@ -574,13 +779,16 @@ function initApp() {
         { role: 'system', content: system },
         { role: 'user', content: userText }
       ],
-      stream: false
+      stream: true
     };
     if (json) body.format = 'json';
 
-    let res;
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60000);
+    let timeoutId;
+    const resetIdleTimeout = () => { clearTimeout(timeoutId); timeoutId = setTimeout(() => controller.abort(), 60000); };
+    resetIdleTimeout();
+
+    let res;
     try {
       res = await fetch(`${ollamaBase()}/api/chat`, {
         method: 'POST',
@@ -589,26 +797,54 @@ function initApp() {
         signal: controller.signal
       });
     } catch (err) {
-      if (err.name === 'AbortError') {
-        throw new Error(currentLang === 'ja'
-          ? 'AIが60秒以内に応答しませんでした — モデルの初回読み込みに時間がかかっているか、端末の負荷が高い可能性があります。再試行するか、より軽量なモデルに変更してください。'
-          : 'AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.');
-      }
-      throw new Error(currentLang === 'ja'
-        ? `${ollamaBase()} に接続できませんでした。右上の「接続確認」で診断してください。`
-        : `Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
-    } finally {
       clearTimeout(timeoutId);
+      if (err.name === 'AbortError') throw new Error(T('errors.timeout'));
+      throw new Error(T('errors.cannotConnect', ollamaBase()));
     }
     if (!res.ok) {
+      clearTimeout(timeoutId);
       let msg = res.status + ' ' + res.statusText;
       try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
       throw new Error(msg);
     }
-    const data = await res.json();
-    const text = data.message?.content || '';
+
+    let text = '';
+    try {
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+      while (true) {
+        let step;
+        try {
+          step = await reader.read();
+        } catch (err) {
+          if (err.name === 'AbortError') throw new Error(T('errors.timeout'));
+          throw err;
+        }
+        if (step.done) break;
+        resetIdleTimeout();
+        buffer += decoder.decode(step.value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          const delta = extractChunkContent(line);
+          if (delta) { text += delta; if (onChunk) onChunk(text); }
+        }
+      }
+      const delta = extractChunkContent(buffer);
+      if (delta) { text += delta; if (onChunk) onChunk(text); }
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
     if (json) return extractJson(text, currentLang);
     return text;
+  }
+
+  function streamPreview(el, loadingLabel) {
+    return (partialText) => {
+      el.innerHTML = `<div class="loading"><div class="spinner"></div>${loadingLabel}</div><pre class="stream-preview">${escapeHtml(partialText)}</pre>`;
+    };
   }
 
   function setLoading(el, on, label) {
@@ -650,8 +886,8 @@ function initApp() {
   document.getElementById('p-run').addEventListener('click', async () => {
     const dest = pDest.value.trim() || 'Okinawa';
     const days = pDays.value || 4;
-    const budget = pBudget.value || (currentLang === 'ja' ? '無制限' : 'không giới hạn');
-    const group = pGroup.value.trim() || (currentLang === 'ja' ? '一人旅' : 'một mình');
+    const budget = pBudget.value || T('common.unlimitedBudget');
+    const group = pGroup.value.trim() || T('common.soloTraveler');
     const notes = pNotes.value.trim();
     setLoading(pResult, true, T('planner.loading'));
 
@@ -659,7 +895,7 @@ function initApp() {
     const user = tr(currentLang, 'planner.userPrompt', dest, days, budget, group, notes);
 
     try {
-      const data = await callClaude(system, user, { json: true });
+      const data = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang)}</div>`;
       savePlannerState({ data });
     } catch (err) { showError(pResult, err); }
@@ -702,7 +938,7 @@ function initApp() {
   }
   if (savedGroup && savedGroup.place) gPlace.value = savedGroup.place;
   if (savedGroup && savedGroup.data) {
-    gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang)}</div>`;
+    gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang, savedGroup.place)}</div>`;
     renderDebate(savedGroup.data);
   }
   gPlace.addEventListener('input', () => saveGroupState({}));
@@ -735,8 +971,8 @@ function initApp() {
     gDebate.innerHTML = '';
 
     try {
-      const data = await callClaude(system, user, { json: true });
-      gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang)}</div>`;
+      const data = await callClaude(system, user, { json: true, onChunk: streamPreview(gResult, T('group.loading')) });
+      gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang, place)}</div>`;
       renderDebate(data);
       saveGroupState({ data });
     } catch (err) { showError(gResult, err); }
@@ -871,7 +1107,9 @@ function initApp() {
     }, 1000);
     const system = T('voice.systemPrompt');
     try {
-      const reply = await callClaude(system, text);
+      const reply = await callClaude(system, text, {
+        onChunk: (partial) => { clearInterval(tickId); thinking.textContent = partial; }
+      });
       clearInterval(tickId);
       thinking.textContent = reply;
       speak(reply);
@@ -964,7 +1202,7 @@ function initApp() {
     const user = tr(currentLang, 'heal.userPrompt', itin, event);
 
     try {
-      const data = await callClaude(system, user, { json: true });
+      const data = await callClaude(system, user, { json: true, onChunk: streamPreview(hResult, T('heal.loading')) });
       hResult.innerHTML = `<div class="result-box">${renderHealHtml(data, currentLang)}</div>`;
       saveHealState({ data });
     } catch (err) { showError(hResult, err); }
@@ -1001,9 +1239,10 @@ function initApp() {
       const caption = await callVision(captionPrompt, cImageBase64, visionModel);
       if (!caption || !caption.trim()) throw new Error(T('camera.noCaption', visionModel));
 
-      setLoading(resultEl, true, T('camera.step2'));
       const system = mode === 'food' ? T('camera.systemPromptFood') : T('camera.systemPromptLandmark');
-      const text = await callClaude(system, tr(currentLang, 'camera.userPrompt', caption));
+      const text = await callClaude(system, tr(currentLang, 'camera.userPrompt', caption), {
+        onChunk: streamPreview(resultEl, T('camera.step2'))
+      });
       resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(visionModel))}</div>`;
     } catch (err) { showError(resultEl, err); }
   });
@@ -1021,19 +1260,72 @@ function initApp() {
         })
       });
     } catch (err) {
-      throw new Error(currentLang === 'ja'
-        ? `${ollamaBase()} に接続できませんでした。Ollamaが起動しているか確認してください。`
-        : `Không gọi được tới ${ollamaBase()}. Kiểm tra Ollama đang chạy chưa.`);
+      throw new Error(T('errors.visionCannotConnect', ollamaBase()));
     }
     if (!res.ok) {
       let msg = res.status + ' ' + res.statusText;
       try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
-      if (/not found/i.test(msg)) msg += currentLang === 'ja' ? ` — モデルが未取得の可能性があります。実行：ollama pull ${model}` : ` — có thể chưa tải model. Chạy: ollama pull ${model}`;
+      if (/not found/i.test(msg)) msg += T('errors.modelNotFoundSuffix', model);
       throw new Error(msg);
     }
     const data = await res.json();
     return data.message?.content || '(no response)';
   }
+
+  // ---------- "Check real data" via OpenStreetMap (Nominatim + Overpass, both free/public) ----------
+  // On-demand (button click) only, one request per click — stays well under Nominatim's
+  // ~1 req/sec usage-policy limit without needing our own rate limiter.
+  async function fetchRealPlaceData(place, context) {
+    const query = context ? `${place}, ${context}` : place;
+    const nomRes = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=${encodeURIComponent(currentLang)}&q=${encodeURIComponent(query)}`);
+    if (!nomRes.ok) throw new Error('Nominatim ' + nomRes.status);
+    const nomResults = await nomRes.json();
+    const hit = nomResults[0];
+    if (!hit) return { found: false };
+
+    let hours = null;
+    try {
+      const overpassType = hit.osm_type === 'node' ? 'node' : hit.osm_type === 'way' ? 'way' : 'relation';
+      const overpassQuery = `[out:json][timeout:15];${overpassType}(${hit.osm_id});out tags;`;
+      const opRes = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`);
+      if (opRes.ok) {
+        const opData = await opRes.json();
+        const tags = (opData.elements && opData.elements[0] && opData.elements[0].tags) || {};
+        hours = tags.opening_hours || null;
+      }
+    } catch (e) { /* Overpass is best-effort — Nominatim's address is still useful on its own */ }
+
+    return { found: true, address: hit.display_name, hours };
+  }
+
+  function wireCheckRealButtons(container) {
+    container.addEventListener('click', async (e) => {
+      const btn = e.target.closest('.check-real-btn');
+      if (!btn) return;
+      const place = btn.dataset.place;
+      const context = btn.dataset.context;
+      const span = btn.nextElementSibling;
+      btn.disabled = true;
+      span.className = 'real-data loading';
+      span.textContent = ' ' + T('common.checkingReal');
+      try {
+        const result = await fetchRealPlaceData(place, context);
+        if (result.found) {
+          span.className = 'real-data found';
+          span.textContent = ' ' + T('common.osmFound', result.address, result.hours);
+        } else {
+          span.className = 'real-data notfound';
+          span.textContent = ' ' + T('common.osmNotFound');
+        }
+      } catch (err) {
+        span.className = 'real-data error';
+        span.textContent = ' ' + T('common.osmError', err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+  [pResult, gResult, hResult].forEach(wireCheckRealButtons);
 
   applyStaticTranslations();
 }

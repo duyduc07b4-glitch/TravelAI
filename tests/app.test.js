@@ -2,8 +2,8 @@ const { test, describe } = require('node:test');
 const assert = require('node:assert/strict');
 const {
   escapeHtml, mapLink, venueWarning, weatherDescription,
-  findFirstJsonObject, extractJson,
-  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
+  findFirstJsonObject, extractJson, extractChunkContent,
+  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, checkPlaceButton,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
 
@@ -30,19 +30,22 @@ describe('normalizeLang', () => {
   });
 });
 
+function leafKeys(obj, prefix = '') {
+  let out = [];
+  for (const k in obj) {
+    const v = obj[k];
+    const path = prefix ? `${prefix}.${k}` : k;
+    if (v && typeof v === 'object' && !Array.isArray(v)) out = out.concat(leafKeys(v, path));
+    else out.push(path);
+  }
+  return out.sort();
+}
+
 describe('i18n dictionary', () => {
-  test('vi and ja expose the exact same set of leaf keys', () => {
-    function leafKeys(obj, prefix = '') {
-      let out = [];
-      for (const k in obj) {
-        const v = obj[k];
-        const path = prefix ? `${prefix}.${k}` : k;
-        if (v && typeof v === 'object' && !Array.isArray(v)) out = out.concat(leafKeys(v, path));
-        else out.push(path);
-      }
-      return out.sort();
-    }
-    assert.deepEqual(leafKeys(I18N.ja), leafKeys(I18N.vi));
+  test('vi, ja, and en all expose the exact same set of leaf keys', () => {
+    const viKeys = leafKeys(I18N.vi);
+    assert.deepEqual(leafKeys(I18N.ja), viKeys);
+    assert.deepEqual(leafKeys(I18N.en), viKeys);
   });
   test('SUPPORTED_LANGS matches the dictionary languages', () => {
     assert.deepEqual([...SUPPORTED_LANGS].sort(), Object.keys(I18N).sort());
@@ -53,10 +56,12 @@ describe('tr', () => {
   test('resolves a plain string leaf', () => {
     assert.equal(tr('vi', 'planner.runBtn'), 'Tạo lịch trình');
     assert.equal(tr('ja', 'planner.runBtn'), '旅程を作成');
+    assert.equal(tr('en', 'planner.runBtn'), 'Create itinerary');
   });
   test('calls a function leaf with the given arguments', () => {
     assert.equal(tr('vi', 'common.dayLabel', 3), 'Day 3');
     assert.equal(tr('ja', 'common.dayLabel', 3), '3日目');
+    assert.equal(tr('en', 'common.dayLabel', 3), 'Day 3');
   });
   test('falls back to vi when the key is missing in the requested language', () => {
     // 'xx' is not a supported language, so normalizeLang() coerces it to 'vi'.
@@ -145,9 +150,16 @@ describe('extractJson', () => {
   test('throws a Japanese error when there is no JSON at all', () => {
     assert.throws(() => extractJson('I cannot help with that.', 'ja'), /JSON形式でデータを返しませんでした/);
   });
+  test('throws an English error when there is no JSON at all', () => {
+    // Regression test: this used to fall through to the Vietnamese message for any
+    // lang !== 'ja', since the error strings were an inline ja/vi ternary instead of
+    // going through the I18N dictionary — 'en' silently got Vietnamese text.
+    assert.throws(() => extractJson('I cannot help with that.', 'en'), /didn't return the JSON/);
+  });
   test('throws a localized error on malformed JSON', () => {
     assert.throws(() => extractJson('{"days": [1, 2,]}', 'vi'), /JSON không hợp lệ/);
     assert.throws(() => extractJson('{"days": [1, 2,]}', 'ja'), /JSONが不正な形式/);
+    assert.throws(() => extractJson('{"days": [1, 2,]}', 'en'), /invalid JSON/);
   });
 });
 
@@ -215,5 +227,41 @@ describe('renderHealHtml', () => {
   test('falls back to a localized placeholder when nothing changed', () => {
     assert.equal(renderHealHtml({}, 'vi'), 'Không có thay đổi.');
     assert.equal(renderHealHtml({}, 'ja'), '変更はありません。');
+  });
+});
+
+describe('checkPlaceButton', () => {
+  test('embeds the place/context as data attributes and a localized label', () => {
+    const html = checkPlaceButton('Yunangi Okinawan Cuisine', 'Okinawa', 'vi');
+    assert.match(html, /class="check-real-btn/);
+    assert.match(html, /data-place="Yunangi Okinawan Cuisine"/);
+    assert.match(html, /data-context="Okinawa"/);
+    assert.match(html, /Kiểm tra thật/);
+  });
+  test('escapes HTML in the place name to keep the attribute safe', () => {
+    const html = checkPlaceButton('Café "Sunset" <bar>', undefined, 'en');
+    assert.doesNotMatch(html, /<bar>/);
+    assert.match(html, /data-place="Café &quot;Sunset&quot; &lt;bar&gt;"/);
+  });
+  test('includes an empty result slot for the click handler to fill in', () => {
+    const html = checkPlaceButton('Beach', undefined, 'ja');
+    assert.match(html, /<span class="real-data"><\/span>/);
+    assert.match(html, /実際に確認/);
+  });
+});
+
+describe('extractChunkContent', () => {
+  test('extracts the content delta from one NDJSON streaming line', () => {
+    assert.equal(extractChunkContent('{"message":{"content":"Hel"},"done":false}'), 'Hel');
+    assert.equal(extractChunkContent('{"message":{"content":"lo"},"done":false}'), 'lo');
+  });
+  test('returns empty string for the final done-only line', () => {
+    assert.equal(extractChunkContent('{"done":true,"total_duration":123}'), '');
+  });
+  test('returns empty string for blank or malformed lines instead of throwing', () => {
+    assert.equal(extractChunkContent(''), '');
+    assert.equal(extractChunkContent('   '), '');
+    assert.equal(extractChunkContent('not json'), '');
+    assert.equal(extractChunkContent(undefined), '');
   });
 });
