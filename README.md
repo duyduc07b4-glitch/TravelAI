@@ -17,7 +17,7 @@ Tóm tắt nhanh:
 ## Tính năng
 
 - 🗺️ **Dynamic Trip Planning** — tạo lịch trình theo ngày, có link Google Maps cho từng địa điểm
-- 👥 **AI Group Matching** — chấm điểm địa điểm theo sở thích từng thành viên trong nhóm
+- 👥 **AI Group Matching** — chấm điểm địa điểm theo sở thích từng thành viên trong nhóm, có thể ưu tiên dùng dữ liệu thật (giờ mở cửa, giá, đánh giá) từ RAG server local nếu đang chạy
 - 🎙️ **Trợ lý giọng nói** — hỏi/đáp bằng giọng nói (Web Speech API)
 - 🌧️ **Self-Healing Itinerary** — tự đề xuất thay đổi lịch trình khi có sự cố (thời tiết...)
 - 🌐 **Đa ngôn ngữ Việt/Nhật/Anh** — nút VI/JA/EN ở góc trên bên phải đổi toàn bộ giao diện, nội dung AI trả về (lịch trình, group matching, giọng nói, self-healing, camera), nhận diện/phát giọng nói theo đúng ngôn ngữ đang chọn. Lựa chọn ngôn ngữ được lưu lại cho lần sau.
@@ -42,8 +42,21 @@ Tóm tắt nhanh:
 | `setup-guide.html` | Hướng dẫn cài đặt chi tiết |
 | `AI Voice Travel Assistant.pdf` | Tài liệu Product Vision gốc |
 | `tests/app.test.js` | Unit test cho các hàm thuần trong `app.js` |
+| `rag-server/` | (Tùy chọn) server RAG local — index tài liệu trong `knowledge/` và trả về đoạn liên quan cho tab Group Matching |
+| `knowledge/` | Dữ liệu tham khảo (nhà hàng, điểm tham quan, ghi chú) dùng để index cho `rag-server` |
 
 Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang. Dữ liệu này chỉ nằm trên máy bạn, không gửi đi đâu.
+
+## (Tùy chọn) Chạy RAG server cho Group Matching
+
+Tab Group Matching sẽ tự dùng dữ liệu thật (giờ mở cửa, giá, đánh giá trong `knowledge/`) nếu server này đang chạy ở `http://localhost:8899`; nếu tắt, AI vẫn hoạt động bình thường nhưng tự suy đoán thay vì tra cứu dữ liệu.
+
+```bash
+cd rag-server
+npm install
+npm run ingest   # index tài liệu trong knowledge/ (chạy lại mỗi khi đổi dữ liệu)
+npm start        # chạy server tại http://localhost:8899
+```
 
 ## Chạy test
 

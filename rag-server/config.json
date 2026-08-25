@@ -1,0 +1,10 @@
+{
+  "knowledgeFolder": "../knowledge",
+  "ollamaUrl": "http://localhost:11434",
+  "embeddingModel": "nomic-embed-text",
+  "chatModel": "llama3.2",
+  "chunkSize": 500,
+  "chunkOverlap": 50,
+  "topK": 4,
+  "port": 8899
+}

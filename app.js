@@ -73,12 +73,14 @@ const I18N = {
       membersLabel: 'Thành viên & sở thích',
       addMemberBtn: '+ Thêm thành viên',
       runBtn: 'Chấm điểm phù hợp',
-      loading: 'Đang chấm điểm...',
+      loading: 'Đang tra cứu dữ liệu & chấm điểm...',
       memberNamePlaceholder: 'Tên (VD: A)',
       memberPrefPlaceholder: 'Sở thích (VD: Hải sản, thích chụp ảnh)',
       defaultMembers: [['A', 'Hải sản'], ['B', 'Check-in, chụp ảnh'], ['C', 'Shopping'], ['D', 'Có trẻ em'], ['E', 'Orion Beer']],
-      systemPrompt: 'Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}\nĐiểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).',
-      userPrompt: (place, members) => `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`
+      systemPrompt: 'Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Nếu có "Dữ liệu tham khảo" bên dưới (giờ mở cửa, giá, đánh giá thật), hãy ưu tiên dùng thay vì đoán. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}\nĐiểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).',
+      userPrompt: (place, members, context) => `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\nDữ liệu tham khảo (RAG, từ knowledge base thật):\n${context}` : ''}`,
+      ragUsed: (sources) => `📚 Đã dùng dữ liệu từ: ${sources}`,
+      ragNone: '📚 Không tìm thấy dữ liệu liên quan trong knowledge base (RAG server tắt hoặc chưa index) — AI sẽ tự suy đoán.'
     },
     voice: {
       title: 'Trợ lý du lịch bằng giọng nói',
@@ -225,8 +227,10 @@ const I18N = {
       memberNamePlaceholder: '名前（例：A）',
       memberPrefPlaceholder: '好み（例：魚介類、写真撮影が好き）',
       defaultMembers: [['A', '魚介類'], ['B', '写真映え・チェックイン重視'], ['C', 'ショッピング'], ['D', '子供連れ'], ['E', 'オリオンビール']],
-      systemPrompt: 'あなたはAI Group Matching Engineです。ある旅行スポットが、グループの各メンバーの好みにどれだけ合っているかを評価し、実際の議論のように各メンバーの視点を短くシミュレートしてから、AIとしての提案をまとめてください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"このスポットについてのこの人の視点・懸念を1文で、本人の立場で述べる"}],"recommendation":"グループ全員が納得できる落としどころをAIとして1〜2文で提案し、簡潔に理由も述べる"}\nスコアは1〜10段階で、各メンバーの好みから項目を推測してください。"debate"内の各メンバーは、それぞれの好みを反映した異なる意見を持つようにしてください（好みに応じて肯定的にも否定的にもなり得ます）。',
-      userPrompt: (place, members) => `スポット：${place}\nメンバーと好み：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`
+      systemPrompt: 'あなたはAI Group Matching Engineです。ある旅行スポットが、グループの各メンバーの好みにどれだけ合っているかを評価し、実際の議論のように各メンバーの視点を短くシミュレートしてから、AIとしての提案をまとめてください。下に「参考データ」があれば（営業時間・料金・実際のレビューなど）、推測より優先して使ってください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"このスポットについてのこの人の視点・懸念を1文で、本人の立場で述べる"}],"recommendation":"グループ全員が納得できる落としどころをAIとして1〜2文で提案し、簡潔に理由も述べる"}\nスコアは1〜10段階で、各メンバーの好みから項目を推測してください。"debate"内の各メンバーは、それぞれの好みを反映した異なる意見を持つようにしてください（好みに応じて肯定的にも否定的にもなり得ます）。',
+      userPrompt: (place, members, context) => `スポット：${place}\nメンバーと好み：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\n参考データ（RAG、実際のナレッジベースより）：\n${context}` : ''}`,
+      ragUsed: (sources) => `📚 使用したデータ元：${sources}`,
+      ragNone: '📚 ナレッジベースに関連データが見つかりませんでした（RAGサーバーが停止しているか未インデックス）— AIが推測して回答します。'
     },
     voice: {
       title: '音声旅行アシスタント',
@@ -373,8 +377,10 @@ const I18N = {
       memberNamePlaceholder: 'Name (e.g. A)',
       memberPrefPlaceholder: 'Preference (e.g. seafood, loves photos)',
       defaultMembers: [['A', 'Seafood'], ['B', 'Check-ins, photos'], ['C', 'Shopping'], ['D', 'Traveling with kids'], ['E', 'Orion Beer']],
-      systemPrompt: 'You are the AI Group Matching Engine. Assess how well a travel spot fits each group member\'s preferences, then briefly simulate each person\'s perspective like a real discussion before the AI settles on a recommendation. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"One sentence giving this person\'s perspective/concern about the place, in their own voice"}],"recommendation":"1-2 sentences where the AI settles on a compromise that works for the whole group, with a brief reason"}\nScore on a 1-10 scale, inferring criteria from each member\'s preferences. Each person in "debate" should have a different opinion reflecting their own preference (can be positive or negative depending on their taste).',
-      userPrompt: (place, members) => `Place: ${place}\nMembers and preferences:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`
+      systemPrompt: 'You are the AI Group Matching Engine. Assess how well a travel spot fits each group member\'s preferences, then briefly simulate each person\'s perspective like a real discussion before the AI settles on a recommendation. If "Reference data" is given below (real opening hours, prices, reviews), prefer it over guessing. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"One sentence giving this person\'s perspective/concern about the place, in their own voice"}],"recommendation":"1-2 sentences where the AI settles on a compromise that works for the whole group, with a brief reason"}\nScore on a 1-10 scale, inferring criteria from each member\'s preferences. Each person in "debate" should have a different opinion reflecting their own preference (can be positive or negative depending on their taste).',
+      userPrompt: (place, members, context) => `Place: ${place}\nMembers and preferences:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\nReference data (RAG, from the real knowledge base):\n${context}` : ''}`,
+      ragUsed: (sources) => `📚 Used data from: ${sources}`,
+      ragNone: '📚 No related data found in the knowledge base (RAG server is off or not indexed yet) — the AI will guess instead.'
     },
     voice: {
       title: 'Voice travel assistant',
@@ -891,6 +897,7 @@ function renderHealHtml(data, lang) {
 const STORAGE_KEYS = {
   url: 'ollama_url',
   model: 'ollama_model',
+  ragUrl: 'rag_url',
   voiceName: 'voice_name',
   lang: 'app_lang',
   planner: 'planner_state_v1',
@@ -997,6 +1004,37 @@ function initApp() {
 
   function ollamaBase() {
     return (serverUrlInput.value.trim() || 'http://localhost:11434').replace(/\/+$/, '');
+  }
+
+  // ---------- RAG server (reads indexed docs from knowledge/, see rag-server/) ----------
+  function ragBase() {
+    return (safeLoadString(STORAGE_KEYS.ragUrl) || 'http://localhost:8899').replace(/\/+$/, '');
+  }
+
+  /** Fetches the most relevant document chunks for a question/place from the RAG server. Returns empty context if the server is off, unreachable, slow, or nothing is indexed. */
+  async function ragSearch(question) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 4000); // RAG is an optional enhancement — never let it stall the main AI call
+    try {
+      const res = await fetch(`${ragBase()}/search`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question }),
+        signal: controller.signal
+      });
+      if (!res.ok) return { context: '', sources: [] };
+      const data = await res.json();
+      const results = data.results || [];
+      if (results.length === 0) return { context: '', sources: [] };
+      return {
+        context: results.map(r => `[${r.source}]\n${r.text}`).join('\n\n'),
+        sources: results.map(r => r.source)
+      };
+    } catch (err) {
+      return { context: '', sources: [] };
+    } finally {
+      clearTimeout(timeoutId);
+    }
   }
 
   function setStatus(state, html) {
@@ -1313,6 +1351,7 @@ function initApp() {
   const gPlace = document.getElementById('g-place');
   const gResult = document.getElementById('g-result');
   const gDebate = document.getElementById('g-debate');
+  const gRagHint = document.getElementById('g-ragHint');
 
   function addMemberRow(name = '', pref = '') {
     const row = document.createElement('div');
@@ -1348,6 +1387,9 @@ function initApp() {
     gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang)}</div>`;
     renderDebate(savedGroup.data);
   }
+  if (savedGroup && savedGroup.ragSources && savedGroup.ragSources.length) {
+    gRagHint.textContent = T('group.ragUsed', savedGroup.ragSources.join(', '));
+  }
   gPlace.addEventListener('input', () => saveGroupState({}));
 
   document.getElementById('g-addMember').addEventListener('click', () => { groupUsesDefaultMembers = false; addMemberRow(); saveGroupState({}); });
@@ -1372,16 +1414,20 @@ function initApp() {
     const place = gPlace.value.trim() || 'American Village';
     const members = currentMembers();
     setLoading(gResult, true, T('group.loading'));
+    gRagHint.textContent = '';
+    gDebate.innerHTML = '';
+
+    const { context, sources } = await ragSearch(`${place}. ${members.map(m => m.pref).join(', ')}`);
+    gRagHint.textContent = sources.length > 0 ? T('group.ragUsed', sources.join(', ')) : T('group.ragNone');
 
     const system = T('group.systemPrompt');
-    const user = tr(currentLang, 'group.userPrompt', place, members);
-    gDebate.innerHTML = '';
+    const user = tr(currentLang, 'group.userPrompt', place, members, context);
 
     try {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(gResult, T('group.loading')) });
       gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang)}</div>`;
       renderDebate(data);
-      saveGroupState({ data });
+      saveGroupState({ data, ragSources: sources });
     } catch (err) { showError(gResult, err); }
   });
 

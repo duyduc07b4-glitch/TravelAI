@@ -1,0 +1,42 @@
+[
+  {
+    "name": "Okinawa Churaumi Aquarium",
+    "type": "Thủy cung",
+    "hours": "08:30-18:30 (mùa hè cao điểm mở tới 20:00, vé cuối bán trước giờ đóng cửa 1 tiếng)",
+    "ticketPrice": "Người lớn khoảng 2,180 yên (giá có thể thay đổi theo năm)",
+    "address": "Ocean Expo Park, Motobu, Okinawa",
+    "kidFriendly": true,
+    "source": "https://churaumi.okinawa/en/",
+    "notes": "Nổi tiếng với bể Kuroshio Sea nuôi cá mập voi và cá đuối manta. Giờ mở cửa thay đổi theo mùa, nên kiểm tra lại trang chính thức trước khi đi."
+  },
+  {
+    "name": "American Village",
+    "type": "Khu mua sắm, giải trí, ẩm thực",
+    "hours": "Cửa hàng thường 10:00-22:00, một số quán bar/nhà hàng mở tới 24:00, giờ khác nhau theo từng cửa hàng",
+    "ticketPrice": "Miễn phí vào cửa (mua sắm/ăn uống tính riêng)",
+    "address": "Chatan, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Khu phức hợp phong cách Mỹ, có vòng quay Ferris wheel, gần Sunset Beach, phù hợp chụp ảnh, mua sắm, ăn tối."
+  },
+  {
+    "name": "Shuri Castle",
+    "type": "Di tích lịch sử, Cố cung Ryukyu",
+    "hours": "08:30-18:00 (thường đóng cửa sớm hơn vào mùa đông)",
+    "ticketPrice": "Người lớn khoảng 400 yên (khu vực chính điện, giá có thể thay đổi)",
+    "address": "Shuri, Naha, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Di sản văn hóa vương quốc Ryukyu cũ, từng bị cháy năm 2019 và đang trong quá trình phục dựng — nên kiểm tra tình trạng mở cửa thực tế trước khi đi."
+  },
+  {
+    "name": "Kokusai Street (Kokusai Dori)",
+    "type": "Phố ẩm thực, quà lưu niệm",
+    "hours": "Cửa hàng thường 10:00-22:00, đông đúc nhất buổi tối",
+    "ticketPrice": "Miễn phí",
+    "address": "Naha, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Con phố chính dài ~1.6km ở Naha, tập trung nhà hàng, quán lưu niệm, dễ đi bộ khám phá."
+  }
+]

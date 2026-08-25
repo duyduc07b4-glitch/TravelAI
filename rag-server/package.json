@@ -1,0 +1,14 @@
+{
+  "name": "rag-server",
+  "version": "1.0.0",
+  "description": "Local RAG server: index tài liệu trong knowledge/ và trả lời truy vấn dựa trên tài liệu, dùng Ollama (embedding + chat).",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "ingest": "node ingest.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
