@@ -307,14 +307,22 @@ async function callClaude(system, userText, { json = false } = {}) {
   if (json) body.format = 'json';
 
   let res;
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
   try {
     res = await fetch(`${ollamaBase()}/api/chat`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: controller.signal
     });
   } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error('AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.');
+    }
     throw new Error(`Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
+  } finally {
+    clearTimeout(timeoutId);
   }
   if (!res.ok) {
     let msg = res.status + ' ' + res.statusText;
@@ -426,20 +434,39 @@ const vHint = document.getElementById('v-hint');
 let recognition = null;
 let recording = false;
 
+const RECOGNITION_ERROR_VI = {
+  'not-allowed': 'Trình duyệt chưa được cấp quyền micro — vào Cài đặt trình duyệt cho phép micro cho trang này.',
+  'no-speech': 'Không nghe thấy giọng nói — thử nói to hơn hoặc gần mic hơn.',
+  'audio-capture': 'Không tìm thấy micro trên máy này.',
+  'network': 'Lỗi mạng — nhận diện giọng nói của Chrome cần internet để hoạt động, kiểm tra kết nối mạng.',
+  'aborted': 'Đã dừng nghe.'
+};
+
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 if (SpeechRecognition) {
-  document.getElementById('voiceSupport').textContent = 'hỗ trợ trong trình duyệt này';
+  document.getElementById('voiceSupport').textContent = 'hỗ trợ trong trình duyệt này (cần internet để nhận diện giọng nói)';
   recognition = new SpeechRecognition();
   recognition.lang = 'vi-VN';
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
   recognition.onresult = (e) => {
-    const transcript = e.results[0][0].transcript;
+    let transcript = '';
+    let isFinal = false;
+    for (let i = 0; i < e.results.length; i++) {
+      transcript += e.results[i][0].transcript;
+      if (e.results[i].isFinal) isFinal = true;
+    }
     document.getElementById('v-text').value = transcript;
-    sendVoiceQuery(transcript);
+    vHint.textContent = isFinal ? 'Đã nghe: "' + transcript + '"' : '🎤 ' + transcript + ' …';
+    if (isFinal && transcript.trim()) sendVoiceQuery(transcript.trim());
   };
-  recognition.onend = () => { recording = false; micBtn.classList.remove('recording'); vHint.textContent = 'Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")'; };
-  recognition.onerror = (e) => { recording = false; micBtn.classList.remove('recording'); vHint.textContent = 'Lỗi mic: ' + e.error; };
+  recognition.onnomatch = () => { vHint.textContent = 'Không nhận ra câu nói — thử lại, nói rõ và chậm hơn.'; };
+  recognition.onend = () => { recording = false; micBtn.classList.remove('recording'); if (!vHint.textContent.startsWith('Đã nghe')) vHint.textContent = 'Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")'; };
+  recognition.onerror = (e) => {
+    recording = false;
+    micBtn.classList.remove('recording');
+    vHint.textContent = '⚠️ ' + (RECOGNITION_ERROR_VI[e.error] || ('Lỗi mic: ' + e.error));
+  };
 } else {
   document.getElementById('voiceSupport').textContent = 'trình duyệt không hỗ trợ — hãy gõ câu hỏi bên dưới';
   micBtn.disabled = true;
@@ -501,13 +528,19 @@ document.getElementById('v-text').addEventListener('keydown', (e) => {
 async function sendVoiceQuery(text) {
   addMsg('user', text);
   document.getElementById('v-text').value = '';
-  const thinking = addMsg('ai', '...');
+  const thinking = addMsg('ai', 'Đang nghĩ...');
+  const startedAt = Date.now();
+  const tickId = setInterval(() => {
+    thinking.textContent = `Đang nghĩ... (${Math.round((Date.now() - startedAt) / 1000)}s)`;
+  }, 1000);
   const system = `Bạn là trợ lý du lịch AI bằng giọng nói, thân thiện, trả lời ngắn gọn (2-4 câu), thực tế, như đang đề xuất trực tiếp cho người dùng đang ở gần đó (nhà hàng, địa điểm ngắm cảnh...). Trả lời bằng tiếng Việt, không dùng markdown.`;
   try {
     const reply = await callClaude(system, text);
+    clearInterval(tickId);
     thinking.textContent = reply;
     speak(reply);
   } catch (err) {
+    clearInterval(tickId);
     thinking.textContent = '⚠️ ' + err.message;
   }
 }
