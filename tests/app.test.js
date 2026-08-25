@@ -193,6 +193,21 @@ describe('renderPlannerHtml', () => {
     assert.doesNotMatch(html, /Day 2/);
     assert.match(html, /Day 3/);
   });
+  test('warns when the model returns fewer days than requested', () => {
+    // Regression test for a real bug report: user asked for a 4-day trip and the
+    // (small, local) model only generated 1 day of activities.
+    const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Beach'] }] }, 'Okinawa', 'vi', 4);
+    assert.match(html, /class="error-box"/);
+    assert.match(html, /yêu cầu 4 ngày nhưng AI chỉ tạo được 1 ngày/);
+  });
+  test('does not warn when the day count matches what was requested', () => {
+    const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Beach'] }] }, 'Okinawa', 'vi', 1);
+    assert.doesNotMatch(html, /error-box/);
+  });
+  test('does not warn when no requestedDays is given (e.g. restoring old saved state)', () => {
+    const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Beach'] }] }, 'Okinawa', 'vi');
+    assert.doesNotMatch(html, /error-box/);
+  });
 });
 
 describe('renderGroupScoreTableHtml', () => {
