@@ -9,44 +9,45 @@
 <body>
 
 <header>
-  <h1>AI Travel Companion <span>Local prototype · AI chạy trên máy bạn qua Ollama · dùng được cả từ điện thoại trong cùng mạng</span></h1>
+  <h1>AI Travel Companion <span id="appSubtitle" data-i18n="appSubtitle"></span></h1>
   <div class="apikey-row">
     <span id="statusDot" class="status-dot status-off"></span>
     <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
     <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
-    <button class="secondary small" id="loadModelBtn">Kiểm tra kết nối</button>
+    <button class="secondary small" id="loadModelBtn" data-i18n="checkConnBtn"></button>
+    <div class="lang-switch" role="group" aria-label="Language / 言語">
+      <button type="button" class="lang-btn" data-lang="vi">VI</button>
+      <button type="button" class="lang-btn" data-lang="ja">JA</button>
+    </div>
   </div>
 </header>
 <div style="max-width:960px; margin:0 auto; padding:0 24px;">
-  <div class="hint" id="loadProgress">
-    Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miễn phí, chạy hoàn toàn offline). Sau khi cài: mở Terminal chạy <code>ollama pull llama3.2</code> để tải model, rồi bấm "Kiểm tra kết nối".
-    Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.
-  </div>
+  <div class="hint" id="loadProgress"></div>
 </div>
 
 <main>
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="planner">🗺️ Lịch trình</button>
-    <button class="tab-btn" data-tab="group">👥 Group Matching</button>
-    <button class="tab-btn" data-tab="voice">🎙️ Trợ lý giọng nói</button>
-    <button class="tab-btn" data-tab="heal">🌧️ Self-Healing</button>
-    <button class="tab-btn" data-tab="camera">📷 Camera AI</button>
+    <button class="tab-btn active" data-tab="planner" data-i18n="tabs.planner"></button>
+    <button class="tab-btn" data-tab="group" data-i18n="tabs.group"></button>
+    <button class="tab-btn" data-tab="voice" data-i18n="tabs.voice"></button>
+    <button class="tab-btn" data-tab="heal" data-i18n="tabs.heal"></button>
+    <button class="tab-btn" data-tab="camera" data-i18n="tabs.camera"></button>
   </nav>
 
   <!-- TAB 1: Dynamic Trip Planning -->
   <section class="panel active" id="panel-planner">
     <div class="card">
-      <h3>Tạo lịch trình tự động</h3>
+      <h3 data-i18n="planner.title"></h3>
       <div class="row2">
-        <div class="field"><label>Điểm đến</label><input type="text" id="p-dest" placeholder="Okinawa"></div>
-        <div class="field"><label>Số ngày</label><input type="number" id="p-days" value="4" min="1" max="14"></div>
+        <div class="field"><label data-i18n="planner.destLabel"></label><input type="text" id="p-dest" placeholder="Okinawa"></div>
+        <div class="field"><label data-i18n="planner.daysLabel"></label><input type="number" id="p-days" value="4" min="1" max="14"></div>
       </div>
       <div class="row2">
-        <div class="field"><label>Ngân sách (yên / tổng)</label><input type="number" id="p-budget" placeholder="80000"></div>
-        <div class="field"><label>Thành phần nhóm</label><input type="text" id="p-group" placeholder="Vợ chồng + 1 bé 5 tuổi"></div>
+        <div class="field"><label data-i18n="planner.budgetLabel"></label><input type="number" id="p-budget" data-i18n="planner.budgetPlaceholder" data-i18n-attr="placeholder" placeholder="80000"></div>
+        <div class="field"><label data-i18n="planner.groupLabel"></label><input type="text" id="p-group" data-i18n="planner.groupPlaceholder" data-i18n-attr="placeholder"></div>
       </div>
-      <div class="field"><label>Ghi chú thêm (phương tiện, sở thích...)</label><input type="text" id="p-notes" placeholder="Thuê xe, thích hải sản, thích biển"></div>
-      <button id="p-run">Tạo lịch trình</button>
+      <div class="field"><label data-i18n="planner.notesLabel"></label><input type="text" id="p-notes" data-i18n="planner.notesPlaceholder" data-i18n-attr="placeholder"></div>
+      <button id="p-run" data-i18n="planner.runBtn"></button>
       <div class="result" id="p-result"></div>
     </div>
   </section>
@@ -54,13 +55,13 @@
   <!-- TAB 2: Group Matching -->
   <section class="panel" id="panel-group">
     <div class="card">
-      <h3>Chấm điểm địa điểm cho cả nhóm</h3>
-      <div class="field"><label>Địa điểm cần đánh giá</label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
-      <div class="field"><label>Thành viên & sở thích</label>
+      <h3 data-i18n="group.title"></h3>
+      <div class="field"><label data-i18n="group.placeLabel"></label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
+      <div class="field"><label data-i18n="group.membersLabel"></label>
         <div id="g-members"></div>
-        <button type="button" class="secondary small" id="g-addMember">+ Thêm thành viên</button>
+        <button type="button" class="secondary small" id="g-addMember" data-i18n="group.addMemberBtn"></button>
       </div>
-      <button id="g-run">Chấm điểm phù hợp</button>
+      <button id="g-run" data-i18n="group.runBtn"></button>
       <div class="result" id="g-result"></div>
       <div class="chat-log" id="g-debate" style="margin-top:14px;"></div>
     </div>
@@ -69,20 +70,20 @@
   <!-- TAB 3: Voice Assistant -->
   <section class="panel" id="panel-voice">
     <div class="card">
-      <h3>Trợ lý du lịch bằng giọng nói <span class="badge" id="voiceSupport"></span></h3>
+      <h3><span data-i18n="voice.title"></span> <span class="badge" id="voiceSupport"></span></h3>
       <div class="field">
-        <label>Giọng đọc</label>
+        <label data-i18n="voice.voiceLabel"></label>
         <select id="v-voice" style="width:100%;"></select>
         <div class="hint" id="v-voiceHint"></div>
       </div>
       <div class="mic-area">
         <button class="mic-btn" id="v-mic">🎤</button>
-        <div class="mic-hint" id="v-hint">Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")</div>
+        <div class="mic-hint" id="v-hint"></div>
       </div>
-      <div class="field"><label>Hoặc gõ câu hỏi</label>
+      <div class="field"><label data-i18n="voice.orTypeLabel"></label>
         <div style="display:flex; gap:8px;">
-          <input type="text" id="v-text" placeholder="Tìm nơi ngắm hoàng hôn đẹp gần đây" style="flex:1;">
-          <button id="v-send" class="secondary">Gửi</button>
+          <input type="text" id="v-text" data-i18n="voice.textPlaceholder" data-i18n-attr="placeholder" style="flex:1;">
+          <button id="v-send" class="secondary" data-i18n="voice.sendBtn"></button>
         </div>
       </div>
       <div class="chat-log" id="v-log"></div>
@@ -92,21 +93,18 @@
   <!-- TAB 4: Self-Healing Itinerary -->
   <section class="panel" id="panel-heal">
     <div class="card">
-      <h3>Lịch trình tự thay đổi</h3>
-      <div class="field"><label>Lịch trình hiện tại (mỗi dòng 1 hoạt động)</label>
-        <textarea id="h-itin">Beach
-Sunset viewing
-Outdoor BBQ
-Dinner ngoài trời</textarea>
+      <h3 data-i18n="heal.title"></h3>
+      <div class="field"><label data-i18n="heal.itinLabel"></label>
+        <textarea id="h-itin"></textarea>
       </div>
       <div class="row2">
-        <div class="field"><label>Điểm đến (để lấy thời tiết thật)</label><input type="text" id="h-dest" placeholder="Okinawa"></div>
-        <div class="field"><label>Tình huống bất ngờ</label><input type="text" id="h-event" placeholder="Buổi sáng mưa lớn"></div>
+        <div class="field"><label data-i18n="heal.destLabel"></label><input type="text" id="h-dest" placeholder="Okinawa"></div>
+        <div class="field"><label data-i18n="heal.eventLabel"></label><input type="text" id="h-event" data-i18n="heal.eventPlaceholder" data-i18n-attr="placeholder"></div>
       </div>
-      <button type="button" class="secondary small" id="h-weather">🌦️ Lấy thời tiết thật</button>
+      <button type="button" class="secondary small" id="h-weather" data-i18n="heal.weatherBtn"></button>
       <div class="hint" id="h-weatherStatus"></div>
       <div style="height:10px;"></div>
-      <button id="h-run">Cập nhật lịch trình</button>
+      <button id="h-run" data-i18n="heal.runBtn"></button>
       <div class="result" id="h-result"></div>
     </div>
   </section>
@@ -114,23 +112,23 @@ Dinner ngoài trời</textarea>
   <!-- TAB 5: Camera AI -->
   <section class="panel" id="panel-camera">
     <div class="card">
-      <h3>AI hiểu qua camera</h3>
+      <h3 data-i18n="camera.title"></h3>
       <div class="row2">
-        <div class="field"><label>Chế độ</label>
+        <div class="field"><label data-i18n="camera.modeLabel"></label>
           <select id="c-mode">
-            <option value="food">🍜 Món ăn</option>
-            <option value="landmark">🏯 Địa danh</option>
+            <option value="food" data-i18n="camera.modeFood"></option>
+            <option value="landmark" data-i18n="camera.modeLandmark"></option>
           </select>
         </div>
-        <div class="field"><label>Vision model (Ollama)</label><input type="text" id="c-model" placeholder="moondream" value="moondream"></div>
+        <div class="field"><label data-i18n="camera.visionModelLabel"></label><input type="text" id="c-model" placeholder="moondream" value="moondream"></div>
       </div>
-      <div class="hint">Model mặc định <code>moondream</code> nhẹ, chạy nhanh trên local nhưng nhận diện còn thô. Muốn chính xác hơn: <code>ollama pull llama3.2-vision</code> rồi đổi ô model.</div>
+      <div class="hint" data-i18n="camera.modelHint" data-i18n-html="1"></div>
       <div class="field" style="margin-top:12px;">
-        <label>Chụp hoặc chọn ảnh</label>
+        <label data-i18n="camera.fileLabel"></label>
         <input type="file" id="c-file" accept="image/*" capture="environment">
       </div>
       <img id="c-preview" style="display:none; max-width:100%; border-radius:10px; margin:10px 0; border:1px solid var(--border);">
-      <button id="c-run" disabled>Phân tích ảnh</button>
+      <button id="c-run" disabled data-i18n="camera.runBtn"></button>
       <div class="result" id="c-result"></div>
     </div>
   </section>

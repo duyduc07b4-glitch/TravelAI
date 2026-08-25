@@ -20,11 +20,13 @@ Tóm tắt nhanh:
 - 👥 **AI Group Matching** — chấm điểm địa điểm theo sở thích từng thành viên trong nhóm
 - 🎙️ **Trợ lý giọng nói** — hỏi/đáp bằng giọng nói (Web Speech API)
 - 🌧️ **Self-Healing Itinerary** — tự đề xuất thay đổi lịch trình khi có sự cố (thời tiết...)
+- 🌐 **Song ngữ Việt/Nhật** — nút VI/JA ở góc trên bên phải đổi toàn bộ giao diện, nội dung AI trả về (lịch trình, group matching, giọng nói, self-healing, camera), nhận diện/phát giọng nói theo đúng ngôn ngữ đang chọn. Lựa chọn ngôn ngữ được lưu lại cho lần sau.
 
 ## Giới hạn hiện tại
 
 - AI chạy local (llama3.2 qua Ollama) không có dữ liệu thời gian thực — giờ mở cửa, số điện thoại, địa chỉ do AI gợi ý **chưa được xác minh**, luôn kiểm tra qua nút "Xem bản đồ" trước khi đi.
 - Chất lượng phụ thuộc vào model đã pull và cấu hình máy chạy.
+- Chất lượng tiếng Nhật do AI sinh ra phụ thuộc vào model — `llama3.2` hiểu và trả lời tiếng Nhật khá tốt nhưng không hoàn hảo như tiếng Anh, nên kiểm tra kỹ trước khi demo.
 
 ## Cấu trúc file
 

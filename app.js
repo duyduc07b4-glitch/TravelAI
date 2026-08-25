@@ -6,37 +6,320 @@
 (function (root) {
 'use strict';
 
+const DEFAULT_LANG = 'vi';
+const SUPPORTED_LANGS = ['vi', 'ja'];
+
+// ---------- i18n dictionary ----------
+// Every leaf is either a string or a function(...) => string (for messages needing interpolation).
+const I18N = {
+  vi: {
+    appSubtitle: 'Local prototype · AI chạy trên máy bạn qua Ollama · dùng được cả từ điện thoại trong cùng mạng',
+    checkConnBtn: 'Kiểm tra kết nối',
+    connect: {
+      defaultHint: 'Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miễn phí, chạy hoàn toàn offline). Sau khi cài: mở Terminal chạy <code>ollama pull llama3.2</code> để tải model, rồi bấm "Kiểm tra kết nối". Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.',
+      connecting: 'Đang kết nối tới Ollama...',
+      noModel: (model) => `⚠️ Kết nối được nhưng chưa có model nào. Chạy: <code>ollama pull ${model}</code> rồi thử lại.`,
+      modelMissing: (names, model) => `⚠️ Server có các model: ${names} — không thấy "${model}". Sửa lại tên model hoặc chạy <code>ollama pull ${model}</code>.`,
+      ready: (model) => `✅ Đã kết nối Ollama, model "${model}" sẵn sàng — AI chạy trên máy này, hoàn toàn offline/miễn phí.`,
+      failed: (base, err) => `⚠️ Không kết nối được tới ${base}. Kiểm tra: Ollama đã chạy chưa, đúng địa chỉ IP chưa, và nếu gọi từ điện thoại/máy khác thì đã bật <code>OLLAMA_HOST=0.0.0.0</code> và <code>OLLAMA_ORIGINS=*</code> chưa. Lỗi: ${err}`
+    },
+    tabs: { planner: '🗺️ Lịch trình', group: '👥 Group Matching', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera AI' },
+    common: {
+      mapLink: '📍 Xem bản đồ',
+      venueWarning: '⚠️ chưa xác minh giờ mở cửa',
+      dayLabel: (n) => `Day ${n}`,
+      noResult: 'Không có kết quả.',
+      noChange: 'Không có thay đổi.',
+      aiFinal: '🤖 AI chốt:',
+      criteriaHeader: 'Tiêu chí',
+      scoreHeader: 'Điểm',
+      changesHeader: 'Thay đổi',
+      newItineraryHeader: 'Lịch trình mới',
+      plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.'
+    },
+    planner: {
+      title: 'Tạo lịch trình tự động',
+      destLabel: 'Điểm đến',
+      daysLabel: 'Số ngày',
+      budgetLabel: 'Ngân sách (yên / tổng)',
+      budgetPlaceholder: '80000',
+      groupLabel: 'Thành phần nhóm',
+      groupPlaceholder: 'Vợ chồng + 1 bé 5 tuổi',
+      notesLabel: 'Ghi chú thêm (phương tiện, sở thích...)',
+      notesPlaceholder: 'Thuê xe, thích hải sản, thích biển',
+      runBtn: 'Tạo lịch trình',
+      loading: 'Đang tạo lịch trình...',
+      systemPrompt: 'Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt), không kèm text hay markdown code fence nào khác, theo đúng schema:\n{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}',
+      userPrompt: (dest, days, budget, group, notes) => `Lên lịch trình du lịch ${dest}, ${days} ngày. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực.`
+    },
+    group: {
+      title: 'Chấm điểm địa điểm cho cả nhóm',
+      placeLabel: 'Địa điểm cần đánh giá',
+      membersLabel: 'Thành viên & sở thích',
+      addMemberBtn: '+ Thêm thành viên',
+      runBtn: 'Chấm điểm phù hợp',
+      loading: 'Đang chấm điểm...',
+      memberNamePlaceholder: 'Tên (VD: A)',
+      memberPrefPlaceholder: 'Sở thích (VD: Hải sản, thích chụp ảnh)',
+      defaultMembers: [['A', 'Hải sản'], ['B', 'Check-in, chụp ảnh'], ['C', 'Shopping'], ['D', 'Có trẻ em'], ['E', 'Orion Beer']],
+      systemPrompt: 'Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}\nĐiểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).',
+      userPrompt: (place, members) => `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`
+    },
+    voice: {
+      title: 'Trợ lý du lịch bằng giọng nói',
+      voiceLabel: 'Giọng đọc',
+      orTypeLabel: 'Hoặc gõ câu hỏi',
+      textPlaceholder: 'Tìm nơi ngắm hoàng hôn đẹp gần đây',
+      sendBtn: 'Gửi',
+      micHintDefault: 'Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")',
+      listening: 'Đang nghe...',
+      heard: (t) => `Đã nghe: "${t}"`,
+      hearing: (t) => `🎤 ${t} …`,
+      noMatch: 'Không nhận ra câu nói — thử lại, nói rõ và chậm hơn.',
+      notSupported: 'trình duyệt không hỗ trợ — hãy gõ câu hỏi bên dưới',
+      supported: 'hỗ trợ trong trình duyệt này (cần internet để nhận diện giọng nói)',
+      thinking: 'Đang nghĩ...',
+      thinkingTick: (s) => `Đang nghĩ... (${s}s)`,
+      noVoices: 'Trình duyệt chưa nạp xong danh sách giọng đọc, hoặc máy chưa cài giọng nào phù hợp.',
+      noNativeVoices: 'Máy chưa có giọng tiếng Việt nào ngoài giọng mặc định, nên đang phát toàn bộ giọng có sẵn (có thể không đọc đúng tiếng Việt). Trên macOS: vào System Settings → Accessibility → Spoken Content → System Voice → tải thêm giọng tiếng Việt (chọn bản "Enhanced/Premium" để nghe tự nhiên hơn nhiều so với giọng mặc định).',
+      voicesFound: (n) => `Tìm thấy ${n} giọng tiếng Việt. Nếu vẫn thấy robot, thử cài thêm giọng "Enhanced/Premium" trong Cài đặt hệ thống để có giọng tự nhiên hơn.`,
+      recognitionErrors: {
+        'not-allowed': 'Trình duyệt chưa được cấp quyền micro — vào Cài đặt trình duyệt cho phép micro cho trang này.',
+        'no-speech': 'Không nghe thấy giọng nói — thử nói to hơn hoặc gần mic hơn.',
+        'audio-capture': 'Không tìm thấy micro trên máy này.',
+        'network': 'Lỗi mạng — nhận diện giọng nói của Chrome cần internet để hoạt động, kiểm tra kết nối mạng.',
+        'aborted': 'Đã dừng nghe.'
+      },
+      micErrorPrefix: 'Lỗi mic: ',
+      systemPrompt: 'Bạn là trợ lý du lịch AI bằng giọng nói, thân thiện, trả lời ngắn gọn (2-4 câu), thực tế, như đang đề xuất trực tiếp cho người dùng đang ở gần đó (nhà hàng, địa điểm ngắm cảnh...). Trả lời bằng tiếng Việt, không dùng markdown.'
+    },
+    heal: {
+      title: 'Lịch trình tự thay đổi',
+      itinLabel: 'Lịch trình hiện tại (mỗi dòng 1 hoạt động)',
+      destLabel: 'Điểm đến (để lấy thời tiết thật)',
+      eventLabel: 'Tình huống bất ngờ',
+      eventPlaceholder: 'Buổi sáng mưa lớn',
+      weatherBtn: '🌦️ Lấy thời tiết thật',
+      runBtn: 'Cập nhật lịch trình',
+      loading: 'Đang cập nhật lịch trình...',
+      defaultItinerary: 'Beach\nSunset viewing\nOutdoor BBQ\nDinner ngoài trời',
+      defaultEvent: 'Buổi sáng mưa lớn',
+      needDest: '⚠️ Nhập điểm đến trước.',
+      lookingUp: 'Đang tra vị trí và thời tiết thật...',
+      notFound: (dest) => `⚠️ Không tìm thấy vị trí "${dest}".`,
+      weatherText: (place, country, desc, temp, precip) => `Tại ${place}${country ? ', ' + country : ''} hiện đang ${desc}, ${temp}°C${precip > 0 ? `, lượng mưa ${precip}mm` : ''}.`,
+      weatherReady: (time) => `✅ Dữ liệu thật từ Open-Meteo, cập nhật lúc ${time}.`,
+      weatherError: (msg) => `⚠️ Không lấy được thời tiết: ${msg}`,
+      systemPrompt: 'Bạn là AI Self-Healing Itinerary Engine. Khi có tình huống bất ngờ, tự động thay thế các hoạt động không còn phù hợp bằng lựa chọn thay thế hợp lý, giữ nguyên các hoạt động không bị ảnh hưởng. Trả lời DUY NHẤT bằng JSON (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
+      userPrompt: (itin, event) => `Lịch trình hiện tại:\n${itin.map(i => '- ' + i).join('\n')}\n\nTình huống: ${event}`
+    },
+    camera: {
+      title: 'AI hiểu qua camera',
+      modeLabel: 'Chế độ',
+      modeFood: '🍜 Món ăn',
+      modeLandmark: '🏯 Địa danh',
+      visionModelLabel: 'Vision model (Ollama)',
+      modelHint: 'Model mặc định <code>moondream</code> nhẹ, chạy nhanh trên local nhưng nhận diện còn thô. Muốn chính xác hơn: <code>ollama pull llama3.2-vision</code> rồi đổi ô model.',
+      fileLabel: 'Chụp hoặc chọn ảnh',
+      runBtn: 'Phân tích ảnh',
+      step1: 'Đang nhìn ảnh (bước 1/2)...',
+      step2: 'Đang phân tích & viết câu trả lời (bước 2/2)...',
+      noCaption: (model) => `Model vision "${model}" không trả về mô tả nào cho ảnh này — thử ảnh khác hoặc đổi model.`,
+      disclaimer: (model) => `⚠️ AI vision chạy local (${model}) dễ nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.`,
+      systemPromptFood: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.',
+      systemPromptLandmark: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.',
+      userPrompt: (caption) => `Mô tả từ AI vision: "${caption}"`
+    },
+    weatherCodes: {
+      0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
+      45: 'sương mù', 48: 'sương mù đóng băng',
+      51: 'mưa phùn nhẹ', 53: 'mưa phùn vừa', 55: 'mưa phùn dày',
+      61: 'mưa nhẹ', 63: 'mưa vừa', 65: 'mưa to',
+      71: 'tuyết nhẹ', 73: 'tuyết vừa', 75: 'tuyết to',
+      80: 'mưa rào nhẹ', 81: 'mưa rào vừa', 82: 'mưa rào dữ dội',
+      95: 'giông bão', 96: 'giông kèm mưa đá nhẹ', 99: 'giông kèm mưa đá to',
+      unknown: 'thời tiết không xác định'
+    },
+    venueKeywords: ['ăn trưa','ăn tối','ăn sáng','nhà hàng','quán ','café','cafe','lunch','dinner','breakfast','restaurant','bar','beer','izakaya','shop','store','mall','shopping'],
+    speechLang: 'vi-VN',
+    speechVoicePrefix: 'vi',
+    geocodeLang: 'vi'
+  },
+  ja: {
+    appSubtitle: 'ローカル試作版 · Ollama経由でこの端末上でAIが動作 · 同じネットワーク内ならスマホからも利用可',
+    checkConnBtn: '接続確認',
+    connect: {
+      defaultHint: 'まずこの端末に<a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a>をインストールしてください（無料・完全オフライン動作）。インストール後、ターミナルで <code>ollama pull llama3.2</code> を実行してモデルを取得し、「接続確認」を押してください。スマホから使う場合：スマホは同じWi-Fiに接続し、Server欄の <code>localhost</code> をこの端末のLAN IPアドレスに置き換え（例：<code>http://192.168.3.23:11434</code>）、スマホでは <code>http://192.168.3.23:8765/app.html</code> を開いてください。',
+      connecting: 'Ollamaに接続中...',
+      noModel: (model) => `⚠️ 接続はできましたが、モデルがまだありません。<code>ollama pull ${model}</code> を実行してから再試行してください。`,
+      modelMissing: (names, model) => `⚠️ サーバーにあるモデル：${names} — 「${model}」が見つかりません。モデル名を修正するか <code>ollama pull ${model}</code> を実行してください。`,
+      ready: (model) => `✅ Ollamaに接続済み、モデル「${model}」使用可能 — この端末上で完全オフライン・無料で動作しています。`,
+      failed: (base, err) => `⚠️ ${base} に接続できません。Ollamaが起動しているか、IPアドレスが正しいか確認してください。スマホ/他端末から接続する場合は <code>OLLAMA_HOST=0.0.0.0</code> と <code>OLLAMA_ORIGINS=*</code> を設定してください。エラー内容：${err}`
+    },
+    tabs: { planner: '🗺️ 旅程', group: '👥 グループマッチング', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラAI' },
+    common: {
+      mapLink: '📍 地図を見る',
+      venueWarning: '⚠️ 営業時間未確認',
+      dayLabel: (n) => `${n}日目`,
+      noResult: '結果がありません。',
+      noChange: '変更はありません。',
+      aiFinal: '🤖 AIの結論：',
+      criteriaHeader: '項目',
+      scoreHeader: 'スコア',
+      changesHeader: '変更点',
+      newItineraryHeader: '新しい旅程',
+      plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ このAIはローカル動作でリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離はAIの一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。'
+    },
+    planner: {
+      title: '旅程を自動作成',
+      destLabel: '目的地',
+      daysLabel: '日数',
+      budgetLabel: '予算（円・合計）',
+      budgetPlaceholder: '80000',
+      groupLabel: 'メンバー構成',
+      groupPlaceholder: '夫婦 + 5歳の子供1人',
+      notesLabel: '補足（交通手段・好みなど）',
+      notesPlaceholder: 'レンタカー希望、魚介類が好き、海が好き',
+      runBtn: '旅程を作成',
+      loading: '旅程を作成中...',
+      systemPrompt: 'あなたはAI Travel Companion、パーソナライズされた旅行プランニングアシスタントです。各アクティビティにはGoogleマップで検索できる具体的な店名・施設名を含めてください（例：「昼食はランチのみ」ではなく「Yunangi Okinawan Cuisineで昼食」）。あなたはリアルタイム情報を持たないため、営業時間・住所・電話番号・実際の交通状況や移動距離を断定してはいけません — アクティビティの順序は一般的な妥当性（例：午後はビーチ、1日の終わりに夕日鑑賞）に基づく推測に留め、経路が最適化されている、または渋滞を確認したとは主張しないでください。必ずJSONのみで回答し（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）、それ以外のテキストやMarkdownのコードフェンスは付けないでください。スキーマ：\n{"days":[{"day":1,"activities":["那覇空港","Yunangi Okinawan Cuisineで昼食","American Village","サンセットビーチ","Steak House 88で夕食"]}],"summary":"概算費用と主な注意点についての1〜2文。出発前に実際の営業時間を確認するよう促すこと"}',
+      userPrompt: (dest, days, budget, group, notes) => `${dest}への${days}日間の旅行プランを作成してください。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。`
+    },
+    group: {
+      title: 'グループ全員向けにスポットを採点',
+      placeLabel: '評価するスポット',
+      membersLabel: 'メンバーと好み',
+      addMemberBtn: '+ メンバーを追加',
+      runBtn: '適合度を採点',
+      loading: '採点中...',
+      memberNamePlaceholder: '名前（例：A）',
+      memberPrefPlaceholder: '好み（例：魚介類、写真撮影が好き）',
+      defaultMembers: [['A', '魚介類'], ['B', '写真映え・チェックイン重視'], ['C', 'ショッピング'], ['D', '子供連れ'], ['E', 'オリオンビール']],
+      systemPrompt: 'あなたはAI Group Matching Engineです。ある旅行スポットが、グループの各メンバーの好みにどれだけ合っているかを評価し、実際の議論のように各メンバーの視点を短くシミュレートしてから、AIとしての提案をまとめてください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"このスポットについてのこの人の視点・懸念を1文で、本人の立場で述べる"}],"recommendation":"グループ全員が納得できる落としどころをAIとして1〜2文で提案し、簡潔に理由も述べる"}\nスコアは1〜10段階で、各メンバーの好みから項目を推測してください。"debate"内の各メンバーは、それぞれの好みを反映した異なる意見を持つようにしてください（好みに応じて肯定的にも否定的にもなり得ます）。',
+      userPrompt: (place, members) => `スポット：${place}\nメンバーと好み：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`
+    },
+    voice: {
+      title: '音声旅行アシスタント',
+      voiceLabel: '読み上げ音声',
+      orTypeLabel: 'または質問を入力',
+      textPlaceholder: '近くの綺麗な夕日スポットを探して',
+      sendBtn: '送信',
+      micHintDefault: 'タップして話す（例：「近くで寿司を食べたい」）',
+      listening: '聞き取り中...',
+      heard: (t) => `聞き取り結果：「${t}」`,
+      hearing: (t) => `🎤 ${t} …`,
+      noMatch: '聞き取れませんでした — もう一度、はっきりゆっくり話してください。',
+      notSupported: 'このブラウザは音声認識に対応していません — 下のテキスト欄から質問してください',
+      supported: 'このブラウザで利用可能（音声認識にはインターネット接続が必要です）',
+      thinking: '考え中...',
+      thinkingTick: (s) => `考え中...（${s}秒）`,
+      noVoices: 'ブラウザがまだ音声リストを読み込んでいないか、対応する音声がインストールされていません。',
+      noNativeVoices: 'この端末に日本語の音声がデフォルト以外にないため、利用可能な音声を全て表示しています（日本語がうまく読み上げられない場合があります）。macOSの場合：システム設定 → アクセシビリティ → 読み上げコンテンツ → システムの声 → 日本語の音声を追加（「拡張/プレミアム」版を選ぶとより自然な声になります）。',
+      voicesFound: (n) => `日本語の音声が${n}件見つかりました。ロボットっぽい場合は、システム設定で「拡張/プレミアム」音声を追加すると自然になります。`,
+      recognitionErrors: {
+        'not-allowed': 'マイクの使用が許可されていません — ブラウザの設定でこのページのマイクを許可してください。',
+        'no-speech': '発話が検出されませんでした — もっと大きな声で、マイクに近づいて話してください。',
+        'audio-capture': 'この端末にマイクが見つかりません。',
+        'network': 'ネットワークエラー — Chromeの音声認識にはインターネット接続が必要です。接続を確認してください。',
+        'aborted': '聞き取りを停止しました。'
+      },
+      micErrorPrefix: 'マイクエラー：',
+      systemPrompt: 'あなたはフレンドリーな音声旅行アシスタントです。簡潔（2〜4文）かつ実用的に、近くにいるユーザーに直接おすすめするように答えてください（レストラン、景勝地など）。日本語で、Markdownを使わずに答えてください。'
+    },
+    heal: {
+      title: '旅程の自動リカバリー',
+      itinLabel: '現在の旅程（1行に1つのアクティビティ）',
+      destLabel: '目的地（実際の天気を取得するため）',
+      eventLabel: '突発的な状況',
+      eventPlaceholder: '朝から大雨',
+      weatherBtn: '🌦️ 実際の天気を取得',
+      runBtn: '旅程を更新',
+      loading: '旅程を更新中...',
+      defaultItinerary: 'ビーチ\n夕日鑑賞\n屋外バーベキュー\n屋外ディナー',
+      defaultEvent: '朝から大雨',
+      needDest: '⚠️ まず目的地を入力してください。',
+      lookingUp: '位置情報と実際の天気を取得中...',
+      notFound: (dest) => `⚠️ 「${dest}」の位置が見つかりません。`,
+      weatherText: (place, country, desc, temp, precip) => `${place}${country ? '、' + country : ''}は現在${desc}、${temp}°C${precip > 0 ? `、降水量${precip}mm` : ''}です。`,
+      weatherReady: (time) => `✅ Open-Meteoの実データ、${time}時点。`,
+      weatherError: (msg) => `⚠️ 天気を取得できませんでした：${msg}`,
+      systemPrompt: 'あなたはAI Self-Healing Itinerary Engineです。突発的な状況が発生した場合、もう適さなくなったアクティビティを合理的な代替案に自動的に置き換え、影響を受けないアクティビティはそのまま維持してください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
+      userPrompt: (itin, event) => `現在の旅程：\n${itin.map(i => '- ' + i).join('\n')}\n\n状況：${event}`
+    },
+    camera: {
+      title: 'カメラでAI認識',
+      modeLabel: 'モード',
+      modeFood: '🍜 料理',
+      modeLandmark: '🏯 観光地',
+      visionModelLabel: 'Vision モデル（Ollama）',
+      modelHint: 'デフォルトの<code>moondream</code>は軽量でローカルでも高速に動きますが、認識精度は粗めです。より正確にしたい場合は <code>ollama pull llama3.2-vision</code> を実行してモデル欄を変更してください。',
+      fileLabel: '写真を撮影または選択',
+      runBtn: '画像を分析',
+      step1: '画像を確認中（ステップ1/2）...',
+      step2: '分析して回答を作成中（ステップ2/2）...',
+      noCaption: (model) => `Visionモデル「${model}」がこの画像の説明を返しませんでした — 別の画像を試すか、モデルを変更してください。`,
+      disclaimer: (model) => `⚠️ ローカル動作のVision AI（${model}）は誤認識しやすく、特に画像内の文字（メニューや看板）やマイナーな料理・観光地では精度が落ちます。参考程度に留め、断定的な結論とはみなさないでください。`,
+      systemPromptFood: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の料理と考えられるか。2) 見える材料。3) 似ていて試す価値のある料理を1〜2つ提案。価格やカロリーを正確に断定しないでください — 触れる場合は概算であることを明記してください。説明が曖昧すぎて判断できない場合は、正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
+      systemPromptLandmark: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の観光地・建造物と考えられるか。2) 確かな情報があれば歴史・文化的背景を少し。3) 近くにありそうな似た種類の観光スポット。説明が曖昧すぎて識別できない場合は、当てずっぽうで答えず正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
+      userPrompt: (caption) => `Vision AIによる説明：「${caption}」`
+    },
+    weatherCodes: {
+      0: '快晴', 1: 'ほぼ晴れ', 2: '所により曇り', 3: '曇り',
+      45: '霧', 48: '着氷性の霧',
+      51: '弱い霧雨', 53: '霧雨', 55: '強い霧雨',
+      61: '弱い雨', 63: '雨', 65: '強い雨',
+      71: '弱い雪', 73: '雪', 75: '強い雪',
+      80: '弱いにわか雨', 81: 'にわか雨', 82: '激しいにわか雨',
+      95: '雷雨', 96: '雹を伴う軽い雷雨', 99: '雹を伴う激しい雷雨',
+      unknown: '不明な天気'
+    },
+    venueKeywords: ['ランチ','昼食','夕食','夕飯','朝食','レストラン','カフェ','喫茶店','バー','居酒屋','ショップ','ストア','モール','ショッピング','食堂','飲み屋'],
+    speechLang: 'ja-JP',
+    speechVoicePrefix: 'ja',
+    geocodeLang: 'ja'
+  }
+};
+
+function normalizeLang(lang) {
+  return SUPPORTED_LANGS.includes(lang) ? lang : DEFAULT_LANG;
+}
+
+function getPath(obj, path) {
+  return path.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
+}
+
+/** Looks up a translation by dot-path for the given language, falling back to DEFAULT_LANG, then the key itself. */
+function tr(lang, path, ...args) {
+  lang = normalizeLang(lang);
+  let val = getPath(I18N[lang], path);
+  if (val === undefined) val = getPath(I18N[DEFAULT_LANG], path);
+  if (val === undefined) return path;
+  return typeof val === 'function' ? val(...args) : val;
+}
+
 // ---------- Pure utils (no DOM, safe to unit test) ----------
 
 function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function mapLink(place, context) {
+function mapLink(place, context, lang) {
   const q = encodeURIComponent(context ? `${place}, ${context}` : place);
-  return `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" class="map-link">📍 Xem bản đồ</a>`;
+  return `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" class="map-link">${tr(lang, 'common.mapLink')}</a>`;
 }
 
-const VENUE_KEYWORDS = ['ăn trưa','ăn tối','ăn sáng','nhà hàng','quán ','café','cafe','lunch','dinner','breakfast','restaurant','bar','beer','izakaya','shop','store','mall','shopping'];
-function venueWarning(text) {
+function venueWarning(text, lang) {
+  const keywords = tr(lang, 'venueKeywords');
   const t = String(text).toLowerCase();
-  if (VENUE_KEYWORDS.some(k => t.includes(k))) {
-    return ' <span class="warn-badge" title="AI không có dữ liệu thời gian thực, giờ mở cửa có thể sai">⚠️ chưa xác minh giờ mở cửa</span>';
+  if (Array.isArray(keywords) && keywords.some(k => t.includes(k.toLowerCase()))) {
+    return ` <span class="warn-badge" title="${escapeHtml(tr(lang, 'common.venueWarning'))}">${tr(lang, 'common.venueWarning')}</span>`;
   }
   return '';
 }
 
-const WEATHER_CODE_VI = {
-  0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
-  45: 'sương mù', 48: 'sương mù đóng băng',
-  51: 'mưa phùn nhẹ', 53: 'mưa phùn vừa', 55: 'mưa phùn dày',
-  61: 'mưa nhẹ', 63: 'mưa vừa', 65: 'mưa to',
-  71: 'tuyết nhẹ', 73: 'tuyết vừa', 75: 'tuyết to',
-  80: 'mưa rào nhẹ', 81: 'mưa rào vừa', 82: 'mưa rào dữ dội',
-  95: 'giông bão', 96: 'giông kèm mưa đá nhẹ', 99: 'giông kèm mưa đá to'
-};
-function weatherDescription(code) {
-  return WEATHER_CODE_VI[code] || 'thời tiết không xác định';
+function weatherDescription(code, lang) {
+  const codes = tr(lang, 'weatherCodes');
+  return (codes && codes[code]) || tr(lang, 'weatherCodes.unknown');
 }
 
 /**
@@ -65,62 +348,65 @@ function findFirstJsonObject(text) {
 
 /**
  * Extracts and parses a JSON object from an LLM text response.
- * Throws a Vietnamese, user-facing Error (not a raw JSON.parse error) on failure.
+ * Throws a user-facing Error (localized) on failure, not a raw JSON.parse error.
  */
-function extractJson(text) {
+function extractJson(text, lang) {
   const stripped = String(text || '').replace(/```json/gi, '').replace(/```/g, '').trim();
-  let candidate = stripped;
   try {
-    return JSON.parse(candidate);
+    return JSON.parse(stripped);
   } catch (e) { /* fall through to balanced-brace extraction */ }
 
   const found = findFirstJsonObject(stripped);
   if (!found) {
-    throw new Error('AI không trả về dữ liệu dạng JSON như yêu cầu — model có thể quá nhỏ để tuân theo định dạng. Thử lại hoặc đổi sang model khác.');
+    throw new Error(lang === 'ja'
+      ? 'AIが要求されたJSON形式でデータを返しませんでした — モデルが小さすぎて形式に従えない可能性があります。再試行するか、別のモデルに変更してください。'
+      : 'AI không trả về dữ liệu dạng JSON như yêu cầu — model có thể quá nhỏ để tuân theo định dạng. Thử lại hoặc đổi sang model khác.');
   }
   try {
     return JSON.parse(found);
   } catch (e) {
-    throw new Error('AI trả về JSON không hợp lệ (bị lỗi cú pháp giữa chừng). Thử lại hoặc đổi sang model khác.');
+    throw new Error(lang === 'ja'
+      ? 'AIが返したJSONが不正な形式です（途中で構文エラー）。再試行するか、別のモデルに変更してください。'
+      : 'AI trả về JSON không hợp lệ (bị lỗi cú pháp giữa chừng). Thử lại hoặc đổi sang model khác.');
   }
 }
 
 // ---------- Render helpers (return HTML strings; pure given data) ----------
 
-function renderPlannerHtml(data, dest) {
+function renderPlannerHtml(data, dest, lang) {
   let dayHtml = '';
   (data.days || []).forEach((d, i) => {
     if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
-    const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest)}${venueWarning(a)}</li>`).join('');
-    dayHtml += `<div class="day-block"><h4>Day ${d.day || (i + 1)}</h4><ul>${items}</ul></div>`;
+    const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest, lang)}${venueWarning(a, lang)}</li>`).join('');
+    dayHtml += `<div class="day-block"><h4>${tr(lang, 'common.dayLabel', d.day || (i + 1))}</h4><ul>${items}</ul></div>`;
   });
-  if (!dayHtml) return 'Không có kết quả.';
+  if (!dayHtml) return tr(lang, 'common.noResult');
   let html = dayHtml;
   if (data.summary) html += `<div class="summary-note">${escapeHtml(data.summary)}</div>`;
-  html += `<div class="summary-note">📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.</div>`;
+  html += `<div class="summary-note">${tr(lang, 'common.plannerDisclaimer')}</div>`;
   return html;
 }
 
-function renderGroupScoreTableHtml(data) {
-  let html = `<table class="score-table"><thead><tr><th>Tiêu chí</th><th>Điểm</th></tr></thead><tbody>`;
+function renderGroupScoreTableHtml(data, lang) {
+  let html = `<table class="score-table"><thead><tr><th>${tr(lang, 'common.criteriaHeader')}</th><th>${tr(lang, 'common.scoreHeader')}</th></tr></thead><tbody>`;
   (data.criteria || []).forEach(c => { html += `<tr><td>${escapeHtml(c.name)}</td><td>${c.score}/10</td></tr>`; });
   html += `</tbody></table>`;
   return html;
 }
 
-function renderHealHtml(data) {
+function renderHealHtml(data, lang) {
   let html = '';
   if ((data.replacements || []).length) {
-    html += `<div class="day-block"><h4>Thay đổi</h4><ul>`;
+    html += `<div class="day-block"><h4>${tr(lang, 'common.changesHeader')}</h4><ul>`;
     data.replacements.forEach(r => {
       html += `<li><strong>${escapeHtml(r.original)}</strong> → <strong>${escapeHtml(r.replacement)}</strong> — ${escapeHtml(r.reason || '')}</li>`;
     });
     html += `</ul></div>`;
   }
   if ((data.updated_itinerary || []).length) {
-    html += `<div class="day-block"><h4>Lịch trình mới</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a)}${venueWarning(a)}</li>`).join('')}</ul></div>`;
+    html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
   }
-  return html || 'Không có thay đổi.';
+  return html || tr(lang, 'common.noChange');
 }
 
 // ---------- localStorage persistence (guarded — private mode can throw) ----------
@@ -129,6 +415,7 @@ const STORAGE_KEYS = {
   url: 'ollama_url',
   model: 'ollama_model',
   voiceName: 'voice_name',
+  lang: 'app_lang',
   planner: 'planner_state_v1',
   group: 'group_state_v1',
   heal: 'heal_state_v1',
@@ -163,8 +450,9 @@ function safeLoadString(key) {
 }
 
 const AppCore = {
-  escapeHtml, mapLink, venueWarning, VENUE_KEYWORDS,
-  WEATHER_CODE_VI, weatherDescription,
+  DEFAULT_LANG, SUPPORTED_LANGS, I18N, tr, normalizeLang,
+  escapeHtml, mapLink, venueWarning,
+  weatherDescription,
   findFirstJsonObject, extractJson,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
@@ -180,13 +468,43 @@ if (typeof document !== 'undefined') {
 }
 
 function initApp() {
+  let currentLang = normalizeLang(safeLoadString(STORAGE_KEYS.lang) || DEFAULT_LANG);
+  const T = (path, ...args) => tr(currentLang, path, ...args);
+  // Tracks fields still showing the built-in example content (not user-typed/saved),
+  // so switching language can re-translate them instead of leaving stale text behind.
+  let healUsesDefaultItin = false;
+  let groupUsesDefaultMembers = false;
+
+  // ---------- Static text translation ----------
+  function applyStaticTranslations() {
+    document.documentElement.lang = currentLang;
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      const val = T(key);
+      if (el.dataset.i18nAttr) el.setAttribute(el.dataset.i18nAttr, val);
+      else if (el.dataset.i18nHtml) el.innerHTML = val;
+      else el.textContent = val;
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === currentLang);
+    });
+    loadProgress.innerHTML = T('connect.defaultHint');
+    updateVoiceSupportLabel();
+    updateMicHintIdle();
+    populateVoices();
+    if (healUsesDefaultItin) hItin.value = T('heal.defaultItinerary');
+    if (groupUsesDefaultMembers) {
+      membersDiv.innerHTML = '';
+      T('group.defaultMembers').forEach(([n, p]) => addMemberRow(n, p));
+    }
+  }
+
   // ---------- Ollama connection ----------
   const serverUrlInput = document.getElementById('serverUrl');
   const modelSelect = document.getElementById('modelSelect');
   const statusDot = document.getElementById('statusDot');
   const loadProgress = document.getElementById('loadProgress');
   const loadModelBtn = document.getElementById('loadModelBtn');
-  const defaultHint = loadProgress.innerHTML;
 
   serverUrlInput.value = safeLoadString(STORAGE_KEYS.url) || 'http://localhost:11434';
   modelSelect.value = safeLoadString(STORAGE_KEYS.model) || 'llama3.2';
@@ -195,18 +513,28 @@ function initApp() {
     return (serverUrlInput.value.trim() || 'http://localhost:11434').replace(/\/+$/, '');
   }
 
-  function setStatus(state, text) {
+  function setStatus(state, html) {
     statusDot.className = 'status-dot ' + (state === 'ready' ? 'status-ok' : state === 'loading' ? 'status-warn' : 'status-off');
-    if (text) loadProgress.innerHTML = text; else loadProgress.innerHTML = defaultHint;
+    loadProgress.innerHTML = html != null ? html : T('connect.defaultHint');
   }
 
   loadModelBtn.addEventListener('click', checkConnection);
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.lang === currentLang) return;
+      currentLang = normalizeLang(btn.dataset.lang);
+      safeSaveString(STORAGE_KEYS.lang, currentLang);
+      if (recognition) recognition.lang = T('speechLang') || (currentLang === 'ja' ? 'ja-JP' : 'vi-VN');
+      applyStaticTranslations();
+    });
+  });
 
   async function checkConnection() {
     safeSaveString(STORAGE_KEYS.url, serverUrlInput.value.trim());
     safeSaveString(STORAGE_KEYS.model, modelSelect.value.trim());
     loadModelBtn.disabled = true;
-    setStatus('loading', 'Đang kết nối tới Ollama...');
+    setStatus('loading', T('connect.connecting'));
     try {
       const res = await fetch(`${ollamaBase()}/api/tags`);
       if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
@@ -214,14 +542,14 @@ function initApp() {
       const names = (data.models || []).map(m => m.name);
       const model = modelSelect.value.trim();
       if (names.length === 0) {
-        setStatus('off', '⚠️ Kết nối được nhưng chưa có model nào. Chạy: <code>ollama pull ' + (model || 'llama3.2') + '</code> rồi thử lại.');
+        setStatus('off', T('connect.noModel', model || 'llama3.2'));
       } else if (!names.some(n => n === model || n.startsWith(model + ':'))) {
-        setStatus('off', `⚠️ Server có các model: ${names.join(', ')} — không thấy "${model}". Sửa lại tên model hoặc chạy <code>ollama pull ${model}</code>.`);
+        setStatus('off', T('connect.modelMissing', names.join(', '), model));
       } else {
-        setStatus('ready', `✅ Đã kết nối Ollama, model "${model}" sẵn sàng — AI chạy trên máy này, hoàn toàn offline/miễn phí.`);
+        setStatus('ready', T('connect.ready', model));
       }
     } catch (err) {
-      setStatus('off', `⚠️ Không kết nối được tới ${ollamaBase()}. Kiểm tra: Ollama đã chạy chưa, đúng địa chỉ IP chưa, và nếu gọi từ điện thoại/máy khác thì đã bật <code>OLLAMA_HOST=0.0.0.0</code> và <code>OLLAMA_ORIGINS=*</code> chưa. Lỗi: ${err.message}`);
+      setStatus('off', T('connect.failed', ollamaBase(), err.message));
     } finally {
       loadModelBtn.disabled = false;
     }
@@ -262,9 +590,13 @@ function initApp() {
       });
     } catch (err) {
       if (err.name === 'AbortError') {
-        throw new Error('AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.');
+        throw new Error(currentLang === 'ja'
+          ? 'AIが60秒以内に応答しませんでした — モデルの初回読み込みに時間がかかっているか、端末の負荷が高い可能性があります。再試行するか、より軽量なモデルに変更してください。'
+          : 'AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.');
       }
-      throw new Error(`Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
+      throw new Error(currentLang === 'ja'
+        ? `${ollamaBase()} に接続できませんでした。右上の「接続確認」で診断してください。`
+        : `Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
     } finally {
       clearTimeout(timeoutId);
     }
@@ -275,15 +607,15 @@ function initApp() {
     }
     const data = await res.json();
     const text = data.message?.content || '';
-    if (json) return extractJson(text);
+    if (json) return extractJson(text, currentLang);
     return text;
   }
 
-  function setLoading(el, on, label = 'Đang hỏi AI...') {
+  function setLoading(el, on, label) {
     if (on) el.innerHTML = `<div class="loading"><div class="spinner"></div>${label}</div>`;
   }
   function showError(el, err) {
-    el.innerHTML = `<div class="error-box">⚠️ ${err.message}</div>`;
+    el.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(err.message)}</div>`;
   }
 
   // ---------- TAB 1: Trip Planner ----------
@@ -311,26 +643,24 @@ function initApp() {
     if (saved.group) pGroup.value = saved.group;
     if (saved.notes) pNotes.value = saved.notes;
     if (saved.data) {
-      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(saved.data, saved.dest || '')}</div>`;
+      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(saved.data, saved.dest || '', currentLang)}</div>`;
     }
   })();
 
   document.getElementById('p-run').addEventListener('click', async () => {
     const dest = pDest.value.trim() || 'Okinawa';
     const days = pDays.value || 4;
-    const budget = pBudget.value || 'không giới hạn';
-    const group = pGroup.value.trim() || 'một mình';
+    const budget = pBudget.value || (currentLang === 'ja' ? '無制限' : 'không giới hạn');
+    const group = pGroup.value.trim() || (currentLang === 'ja' ? '一人旅' : 'một mình');
     const notes = pNotes.value.trim();
-    setLoading(pResult, true, 'Đang tạo lịch trình...');
+    setLoading(pResult, true, T('planner.loading'));
 
-    const system = `Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ, không kèm text hay markdown code fence nào khác, theo đúng schema:
-{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}`;
-    const user = `Lên lịch trình du lịch ${dest}, ${days} ngày. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}
-Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực.`;
+    const system = T('planner.systemPrompt');
+    const user = tr(currentLang, 'planner.userPrompt', dest, days, budget, group, notes);
 
     try {
       const data = await callClaude(system, user, { json: true });
-      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest)}</div>`;
+      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang)}</div>`;
       savePlannerState({ data });
     } catch (err) { showError(pResult, err); }
   });
@@ -340,17 +670,16 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
   const gPlace = document.getElementById('g-place');
   const gResult = document.getElementById('g-result');
   const gDebate = document.getElementById('g-debate');
-  const DEFAULT_MEMBERS = [['A','Hải sản'], ['B','Check-in, chụp ảnh'], ['C','Shopping'], ['D','Có trẻ em'], ['E','Orion Beer']];
 
   function addMemberRow(name = '', pref = '') {
     const row = document.createElement('div');
     row.className = 'member-row';
-    row.innerHTML = `<input type="text" placeholder="Tên (VD: A)" class="g-name" value="${escapeHtml(name)}">
-      <input type="text" placeholder="Sở thích (VD: Hải sản, thích chụp ảnh)" class="g-pref" value="${escapeHtml(pref)}">
+    row.innerHTML = `<input type="text" placeholder="${escapeHtml(T('group.memberNamePlaceholder'))}" class="g-name" value="${escapeHtml(name)}">
+      <input type="text" placeholder="${escapeHtml(T('group.memberPrefPlaceholder'))}" class="g-pref" value="${escapeHtml(pref)}">
       <button type="button" class="secondary small g-remove">✕</button>`;
-    row.querySelector('.g-remove').addEventListener('click', () => { row.remove(); saveGroupState({}); });
-    row.querySelector('.g-name').addEventListener('input', () => saveGroupState({}));
-    row.querySelector('.g-pref').addEventListener('input', () => saveGroupState({}));
+    row.querySelector('.g-remove').addEventListener('click', () => { row.remove(); groupUsesDefaultMembers = false; saveGroupState({}); });
+    row.querySelector('.g-name').addEventListener('input', () => { groupUsesDefaultMembers = false; saveGroupState({}); });
+    row.querySelector('.g-pref').addEventListener('input', () => { groupUsesDefaultMembers = false; saveGroupState({}); });
     membersDiv.appendChild(row);
   }
 
@@ -368,16 +697,17 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
   if (savedGroup && Array.isArray(savedGroup.members) && savedGroup.members.length) {
     savedGroup.members.forEach(m => addMemberRow(m.name, m.pref));
   } else {
-    DEFAULT_MEMBERS.forEach(([n, p]) => addMemberRow(n, p));
+    groupUsesDefaultMembers = true;
+    T('group.defaultMembers').forEach(([n, p]) => addMemberRow(n, p));
   }
   if (savedGroup && savedGroup.place) gPlace.value = savedGroup.place;
   if (savedGroup && savedGroup.data) {
-    gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data)}</div>`;
+    gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang)}</div>`;
     renderDebate(savedGroup.data);
   }
   gPlace.addEventListener('input', () => saveGroupState({}));
 
-  document.getElementById('g-addMember').addEventListener('click', () => { addMemberRow(); saveGroupState({}); });
+  document.getElementById('g-addMember').addEventListener('click', () => { groupUsesDefaultMembers = false; addMemberRow(); saveGroupState({}); });
 
   function renderDebate(data) {
     gDebate.innerHTML = '';
@@ -390,7 +720,7 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
     if (data.recommendation) {
       const div = document.createElement('div');
       div.className = 'msg user';
-      div.innerHTML = `<strong>🤖 AI chốt:</strong> ${escapeHtml(data.recommendation)}`;
+      div.innerHTML = `<strong>${T('common.aiFinal')}</strong> ${escapeHtml(data.recommendation)}`;
       gDebate.appendChild(div);
     }
   }
@@ -398,17 +728,15 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
   document.getElementById('g-run').addEventListener('click', async () => {
     const place = gPlace.value.trim() || 'American Village';
     const members = currentMembers();
-    setLoading(gResult, true, 'Đang chấm điểm...');
+    setLoading(gResult, true, T('group.loading'));
 
-    const system = `Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Trả lời DUY NHẤT bằng JSON hợp lệ theo schema:
-{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}
-Điểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).`;
-    const user = `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`;
+    const system = T('group.systemPrompt');
+    const user = tr(currentLang, 'group.userPrompt', place, members);
     gDebate.innerHTML = '';
 
     try {
       const data = await callClaude(system, user, { json: true });
-      gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data)}</div>`;
+      gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang)}</div>`;
       renderDebate(data);
       saveGroupState({ data });
     } catch (err) { showError(gResult, err); }
@@ -421,19 +749,17 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
   let recognition = null;
   let recording = false;
 
-  const RECOGNITION_ERROR_VI = {
-    'not-allowed': 'Trình duyệt chưa được cấp quyền micro — vào Cài đặt trình duyệt cho phép micro cho trang này.',
-    'no-speech': 'Không nghe thấy giọng nói — thử nói to hơn hoặc gần mic hơn.',
-    'audio-capture': 'Không tìm thấy micro trên máy này.',
-    'network': 'Lỗi mạng — nhận diện giọng nói của Chrome cần internet để hoạt động, kiểm tra kết nối mạng.',
-    'aborted': 'Đã dừng nghe.'
-  };
+  function updateMicHintIdle() {
+    if (!recording && !vHint.dataset.locked) vHint.textContent = T('voice.micHintDefault');
+  }
+  function updateVoiceSupportLabel() {
+    document.getElementById('voiceSupport').textContent = SpeechRecognitionCtor ? T('voice.supported') : T('voice.notSupported');
+  }
 
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (SpeechRecognition) {
-    document.getElementById('voiceSupport').textContent = 'hỗ trợ trong trình duyệt này (cần internet để nhận diện giọng nói)';
-    recognition = new SpeechRecognition();
-    recognition.lang = 'vi-VN';
+  const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognitionCtor) {
+    recognition = new SpeechRecognitionCtor();
+    recognition.lang = T('speechLang');
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
     recognition.onresult = (e) => {
@@ -444,18 +770,24 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
         if (e.results[i].isFinal) isFinal = true;
       }
       document.getElementById('v-text').value = transcript;
-      vHint.textContent = isFinal ? 'Đã nghe: "' + transcript + '"' : '🎤 ' + transcript + ' …';
+      vHint.dataset.locked = '1';
+      vHint.textContent = isFinal ? T('voice.heard', transcript) : T('voice.hearing', transcript);
       if (isFinal && transcript.trim()) sendVoiceQuery(transcript.trim());
     };
-    recognition.onnomatch = () => { vHint.textContent = 'Không nhận ra câu nói — thử lại, nói rõ và chậm hơn.'; };
-    recognition.onend = () => { recording = false; micBtn.classList.remove('recording'); if (!vHint.textContent.startsWith('Đã nghe')) vHint.textContent = 'Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")'; };
+    recognition.onnomatch = () => { vHint.dataset.locked = '1'; vHint.textContent = T('voice.noMatch'); };
+    recognition.onend = () => {
+      recording = false;
+      micBtn.classList.remove('recording');
+      delete vHint.dataset.locked;
+      updateMicHintIdle();
+    };
     recognition.onerror = (e) => {
       recording = false;
       micBtn.classList.remove('recording');
-      vHint.textContent = '⚠️ ' + (RECOGNITION_ERROR_VI[e.error] || ('Lỗi mic: ' + e.error));
+      vHint.dataset.locked = '1';
+      vHint.textContent = (T('voice.recognitionErrors')[e.error]) || (T('voice.micErrorPrefix') + e.error);
     };
   } else {
-    document.getElementById('voiceSupport').textContent = 'trình duyệt không hỗ trợ — hãy gõ câu hỏi bên dưới';
     micBtn.disabled = true;
   }
 
@@ -466,14 +798,15 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
 
   function populateVoices() {
     availableVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-    const viVoices = availableVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('vi'));
-    const list = viVoices.length ? viVoices : availableVoices;
+    const prefix = T('speechVoicePrefix');
+    const langVoices = availableVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith(prefix));
+    const list = langVoices.length ? langVoices : availableVoices;
     const savedVoiceName = safeLoadString(STORAGE_KEYS.voiceName);
 
     voiceSelect.innerHTML = '';
     if (list.length === 0) {
-      voiceSelect.innerHTML = '<option value="">(không có giọng đọc nào)</option>';
-      voiceHint.textContent = 'Trình duyệt chưa nạp xong danh sách giọng đọc, hoặc máy chưa cài giọng tiếng Việt nào.';
+      voiceSelect.innerHTML = '<option value="">—</option>';
+      voiceHint.textContent = T('voice.noVoices');
       return;
     }
     list.forEach(v => {
@@ -483,10 +816,10 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
       if (v.name === savedVoiceName) opt.selected = true;
       voiceSelect.appendChild(opt);
     });
-    if (!viVoices.length) {
-      voiceHint.innerHTML = 'Máy chưa có giọng tiếng Việt nào ngoài giọng mặc định, nên đang phát toàn bộ giọng có sẵn (có thể không đọc đúng tiếng Việt). Trên macOS: vào System Settings → Accessibility → Spoken Content → System Voice → tải thêm giọng tiếng Việt (chọn bản "Enhanced/Premium" để nghe tự nhiên hơn nhiều so với giọng mặc định).';
+    if (!langVoices.length) {
+      voiceHint.innerHTML = T('voice.noNativeVoices');
     } else {
-      voiceHint.textContent = `Tìm thấy ${viVoices.length} giọng tiếng Việt. Nếu vẫn thấy robot, thử cài thêm giọng "Enhanced/Premium" trong Cài đặt hệ thống để có giọng tự nhiên hơn.`;
+      voiceHint.textContent = T('voice.voicesFound', langVoices.length);
     }
   }
   if (window.speechSynthesis) {
@@ -500,7 +833,9 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
     if (recording) { recognition.stop(); return; }
     recording = true;
     micBtn.classList.add('recording');
-    vHint.textContent = 'Đang nghe...';
+    vHint.dataset.locked = '1';
+    vHint.textContent = T('voice.listening');
+    recognition.lang = T('speechLang');
     recognition.start();
   });
 
@@ -529,12 +864,12 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
   async function sendVoiceQuery(text) {
     addMsg('user', text);
     document.getElementById('v-text').value = '';
-    const thinking = addMsg('ai', 'Đang nghĩ...');
+    const thinking = addMsg('ai', T('voice.thinking'));
     const startedAt = Date.now();
     const tickId = setInterval(() => {
-      thinking.textContent = `Đang nghĩ... (${Math.round((Date.now() - startedAt) / 1000)}s)`;
+      thinking.textContent = T('voice.thinkingTick', Math.round((Date.now() - startedAt) / 1000));
     }, 1000);
-    const system = `Bạn là trợ lý du lịch AI bằng giọng nói, thân thiện, trả lời ngắn gọn (2-4 câu), thực tế, như đang đề xuất trực tiếp cho người dùng đang ở gần đó (nhà hàng, địa điểm ngắm cảnh...). Trả lời bằng tiếng Việt, không dùng markdown.`;
+    const system = T('voice.systemPrompt');
     try {
       const reply = await callClaude(system, text);
       clearInterval(tickId);
@@ -564,7 +899,7 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
     const utter = new SpeechSynthesisUtterance(text);
     const chosen = availableVoices.find(v => v.name === voiceSelect.value);
     if (chosen) { utter.voice = chosen; utter.lang = chosen.lang; }
-    else { utter.lang = 'vi-VN'; }
+    else { utter.lang = T('speechLang'); }
     utter.rate = 1.02;
     utter.pitch = 1.0;
     window.speechSynthesis.speak(utter);
@@ -579,55 +914,58 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
   function saveHealState(extra) {
     safeSave(STORAGE_KEYS.heal, Object.assign({ itin: hItin.value, dest: hDest.value, event: hEvent.value }, extra));
   }
-  [hItin, hDest, hEvent].forEach(el => el.addEventListener('input', () => saveHealState({})));
+  hItin.addEventListener('input', () => { healUsesDefaultItin = false; saveHealState({}); });
+  [hDest, hEvent].forEach(el => el.addEventListener('input', () => saveHealState({})));
 
   (function restoreHeal() {
     const saved = safeLoad(STORAGE_KEYS.heal);
-    if (!saved) return;
-    if (saved.itin) hItin.value = saved.itin;
-    if (saved.dest) hDest.value = saved.dest;
-    if (saved.event) hEvent.value = saved.event;
-    if (saved.data) {
-      hResult.innerHTML = `<div class="result-box">${renderHealHtml(saved.data)}</div>`;
+    if (saved) {
+      if (saved.itin) hItin.value = saved.itin;
+      if (saved.dest) hDest.value = saved.dest;
+      if (saved.event) hEvent.value = saved.event;
+      if (saved.data) {
+        hResult.innerHTML = `<div class="result-box">${renderHealHtml(saved.data, currentLang)}</div>`;
+      }
+    } else {
+      healUsesDefaultItin = true;
+      hItin.value = T('heal.defaultItinerary');
     }
   })();
 
   document.getElementById('h-weather').addEventListener('click', async () => {
     const dest = hDest.value.trim();
     const statusEl = document.getElementById('h-weatherStatus');
-    if (!dest) { statusEl.textContent = '⚠️ Nhập điểm đến trước.'; return; }
-    statusEl.textContent = 'Đang tra vị trí và thời tiết thật...';
+    if (!dest) { statusEl.textContent = T('heal.needDest'); return; }
+    statusEl.textContent = T('heal.lookingUp');
     try {
-      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=vi&name=${encodeURIComponent(dest)}`);
+      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=${encodeURIComponent(T('geocodeLang'))}&name=${encodeURIComponent(dest)}`);
       const geo = await geoRes.json();
       const place = geo.results && geo.results[0];
-      if (!place) { statusEl.textContent = `⚠️ Không tìm thấy vị trí "${dest}".`; return; }
+      if (!place) { statusEl.textContent = T('heal.notFound', dest); return; }
 
       const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation`);
       const w = await wRes.json();
       const c = w.current;
-      const desc = weatherDescription(c.weather_code);
-      const text = `Tại ${place.name}${place.country ? ', ' + place.country : ''} hiện đang ${desc}, ${c.temperature_2m}°C${c.precipitation > 0 ? `, lượng mưa ${c.precipitation}mm` : ''}.`;
-      hEvent.value = text;
-      statusEl.textContent = `✅ Dữ liệu thật từ Open-Meteo, cập nhật lúc ${c.time?.slice(11,16) || ''}.`;
+      const desc = weatherDescription(c.weather_code, currentLang);
+      hEvent.value = tr(currentLang, 'heal.weatherText', place.name, place.country, desc, c.temperature_2m, c.precipitation);
+      statusEl.textContent = T('heal.weatherReady', c.time?.slice(11, 16) || '');
       saveHealState({});
     } catch (err) {
-      statusEl.textContent = '⚠️ Không lấy được thời tiết: ' + err.message;
+      statusEl.textContent = T('heal.weatherError', err.message);
     }
   });
 
   document.getElementById('h-run').addEventListener('click', async () => {
     const itin = hItin.value.split('\n').map(s => s.trim()).filter(Boolean);
-    const event = hEvent.value.trim() || 'Buổi sáng mưa lớn';
-    setLoading(hResult, true, 'Đang cập nhật lịch trình...');
+    const event = hEvent.value.trim() || T('heal.defaultEvent');
+    setLoading(hResult, true, T('heal.loading'));
 
-    const system = `Bạn là AI Self-Healing Itinerary Engine. Khi có tình huống bất ngờ, tự động thay thế các hoạt động không còn phù hợp bằng lựa chọn thay thế hợp lý, giữ nguyên các hoạt động không bị ảnh hưởng. Trả lời DUY NHẤT bằng JSON theo schema:
-{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}`;
-    const user = `Lịch trình hiện tại:\n${itin.map(i => '- ' + i).join('\n')}\n\nTình huống: ${event}`;
+    const system = T('heal.systemPrompt');
+    const user = tr(currentLang, 'heal.userPrompt', itin, event);
 
     try {
       const data = await callClaude(system, user, { json: true });
-      hResult.innerHTML = `<div class="result-box">${renderHealHtml(data)}</div>`;
+      hResult.innerHTML = `<div class="result-box">${renderHealHtml(data, currentLang)}</div>`;
       saveHealState({ data });
     } catch (err) { showError(hResult, err); }
   });
@@ -658,17 +996,15 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
     const resultEl = document.getElementById('c-result');
 
     try {
-      setLoading(resultEl, true, 'Đang nhìn ảnh (bước 1/2)...');
+      setLoading(resultEl, true, T('camera.step1'));
       const captionPrompt = 'Describe this image in detail, mentioning any text you can see.';
       const caption = await callVision(captionPrompt, cImageBase64, visionModel);
-      if (!caption || !caption.trim()) throw new Error(`Model vision "${visionModel}" không trả về mô tả nào cho ảnh này — thử ảnh khác hoặc đổi model.`);
+      if (!caption || !caption.trim()) throw new Error(T('camera.noCaption', visionModel));
 
-      setLoading(resultEl, true, 'Đang phân tích & viết câu trả lời (bước 2/2)...');
-      const system = mode === 'food'
-        ? `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.`
-        : `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.`;
-      const text = await callClaude(system, `Mô tả từ AI vision: "${caption}"`);
-      resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">⚠️ AI vision chạy local (${escapeHtml(visionModel)}) dễ nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.</div>`;
+      setLoading(resultEl, true, T('camera.step2'));
+      const system = mode === 'food' ? T('camera.systemPromptFood') : T('camera.systemPromptLandmark');
+      const text = await callClaude(system, tr(currentLang, 'camera.userPrompt', caption));
+      resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(visionModel))}</div>`;
     } catch (err) { showError(resultEl, err); }
   });
 
@@ -685,17 +1021,21 @@ Sắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/ch
         })
       });
     } catch (err) {
-      throw new Error(`Không gọi được tới ${ollamaBase()}. Kiểm tra Ollama đang chạy chưa.`);
+      throw new Error(currentLang === 'ja'
+        ? `${ollamaBase()} に接続できませんでした。Ollamaが起動しているか確認してください。`
+        : `Không gọi được tới ${ollamaBase()}. Kiểm tra Ollama đang chạy chưa.`);
     }
     if (!res.ok) {
       let msg = res.status + ' ' + res.statusText;
       try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
-      if (/not found/i.test(msg)) msg += ` — có thể chưa tải model. Chạy: ollama pull ${model}`;
+      if (/not found/i.test(msg)) msg += currentLang === 'ja' ? ` — モデルが未取得の可能性があります。実行：ollama pull ${model}` : ` — có thể chưa tải model. Chạy: ollama pull ${model}`;
       throw new Error(msg);
     }
     const data = await res.json();
-    return data.message?.content || '(không có phản hồi)';
+    return data.message?.content || '(no response)';
   }
+
+  applyStaticTranslations();
 }
 
 })(typeof globalThis !== 'undefined' ? globalThis : this);
