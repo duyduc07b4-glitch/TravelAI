@@ -101,6 +101,9 @@
   .hint{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.7;}
   .hint code{background:var(--panel2); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent2); font-size:11.5px;}
   .badge{display:inline-block; background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:11px; color:var(--muted); margin-left:6px;}
+  @media (max-width: 780px){
+    .row2, .row3{grid-template-columns:1fr;}
+  }
 </style>
 </head>
 <body>
@@ -111,6 +114,7 @@
     <span id="statusDot" class="status-dot status-off"></span>
     <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
     <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
+    <input type="number" id="timeoutSec" placeholder="180" min="30" max="600" title="Timeout AI (giây)" style="width:88px;">
     <button class="secondary small" id="loadModelBtn">Kiểm tra kết nối</button>
   </div>
 </header>
@@ -137,6 +141,17 @@
       <div class="row2">
         <div class="field"><label>Điểm đến</label><input type="text" id="p-dest" placeholder="Okinawa"></div>
         <div class="field"><label>Số ngày</label><input type="number" id="p-days" value="4" min="1" max="14"></div>
+      </div>
+      <div class="row3">
+        <div class="field"><label>Ngày khởi hành</label><input type="date" id="p-start"></div>
+        <div class="field"><label>Nhịp độ</label>
+          <select id="p-pace">
+            <option value="thoai mai">Thoải mái (ít điểm hơn, nghỉ nhiều hơn)</option>
+            <option value="can bang" selected>Cân bằng</option>
+            <option value="day dac">Dày đặc (nhiều điểm tham quan)</option>
+          </select>
+        </div>
+        <div class="field"><label>Ưu tiên chính</label><input type="text" id="p-priority" placeholder="Ẩm thực địa phương, biển, check-in"></div>
       </div>
       <div class="row2">
         <div class="field"><label>Ngân sách (yên / tổng)</label><input type="number" id="p-budget" placeholder="80000"></div>
@@ -237,6 +252,7 @@ Dinner ngoài trời</textarea>
 // ---------- Ollama connection (AI chạy trên máy chủ Ollama, gọi qua mạng LAN) ----------
 const serverUrlInput = document.getElementById('serverUrl');
 const modelSelect = document.getElementById('modelSelect');
+const timeoutSecInput = document.getElementById('timeoutSec');
 const statusDot = document.getElementById('statusDot');
 const loadProgress = document.getElementById('loadProgress');
 const loadModelBtn = document.getElementById('loadModelBtn');
@@ -244,8 +260,16 @@ const defaultHint = loadProgress.innerHTML;
 
 const savedUrl = localStorage.getItem('ollama_url');
 const savedModel = localStorage.getItem('ollama_model');
+const savedTimeoutSec = Number(localStorage.getItem('ollama_timeout_sec') || 180);
 serverUrlInput.value = savedUrl || 'http://localhost:11434';
 modelSelect.value = savedModel || 'llama3.2';
+timeoutSecInput.value = String(Math.min(600, Math.max(30, savedTimeoutSec || 180)));
+
+timeoutSecInput.addEventListener('change', () => {
+  const v = Math.min(600, Math.max(30, Number(timeoutSecInput.value || 180)));
+  timeoutSecInput.value = String(v);
+  localStorage.setItem('ollama_timeout_sec', String(v));
+});
 
 function ollamaBase() {
   return (serverUrlInput.value.trim() || 'http://localhost:11434').replace(/\/+$/, '');
@@ -261,6 +285,7 @@ loadModelBtn.addEventListener('click', checkConnection);
 async function checkConnection() {
   localStorage.setItem('ollama_url', serverUrlInput.value.trim());
   localStorage.setItem('ollama_model', modelSelect.value.trim());
+  localStorage.setItem('ollama_timeout_sec', String(getTimeoutMs() / 1000));
   loadModelBtn.disabled = true;
   setStatus('loading', 'Đang kết nối tới Ollama...');
   try {
@@ -307,22 +332,29 @@ async function callClaude(system, userText, { json = false } = {}) {
   if (json) body.format = 'json';
 
   let res;
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 60000);
+  const timeoutMs = getTimeoutMs();
+  localStorage.setItem('ollama_timeout_sec', String(timeoutMs / 1000));
+
   try {
-    res = await fetch(`${ollamaBase()}/api/chat`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: controller.signal
-    });
+    res = await fetchChatWithTimeout(body, timeoutMs);
   } catch (err) {
-    if (err.name === 'AbortError') {
-      throw new Error('AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.');
+    if (err && err.name === 'AbortError') {
+      setStatus('loading', `Model phản hồi chậm, đang thử lại với timeout dài hơn (${Math.round((timeoutMs * 2) / 1000)}s)...`);
+      try {
+        res = await fetchChatWithTimeout(body, timeoutMs * 2);
+      } catch (err2) {
+        if (err2 && err2.name === 'AbortError') {
+          throw new Error(`AI không phản hồi sau ${Math.round((timeoutMs * 2) / 1000)} giây. Cách xử lý nhanh: 1) mở terminal chạy "ollama run ${model}" một lần để warm-up model, 2) tăng ô timeout lên 300-600 giây, 3) đổi model nhẹ hơn như llama3.2:1b hoặc qwen2.5:1.5b.`);
+        }
+        throw new Error(`Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
+      }
+    } else {
+      throw new Error(`Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
     }
-    throw new Error(`Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
-  } finally {
-    clearTimeout(timeoutId);
+  }
+
+  if (statusDot.classList.contains('status-warn')) {
+    setStatus('ready', `✅ Đã kết nối Ollama, model "${model}" sẵn sàng — AI chạy trên máy này, hoàn toàn offline/miễn phí.`);
   }
   if (!res.ok) {
     let msg = res.status + ' ' + res.statusText;
@@ -339,6 +371,27 @@ async function callClaude(system, userText, { json = false } = {}) {
   return text;
 }
 
+function getTimeoutMs() {
+  const sec = Math.min(600, Math.max(30, Number(timeoutSecInput.value || 180)));
+  timeoutSecInput.value = String(sec);
+  return sec * 1000;
+}
+
+async function fetchChatWithTimeout(body, timeoutMs) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(`${ollamaBase()}/api/chat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 function setLoading(el, on, label = 'Đang hỏi AI...') {
   if (on) el.innerHTML = `<div class="loading"><div class="spinner"></div>${label}</div>`;
 }
@@ -348,32 +401,135 @@ function showError(el, err) {
 
 // ---------- TAB 1: Trip Planner ----------
 document.getElementById('p-run').addEventListener('click', async () => {
+  const resultEl = document.getElementById('p-result');
+  
+  // Kiểm tra Ollama đã kết nối chưa
+  if (!statusDot.classList.contains('status-ok')) {
+    resultEl.innerHTML = `<div class="error-box">❌ Ollama chưa kết nối!<br><br>Bước để xử lý nhanh:<br>1. Mở Terminal / PowerShell mới và chạy: <code>ollama serve</code><br>2. Đợi tới khi thấy "Listen on 127.0.0.1:11434"<br>3. Quay lại app, bấm <strong>"Kiểm tra kết nối"</strong> (dấu tròn xanh)<br>4. Bấm <strong>"Tạo lịch trình"</strong> lại</div>`;
+    return;
+  }
+  
   const dest = document.getElementById('p-dest').value.trim() || 'Okinawa';
-  const days = document.getElementById('p-days').value || 4;
+  const days = Number(document.getElementById('p-days').value || 4);
   const budget = document.getElementById('p-budget').value || 'không giới hạn';
   const group = document.getElementById('p-group').value.trim() || 'một mình';
   const notes = document.getElementById('p-notes').value.trim();
-  const resultEl = document.getElementById('p-result');
+  const pace = document.getElementById('p-pace').value;
+  const priority = document.getElementById('p-priority').value.trim() || 'cân bằng tham quan và nghỉ ngơi';
+  const startDate = document.getElementById('p-start').value;
   setLoading(resultEl, true, 'Đang tạo lịch trình...');
 
-  const system = `Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ hay số điện thoại của bất kỳ quán/địa điểm nào — chỉ gợi ý tên, người dùng sẽ tự kiểm tra giờ mở cửa thật trên Maps trước khi đi. Trả lời DUY NHẤT bằng JSON hợp lệ, không kèm text hay markdown code fence nào khác, theo đúng schema:
-{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}`;
-  const user = `Lên lịch trình du lịch ${dest}, ${days} ngày. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}
-Tối ưu theo: quãng đường di chuyển, kẹt xe, thời tiết, chi phí, trải nghiệm phù hợp cả nhóm. Không cần đảm bảo giờ mở cửa vì bạn không có dữ liệu thời gian thực.`;
+  let weatherContext = 'Không có dữ liệu thời tiết thật.';
+  let weatherByDay = [];
+  try {
+    const weather = await getTripForecast(dest, days, startDate);
+    weatherByDay = weather.byDay;
+    weatherContext = weather.summary;
+  } catch (e) {
+    weatherContext = 'Không lấy được thời tiết thật, AI cần đưa phương án dự phòng trong nhà cho mọi ngày.';
+  }
+
+  const system = `Bạn là AI Dynamic Trip Planning Engine. Mục tiêu: tạo lịch trình DU LỊCH ĐỘNG theo ngày và khung giờ, cân đối thời tiết, ngân sách, quãng đường di chuyển và nhu cầu nhóm.
+Yêu cầu bắt buộc:
+1) Mỗi hoạt động dùng tên điểm cụ thể có thể tìm trên Google Maps.
+2) Mỗi ngày có 4 slot: Sáng, Trưa, Chiều, Tối.
+3) Mỗi slot có loại "indoor" hoặc "outdoor" và 1 phương án fallback trong nhà.
+4) Có ước tính chi phí theo ngày và tổng chuyến đi.
+5) KHÔNG khẳng định giờ mở cửa, địa chỉ chính xác, số điện thoại.
+Trả lời DUY NHẤT bằng JSON hợp lệ theo schema:
+{"days":[{"day":1,"date":"YYYY-MM-DD","theme":"...","estimated_cost":18000,"slots":[{"time":"Sáng","activity":"...","type":"outdoor","transport":"...","fallback":"..."},{"time":"Trưa","activity":"...","type":"indoor","transport":"...","fallback":"..."},{"time":"Chiều","activity":"...","type":"outdoor","transport":"...","fallback":"..."},{"time":"Tối","activity":"...","type":"indoor","transport":"...","fallback":"..."}],"daily_tip":"..."}],"budget_summary":{"total_estimated":76000,"within_budget":true,"advice":"..."},"summary":"..."}`;
+  const user = `Điểm đến: ${dest}
+Số ngày: ${days}
+Ngày khởi hành: ${startDate || 'không cung cấp'}
+Ngân sách: ${budget} yên (tổng chuyến)
+Nhóm: ${group}
+Nhịp độ mong muốn: ${pace}
+Ưu tiên chính: ${priority}
+Ghi chú thêm: ${notes || 'không có'}
+
+Thời tiết thật theo ngày (nếu có):
+${weatherContext}
+
+Yêu cầu tối ưu:
+- Giảm di chuyển lòng vòng trong cùng ngày.
+- Nếu ngày có mưa/giông thì ưu tiên slot indoor hoặc fallback indoor thật hợp lý.
+- Giữ trải nghiệm phù hợp nhóm gia đình/đi đôi/đi một mình tùy mô tả.
+- Trả đúng JSON schema, không markdown.`;
 
   try {
     const data = await callClaude(system, user, { json: true });
     let html = '';
     (data.days || []).forEach((d, i) => {
-      if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
-      const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest)}${venueWarning(a)}</li>`).join('');
-      html += `<div class="day-block"><h4>Day ${d.day || (i + 1)}</h4><ul>${items}</ul></div>`;
+      if (!d || !Array.isArray(d.slots) || d.slots.length === 0) return;
+      const dayWeather = weatherByDay[i];
+      const headerWeather = dayWeather ? ` <span class="badge">${escapeHtml(dayWeather.text)}</span>` : '';
+      html += `<div class="day-block"><h4>Day ${d.day || (i + 1)}${d.date ? ' · ' + escapeHtml(d.date) : ''}${headerWeather}</h4>`;
+      if (d.theme) html += `<div class="hint" style="margin:2px 0 8px;">Chủ đề: ${escapeHtml(d.theme)}</div>`;
+      html += '<ul>';
+      d.slots.forEach(s => {
+        const isRainDay = !!dayWeather && dayWeather.isWet;
+        const useFallback = isRainDay && String(s.type || '').toLowerCase() === 'outdoor' && s.fallback;
+        const activity = useFallback ? `${s.fallback} (fallback do mưa)` : s.activity;
+        html += `<li><strong>${escapeHtml(s.time || '')}:</strong> ${escapeHtml(activity || '')} ${mapLink(activity || s.activity, dest)}${venueWarning(activity || s.activity)}`;
+        if (s.transport) html += `<div class="hint">Di chuyển: ${escapeHtml(s.transport)}</div>`;
+        html += '</li>';
+      });
+      html += '</ul>';
+      if (typeof d.estimated_cost !== 'undefined') {
+        html += `<div class="hint">Ước tính ngày: ~${escapeHtml(String(d.estimated_cost))} yên</div>`;
+      }
+      if (d.daily_tip) html += `<div class="hint">Mẹo: ${escapeHtml(d.daily_tip)}</div>`;
+      html += '</div>';
     });
+    if (data.budget_summary) {
+      const b = data.budget_summary;
+      const within = b.within_budget === false ? '⚠️ Có thể vượt ngân sách' : '✅ Trong mức ngân sách dự kiến';
+      html += `<div class="summary-note"><strong>${within}</strong><br>Tổng ước tính: ${escapeHtml(String(b.total_estimated || 'chưa rõ'))} yên${b.advice ? `<br>${escapeHtml(b.advice)}` : ''}</div>`;
+    }
     if (data.summary) html += `<div class="summary-note">${escapeHtml(data.summary)}</div>`;
     html += `<div class="summary-note">📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong> (nhiều quán ở Nhật chỉ mở buổi tối) — luôn kiểm tra qua Maps trước khi đến, đừng tin trực tiếp thứ tự lịch trình.</div>`;
     resultEl.innerHTML = `<div class="result-box">${html || 'Không có kết quả.'}</div>`;
   } catch (err) { showError(resultEl, err); }
 });
+
+async function getTripForecast(destination, days, startDate) {
+  const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=vi&name=${encodeURIComponent(destination)}`);
+  const geo = await geoRes.json();
+  const place = geo.results && geo.results[0];
+  if (!place) throw new Error('Không tìm thấy địa điểm để lấy thời tiết.');
+
+  const start = startDate ? new Date(startDate) : new Date();
+  const end = new Date(start);
+  end.setDate(start.getDate() + Math.max(0, days - 1));
+  const toYmd = d => d.toISOString().slice(0, 10);
+
+  const weatherRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&timezone=auto&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&start_date=${toYmd(start)}&end_date=${toYmd(end)}`);
+  const weather = await weatherRes.json();
+  if (!weather.daily || !Array.isArray(weather.daily.time)) throw new Error('Dữ liệu thời tiết không hợp lệ.');
+
+  const byDay = weather.daily.time.map((date, idx) => {
+    const code = weather.daily.weather_code[idx];
+    const rain = Number(weather.daily.precipitation_sum[idx] || 0);
+    const isWet = rain >= 1 || [51,53,55,61,63,65,80,81,82,95,96,99].includes(Number(code));
+    const desc = WEATHER_CODE_VI[code] || 'thời tiết thay đổi';
+    const tMax = weather.daily.temperature_2m_max[idx];
+    const tMin = weather.daily.temperature_2m_min[idx];
+    return {
+      date,
+      isWet,
+      text: `${date}: ${desc}, ${tMin}°C - ${tMax}°C${rain > 0 ? `, mưa ${rain}mm` : ''}`
+    };
+  }).slice(0, days);
+
+  return {
+    byDay,
+    summary: byDay.map(d => `- Day ${dayIndexFromStart(byDay, d.date)} (${d.date}): ${d.text}`).join('\n')
+  };
+}
+
+function dayIndexFromStart(list, date) {
+  return Math.max(1, list.findIndex(d => d.date === date) + 1);
+}
 
 // ---------- TAB 2: Group Matching ----------
 const membersDiv = document.getElementById('g-members');
