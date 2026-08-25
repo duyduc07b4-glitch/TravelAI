@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const {
   escapeHtml, mapLink, venueWarning, weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
-  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, checkPlaceButton,
+  renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
 
@@ -227,26 +227,6 @@ describe('renderHealHtml', () => {
   test('falls back to a localized placeholder when nothing changed', () => {
     assert.equal(renderHealHtml({}, 'vi'), 'Không có thay đổi.');
     assert.equal(renderHealHtml({}, 'ja'), '変更はありません。');
-  });
-});
-
-describe('checkPlaceButton', () => {
-  test('embeds the place/context as data attributes and a localized label', () => {
-    const html = checkPlaceButton('Yunangi Okinawan Cuisine', 'Okinawa', 'vi');
-    assert.match(html, /class="check-real-btn/);
-    assert.match(html, /data-place="Yunangi Okinawan Cuisine"/);
-    assert.match(html, /data-context="Okinawa"/);
-    assert.match(html, /Kiểm tra thật/);
-  });
-  test('escapes HTML in the place name to keep the attribute safe', () => {
-    const html = checkPlaceButton('Café "Sunset" <bar>', undefined, 'en');
-    assert.doesNotMatch(html, /<bar>/);
-    assert.match(html, /data-place="Café &quot;Sunset&quot; &lt;bar&gt;"/);
-  });
-  test('includes an empty result slot for the click handler to fill in', () => {
-    const html = checkPlaceButton('Beach', undefined, 'ja');
-    assert.match(html, /<span class="real-data"><\/span>/);
-    assert.match(html, /実際に確認/);
   });
 });
 

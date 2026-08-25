@@ -36,12 +36,6 @@ const I18N = {
       changesHeader: 'Thay đổi',
       newItineraryHeader: 'Lịch trình mới',
       plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.',
-      checkReal: '🔍 Kiểm tra thật',
-      checkingReal: 'Đang tra cứu OpenStreetMap...',
-      osmFound: (address, hours) => `✅ OSM: ${address}${hours ? ' · Giờ mở cửa: ' + hours : ' · Không có giờ mở cửa trong dữ liệu OSM'}`,
-      osmNotFound: '❌ Không tìm thấy trên OpenStreetMap — vẫn nên tự kiểm tra trực tiếp.',
-      osmError: (msg) => `⚠️ Lỗi khi tra cứu: ${msg}`,
-      osmAttribution: 'Dữ liệu "Kiểm tra thật" lấy từ <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--accent)">© cộng tác viên OpenStreetMap</a> — miễn phí nhưng không phải lúc nào cũng đầy đủ hoặc cập nhật.',
       unlimitedBudget: 'không giới hạn',
       soloTraveler: 'một mình'
     },
@@ -185,12 +179,6 @@ const I18N = {
       changesHeader: '変更点',
       newItineraryHeader: '新しい旅程',
       plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ このAIはローカル動作でリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離はAIの一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。',
-      checkReal: '🔍 実際に確認',
-      checkingReal: 'OpenStreetMapを確認中...',
-      osmFound: (address, hours) => `✅ OSM：${address}${hours ? ' ・営業時間：' + hours : ' ・OSMに営業時間データなし'}`,
-      osmNotFound: '❌ OpenStreetMapに見つかりませんでした — 現地で改めて確認してください。',
-      osmError: (msg) => `⚠️ 確認中にエラー：${msg}`,
-      osmAttribution: '「実際に確認」のデータは<a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--accent)">© OpenStreetMapコントリビューター</a>提供 — 無料ですが常に完全・最新とは限りません。',
       unlimitedBudget: '無制限',
       soloTraveler: '一人旅'
     },
@@ -334,12 +322,6 @@ const I18N = {
       changesHeader: 'Changes',
       newItineraryHeader: 'Updated itinerary',
       plannerDisclaimer: '📍 Click "View map" to see the real address, opening hours, and phone number (if listed). ⚠️ This AI runs locally with no real-time data, so it <strong>cannot confirm whether a place is actually open at that time</strong>, and the ordering/distance between stops is just the AI\'s general guess — <strong>not based on real traffic or map data</strong>. Always double-check on Maps before you go.',
-      checkReal: '🔍 Verify real data',
-      checkingReal: 'Checking OpenStreetMap...',
-      osmFound: (address, hours) => `✅ OSM: ${address}${hours ? ' · Hours: ' + hours : ' · No opening-hours data on OSM'}`,
-      osmNotFound: '❌ Not found on OpenStreetMap — still worth checking in person.',
-      osmError: (msg) => `⚠️ Lookup error: ${msg}`,
-      osmAttribution: '"Verify real data" results come from <a href="https://www.openstreetmap.org/copyright" target="_blank" style="color:var(--accent)">© OpenStreetMap contributors</a> — free, but not always complete or up to date.',
       unlimitedBudget: 'unlimited',
       soloTraveler: 'solo'
     },
@@ -489,15 +471,6 @@ function mapLink(place, context, lang) {
   return `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" class="map-link">${tr(lang, 'common.mapLink')}</a>`;
 }
 
-/**
- * Renders a "check real data" button + an empty result slot next to it.
- * The button is wired up via event delegation in initApp() (fetchRealPlaceData),
- * since this needs a live network call, not something a pure render function can do.
- */
-function checkPlaceButton(place, context, lang) {
-  return ` <button type="button" class="check-real-btn small secondary" data-place="${escapeHtml(place)}" data-context="${escapeHtml(context || '')}">${tr(lang, 'common.checkReal')}</button><span class="real-data"></span>`;
-}
-
 function venueWarning(text, lang) {
   const keywords = tr(lang, 'venueKeywords');
   const t = String(text).toLowerCase();
@@ -574,7 +547,7 @@ function renderPlannerHtml(data, dest, lang) {
   let dayHtml = '';
   (data.days || []).forEach((d, i) => {
     if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
-    const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest, lang)}${checkPlaceButton(a, dest, lang)}${venueWarning(a, lang)}</li>`).join('');
+    const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest, lang)}${venueWarning(a, lang)}</li>`).join('');
     dayHtml += `<div class="day-block"><h4>${tr(lang, 'common.dayLabel', d.day || (i + 1))}</h4><ul>${items}</ul></div>`;
   });
   if (!dayHtml) return tr(lang, 'common.noResult');
@@ -584,11 +557,10 @@ function renderPlannerHtml(data, dest, lang) {
   return html;
 }
 
-function renderGroupScoreTableHtml(data, lang, place) {
+function renderGroupScoreTableHtml(data, lang) {
   let html = `<table class="score-table"><thead><tr><th>${tr(lang, 'common.criteriaHeader')}</th><th>${tr(lang, 'common.scoreHeader')}</th></tr></thead><tbody>`;
   (data.criteria || []).forEach(c => { html += `<tr><td>${escapeHtml(c.name)}</td><td>${c.score}/10</td></tr>`; });
   html += `</tbody></table>`;
-  if (place) html += `<div class="summary-note">${checkPlaceButton(place, undefined, lang)}</div>`;
   return html;
 }
 
@@ -602,7 +574,7 @@ function renderHealHtml(data, lang) {
     html += `</ul></div>`;
   }
   if ((data.updated_itinerary || []).length) {
-    html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${checkPlaceButton(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
+    html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
   }
   return html || tr(lang, 'common.noChange');
 }
@@ -652,7 +624,6 @@ const AppCore = {
   escapeHtml, mapLink, venueWarning,
   weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
-  checkPlaceButton,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
 };
@@ -938,7 +909,7 @@ function initApp() {
   }
   if (savedGroup && savedGroup.place) gPlace.value = savedGroup.place;
   if (savedGroup && savedGroup.data) {
-    gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang, savedGroup.place)}</div>`;
+    gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang)}</div>`;
     renderDebate(savedGroup.data);
   }
   gPlace.addEventListener('input', () => saveGroupState({}));
@@ -972,7 +943,7 @@ function initApp() {
 
     try {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(gResult, T('group.loading')) });
-      gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang, place)}</div>`;
+      gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang)}</div>`;
       renderDebate(data);
       saveGroupState({ data });
     } catch (err) { showError(gResult, err); }
@@ -1271,61 +1242,6 @@ function initApp() {
     const data = await res.json();
     return data.message?.content || '(no response)';
   }
-
-  // ---------- "Check real data" via OpenStreetMap (Nominatim + Overpass, both free/public) ----------
-  // On-demand (button click) only, one request per click — stays well under Nominatim's
-  // ~1 req/sec usage-policy limit without needing our own rate limiter.
-  async function fetchRealPlaceData(place, context) {
-    const query = context ? `${place}, ${context}` : place;
-    const nomRes = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&accept-language=${encodeURIComponent(currentLang)}&q=${encodeURIComponent(query)}`);
-    if (!nomRes.ok) throw new Error('Nominatim ' + nomRes.status);
-    const nomResults = await nomRes.json();
-    const hit = nomResults[0];
-    if (!hit) return { found: false };
-
-    let hours = null;
-    try {
-      const overpassType = hit.osm_type === 'node' ? 'node' : hit.osm_type === 'way' ? 'way' : 'relation';
-      const overpassQuery = `[out:json][timeout:15];${overpassType}(${hit.osm_id});out tags;`;
-      const opRes = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`);
-      if (opRes.ok) {
-        const opData = await opRes.json();
-        const tags = (opData.elements && opData.elements[0] && opData.elements[0].tags) || {};
-        hours = tags.opening_hours || null;
-      }
-    } catch (e) { /* Overpass is best-effort — Nominatim's address is still useful on its own */ }
-
-    return { found: true, address: hit.display_name, hours };
-  }
-
-  function wireCheckRealButtons(container) {
-    container.addEventListener('click', async (e) => {
-      const btn = e.target.closest('.check-real-btn');
-      if (!btn) return;
-      const place = btn.dataset.place;
-      const context = btn.dataset.context;
-      const span = btn.nextElementSibling;
-      btn.disabled = true;
-      span.className = 'real-data loading';
-      span.textContent = ' ' + T('common.checkingReal');
-      try {
-        const result = await fetchRealPlaceData(place, context);
-        if (result.found) {
-          span.className = 'real-data found';
-          span.textContent = ' ' + T('common.osmFound', result.address, result.hours);
-        } else {
-          span.className = 'real-data notfound';
-          span.textContent = ' ' + T('common.osmNotFound');
-        }
-      } catch (err) {
-        span.className = 'real-data error';
-        span.textContent = ' ' + T('common.osmError', err.message);
-      } finally {
-        btn.disabled = false;
-      }
-    });
-  }
-  [pResult, gResult, hResult].forEach(wireCheckRealButtons);
 
   applyStaticTranslations();
 }
