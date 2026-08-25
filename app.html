@@ -9,19 +9,49 @@
 <body>
 
 <header>
-  <h1>AI Travel Companion <span id="appSubtitle" data-i18n="appSubtitle"></span></h1>
-  <div class="apikey-row">
-    <span id="statusDot" class="status-dot status-off"></span>
-    <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
-    <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
-    <button class="secondary small" id="loadModelBtn" data-i18n="checkConnBtn"></button>
-    <div class="lang-switch" role="group" aria-label="Language / 言語 / Ngôn ngữ">
-      <button type="button" class="lang-btn" data-lang="vi">VI</button>
-      <button type="button" class="lang-btn" data-lang="ja">JA</button>
-      <button type="button" class="lang-btn" data-lang="en">EN</button>
+  <div class="topbar-shell">
+    <div class="brand-block">
+      <div class="brand-mark">O</div>
+      <div>
+        <h1>AI Travel Companion <span id="appSubtitle" data-i18n="appSubtitle"></span></h1>
+      </div>
+    </div>
+    <div class="apikey-row">
+      <span id="statusDot" class="status-dot status-off"></span>
+      <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
+      <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
+      <button class="secondary small" id="loadModelBtn" data-i18n="checkConnBtn"></button>
+      <div class="lang-switch" role="group" aria-label="Language / 言語 / Ngôn ngữ">
+        <button type="button" class="lang-btn" data-lang="vi">VI</button>
+        <button type="button" class="lang-btn" data-lang="ja">JA</button>
+        <button type="button" class="lang-btn" data-lang="en">EN</button>
+      </div>
     </div>
   </div>
 </header>
+
+<div class="hero-banner">
+  <div class="hero-copy">
+    <div class="eyebrow">Okinawa island planner</div>
+    <h2>Plan a breezy escape across coral seas</h2>
+    <p>From reef mornings to sunset coastlines, build a trip that feels relaxed, vivid, and truly local.</p>
+  </div>
+  <div class="hero-meta">
+    <div class="meta-card">
+      <span class="meta-label">Sunrise</span>
+      <strong>6:30</strong>
+    </div>
+    <div class="meta-card">
+      <span class="meta-label">Best season</span>
+      <strong>Apr–Oct</strong>
+    </div>
+    <div class="meta-card">
+      <span class="meta-label">Theme</span>
+      <strong>Island joy</strong>
+    </div>
+  </div>
+</div>
+
 <div style="max-width:960px; margin:0 auto; padding:0 24px;">
   <div class="hint" id="loadProgress"></div>
 </div>
