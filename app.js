@@ -573,8 +573,263 @@ function renderGroupScoreTableHtml(data, lang) {
   return html;
 }
 
+function dedupePlanItems(items) {
+  const seen = new Set();
+  return (Array.isArray(items) ? items : []).filter(item => {
+    const key = String(item || '').trim().toLowerCase();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function flattenActivities(planData) {
+  if (!planData || !Array.isArray(planData.days)) return [];
+  const flat = [];
+  planData.days.forEach(day => {
+    if (!day || !Array.isArray(day.activities)) return;
+    day.activities.forEach(activity => {
+      if (typeof activity === 'string' && activity.trim()) flat.push(activity.trim());
+    });
+  });
+  return dedupePlanItems(flat);
+}
+
+function normalizeHealedText(text) {
+  return String(text || '').trim().toLowerCase();
+}
+
+function classifyIncident(eventText) {
+  const text = normalizeHealedText(eventText);
+  const rainy = /mưa|rain|drizzle|bão|giông|typhoon|lụt|flood|雨|嵐|台風/.test(text);
+  const hot = /nắng|nóng|heat|heatwave|extreme heat|猛暑|酷暑|暑/.test(text);
+  const windy = /gió|wind|gust|強風|風が強/.test(text);
+  let type = 'default';
+  let severity = 'low';
+
+  if (/bão|giông|typhoon|lụt|flood|hurricane|台風|暴風雨|雷雨/.test(text) || (rainy && windy && /(mưa to|mưa lớn|heavy rain|rainstorm|torrential|豪雨|大雨|gió lớn|gió mạnh|strong wind|暴風|強風)/.test(text))) {
+    type = 'storm';
+    severity = 'high';
+  } else if (rainy && /(mưa rất to|mưa to|mưa lớn|heavy rain|rainstorm|torrential|mưa dông|豪雨|大雨)/.test(text)) {
+    type = 'rain';
+    severity = 'high';
+  } else if (windy && /(gió lớn|gió mạnh|strong wind|gust|windy|暴風|強風)/.test(text)) {
+    type = 'wind';
+    severity = 'high';
+  } else if (hot && /(nắng gắt|nắng mạnh|nóng quá|heatwave|extreme heat|猛暑|酷暑)/.test(text)) {
+    type = 'heat';
+    severity = 'high';
+  } else if (rainy) {
+    type = 'rain';
+    severity = 'medium';
+  } else if (windy) {
+    type = 'wind';
+    severity = 'medium';
+  }
+  return { type, severity, text };
+}
+
+function isSevereWeatherIncident(incident) {
+  return !!incident && incident.severity === 'high';
+}
+
+function classifyActivity(item) {
+  const text = normalizeHealedText(item);
+  const outdoor = /beach|sunset|outdoor|park|hike|trail|garden|boat|cruise|snorkel|surf|bbq|barbecue|bay|海|ビーチ|公園|散策|ハイキング/.test(text);
+  const indoor = /museum|aquarium|mall|shopping|café|cafe|restaurant|food hall|arcade|spa|cinema|movie|indoor|market|shop|博物館|水族館|モール|映画館|屋内/.test(text);
+  const transit = /airport|flight|train|bus|car|drive|taxi|transfer|station|空港|駅|移動/.test(text);
+  const food = /lunch|dinner|breakfast|ăn|restaurant|café|cafe|izakaya|sushi|ramen|bbq|barbecue|food|昼食|夕食|朝食|レストラン/.test(text);
+  let category = 'general';
+  if (transit) category = 'transit';
+  else if (food) category = 'food';
+  else if (indoor) category = 'indoor';
+  else if (outdoor) category = 'outdoor';
+  return { category, outdoor };
+}
+
+function parseBudgetNumber(value) {
+  const raw = String(value || '').replace(/[^\d]/g, '');
+  return raw ? parseInt(raw, 10) : null;
+}
+
+function buildPlannerContextSummary(context) {
+  const parts = [];
+  if (context && context.days) parts.push(`${context.days} ngày`);
+  if (context && context.budget) parts.push(`ngân sách ${context.budget} yên`);
+  if (context && context.group) parts.push(`nhóm: ${context.group}`);
+  if (context && context.notes) parts.push(`ghi chú: ${context.notes}`);
+  return parts.join(' • ');
+}
+
+function shouldReplaceActivity(item, info, incident) {
+  if (!isSevereWeatherIncident(incident)) return false;
+  const text = normalizeHealedText(item);
+  const seaTransit = /boat|cruise|ferry|港|船/.test(text);
+  const hasIndoorFoodCue = /nhà hàng|quán|restaurant|café|cafe|izakaya|food hall|indoor/.test(text);
+  const outdoorFood = /bbq|barbecue|picnic|outdoor dining|grill/.test(text) && !hasIndoorFoodCue;
+  if (info.category === 'transit' && !seaTransit) return false;
+  if (info.category === 'food' && !outdoorFood) return false;
+  return info.category === 'outdoor' || seaTransit || outdoorFood;
+}
+
+function rankReplacementCandidates(candidates, original, context, incidentType) {
+  const text = normalizeHealedText(original);
+  const group = normalizeHealedText(context && context.group);
+  const notes = normalizeHealedText(context && context.notes);
+  const budget = parseBudgetNumber(context && context.budget);
+  const scored = [];
+  const seen = new Set();
+
+  (Array.isArray(candidates) ? candidates : []).forEach(candidate => {
+    const key = normalizeHealedText(candidate);
+    if (!key || seen.has(key)) return;
+    seen.add(key);
+    let score = 0;
+    if (/aquarium|museum/.test(key)) score += 3;
+    if (/indoor activity|food hall|indoor market|café|cafe|cinema/.test(key)) score += 2;
+    if (/bé|baby|child|kid|trẻ em|子供|kids/.test(group + ' ' + notes)) {
+      if (/aquarium|museum|indoor activity|cinema|arcade|food hall/.test(key)) score += 4;
+    }
+    if (budget !== null && budget <= 120000) {
+      if (/museum|café|cafe|indoor market|food hall|arcade|aquarium|indoor activity/.test(key)) score += 3;
+      if (/spa|shopping mall/.test(key)) score -= 2;
+    }
+    if (/beach|sea|ocean|snorkel|surf|boat|cruise|bay/.test(text + ' ' + notes)) {
+      if (/aquarium|museum|food hall|indoor market|café|cafe/.test(key)) score += 3;
+    }
+    if (/bbq|barbecue|food|ẩm thực|eat|grill/.test(text + ' ' + notes)) {
+      if (/food hall|restaurant|café|cafe|indoor market/.test(key)) score += 3;
+    }
+    if (incidentType === 'storm') score += /indoor|museum|aquarium|cinema|food hall|market|café|cafe/.test(key) ? 2 : 0;
+    scored.push({ candidate, score });
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return scored.map(s => s.candidate);
+}
+
+function getReplacementCandidates(original, context, incidentType, info) {
+  const text = normalizeHealedText(original);
+  const scenicPool = ['Aquarium', 'Museum', 'Indoor Market', 'Shopping Mall', 'Café', 'Cinema'];
+  const outdoorPool = ['Museum', 'Aquarium', 'Indoor Activity', 'Indoor Market', 'Café', 'Cinema', 'Arcade', 'Shopping Mall'];
+  const foodPool = ['Food Hall', 'Restaurant', 'Café', 'Indoor Market', 'Museum', 'Aquarium', 'Indoor Activity', 'Cinema'];
+  const defaultPool = ['Museum', 'Aquarium', 'Indoor Market', 'Food Hall', 'Café', 'Indoor Activity', 'Cinema', 'Arcade', 'Shopping Mall'];
+  let pool = defaultPool;
+  if (/bbq|barbecue|picnic|grill|food|ăn|lunch|dinner|breakfast/.test(text) || info.category === 'food') pool = foodPool;
+  else if (/beach|sunset|sea|ocean|snorkel|surf|boat|cruise|bay|viewpoint|park|hike|trail|bãi biển|ngắm hoàng hôn|biển/.test(text)) pool = scenicPool;
+  else if (info.category === 'outdoor') pool = outdoorPool;
+  return rankReplacementCandidates(pool, original, context, incidentType);
+}
+
+function formatReplacementActivity(original, replacement) {
+  const source = String(original || '').trim();
+  const target = String(replacement || '').trim();
+  const lower = normalizeHealedText(source);
+  if (!source || !target) return target || source;
+  if (/^đi đến\s+/i.test(source)) return source.replace(/^đi đến\s+/i, `Đi đến ${target} (thay thế cho) `);
+  if (/^visit\s+/i.test(source)) return source.replace(/^visit\s+/i, `Visit ${target} (instead of) `);
+  if (/^tham quan\s+/i.test(source)) return `Tham quan ${target}`;
+  if (/ăn|lunch|dinner|breakfast|restaurant|quán|nhà hàng/.test(lower)) return `Ăn tại ${target}`;
+  if (/ngắm|sunset|view|beach|biển/.test(lower)) return `Tham quan trong nhà tại ${target}`;
+  return `${target}`;
+}
+
+function summarizeIncident(eventText, incident) {
+  const text = String(eventText || '').trim();
+  if (!text) return 'Không có mô tả tình huống cụ thể.';
+  if (incident.type === 'storm') return `Sự cố nghiêm trọng: ${text}`;
+  if (incident.type === 'rain') return `Thời tiết mưa: ${text}`;
+  if (incident.type === 'heat') return `Thời tiết nóng / nắng: ${text}`;
+  if (incident.type === 'wind') return `Thời tiết gió mạnh: ${text}`;
+  return text;
+}
+
+function buildSelfHealingPlan(planData, itin, eventText, context) {
+  const incident = classifyIncident(eventText);
+  const sourceDays = Array.isArray(planData && planData.days) && planData.days.length
+    ? planData.days
+    : [{ day: 1, activities: dedupePlanItems(itin) }];
+
+  const updatedDays = [];
+  const replacements = [];
+  const used = new Set();
+
+  sourceDays.forEach((day, index) => {
+    const activities = [];
+    const originalItems = dedupePlanItems(Array.isArray(day && day.activities) ? day.activities : []);
+    originalItems.forEach(item => {
+      const info = classifyActivity(item);
+      const key = normalizeHealedText(item);
+      used.add(key);
+
+      if (!shouldReplaceActivity(item, info, incident)) {
+        activities.push({ original: item, text: item, changed: false, reason: '' });
+        return;
+      }
+
+      const replacement = getReplacementCandidates(item, context || {}, incident.type, info)
+        .find(candidate => !used.has(normalizeHealedText(candidate)) && normalizeHealedText(candidate) !== key);
+
+      if (!replacement) {
+        activities.push({ original: item, text: item, changed: false, reason: '' });
+        return;
+      }
+
+      used.add(normalizeHealedText(replacement));
+      const reason = incident.type === 'storm'
+        ? 'Bão / gió lớn / mưa dông nên ưu tiên hoạt động trong nhà và gần nhau hơn'
+        : incident.type === 'heat'
+          ? 'Nắng nóng cực đoan, chuyển sang nơi có điều hòa'
+          : incident.type === 'rain'
+            ? 'Mưa to khiến hoạt động ngoài trời không còn phù hợp'
+            : 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế';
+
+      const replacementText = formatReplacementActivity(item, replacement);
+      activities.push({ original: item, text: replacementText, changed: true, reason });
+      replacements.push({ original: item, replacement: replacementText, reason });
+    });
+    updatedDays.push({ day: day.day || (index + 1), activities });
+  });
+
+  if (!isSevereWeatherIncident(incident)) {
+    return {
+      incident_summary: summarizeIncident(eventText, incident),
+      severity: incident.severity,
+      replacements: [],
+      updated_days: updatedDays.map(day => ({
+        day: day.day,
+        activities: day.activities.map(a => ({ original: a.original, text: a.original, changed: false, reason: '' }))
+      })),
+      updated_itinerary: dedupePlanItems(sourceDays.flatMap(d => Array.isArray(d.activities) ? d.activities : [])),
+      context_summary: buildPlannerContextSummary(context || {}),
+      notes: 'Thời tiết chưa chuyển xấu tới mức cần đổi lịch trình; giữ nguyên kế hoạch hiện tại.'
+    };
+  }
+
+  return {
+    incident_summary: summarizeIncident(eventText, incident),
+    severity: incident.severity,
+    replacements,
+    updated_days: updatedDays,
+    updated_itinerary: updatedDays.flatMap(day => day.activities.map(a => a.text)),
+    context_summary: buildPlannerContextSummary(context || {}),
+    notes: incident.type === 'storm'
+      ? 'Giữ lịch trình trong nhà, giảm di chuyển và ưu tiên điểm gần nhau.'
+      : incident.type === 'heat'
+        ? 'Ưu tiên điều hòa, nước uống và hạn chế nắng gắt.'
+        : incident.type === 'rain'
+          ? 'Chuyển sang các điểm trong nhà, tránh hoạt động ngoài trời kéo dài.'
+          : 'Điều chỉnh nhẹ để phù hợp với thời tiết hiện tại.'
+  };
+}
+
 function renderHealHtml(data, lang) {
   let html = '';
+  if (data.incident_summary) {
+    html += `<div class="summary-note"><strong>Tình huống:</strong> ${escapeHtml(data.incident_summary)}${data.severity ? ` · Mức độ: ${escapeHtml(data.severity)}` : ''}</div>`;
+  }
+  if (data.context_summary) {
+    html += `<div class="summary-note"><strong>Bám theo plan Tab 1:</strong> ${escapeHtml(data.context_summary)}</div>`;
+  }
   if ((data.replacements || []).length) {
     html += `<div class="day-block"><h4>${tr(lang, 'common.changesHeader')}</h4><ul>`;
     data.replacements.forEach(r => {
@@ -582,9 +837,22 @@ function renderHealHtml(data, lang) {
     });
     html += `</ul></div>`;
   }
-  if ((data.updated_itinerary || []).length) {
+  if (Array.isArray(data.updated_days) && data.updated_days.length) {
+    html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4>${data.updated_days.map((day, idx) => {
+      const activities = Array.isArray(day.activities) ? day.activities : [];
+      return `<div class="day-block"><h4>${tr(lang, 'common.dayLabel', day.day || (idx + 1))}</h4><ul>${activities.map(activity => {
+        const changed = !!activity.changed;
+        const original = String(activity.original || '');
+        const text = String(activity.text || original);
+        const reason = changed && activity.reason ? `<span class="reason-tag">Lý do: ${escapeHtml(activity.reason)}</span>` : '';
+        const before = changed && original && original !== text ? `<del>${escapeHtml(original)}</del> → ` : '';
+        return `<li class="${changed ? 'changed-item' : ''}">${before}<strong>${escapeHtml(text)}</strong>${reason} ${mapLink(text, undefined, lang)}${venueWarning(text, lang)}</li>`;
+      }).join('')}</ul></div>`;
+    }).join('')}</div>`;
+  } else if ((data.updated_itinerary || []).length) {
     html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
   }
+  if (data.notes) html += `<div class="summary-note">${escapeHtml(data.notes)}</div>`;
   return html || tr(lang, 'common.noChange');
 }
 
@@ -634,6 +902,9 @@ const AppCore = {
   weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml,
+  dedupePlanItems, flattenActivities, normalizeHealedText,
+  classifyIncident, isSevereWeatherIncident, classifyActivity,
+  parseBudgetNumber, buildPlannerContextSummary, buildSelfHealingPlan,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
 };
 
@@ -649,6 +920,12 @@ if (typeof document !== 'undefined') {
 function initApp() {
   let currentLang = normalizeLang(safeLoadString(STORAGE_KEYS.lang) || DEFAULT_LANG);
   const T = (path, ...args) => tr(currentLang, path, ...args);
+  const tripState = {
+    destination: '',
+    itinerary: [],
+    plannerData: null,
+    plannerContext: null
+  };
   // Tracks fields still showing the built-in example content (not user-typed/saved),
   // so switching language can re-translate them instead of leaving stale text behind.
   let healUsesDefaultItin = false;
@@ -842,6 +1119,39 @@ function initApp() {
   const pNotes = document.getElementById('p-notes');
   const pResult = document.getElementById('p-result');
 
+  function getPlannerContext() {
+    const fallback = tripState.plannerContext || {};
+    return {
+      destination: pDest.value.trim() || fallback.destination || tripState.destination || '',
+      days: pDays.value || fallback.days || '',
+      budget: pBudget.value || fallback.budget || T('common.unlimitedBudget'),
+      group: pGroup.value.trim() || fallback.group || T('common.soloTraveler'),
+      notes: pNotes.value.trim() || fallback.notes || ''
+    };
+  }
+
+  function syncPlannerToSelfHealing() {
+    const hDestEl = document.getElementById('h-dest');
+    const hItinEl = document.getElementById('h-itin');
+    if (hDestEl) hDestEl.value = tripState.destination || '';
+    if (hItinEl) hItinEl.value = Array.isArray(tripState.itinerary) ? tripState.itinerary.join('\n') : '';
+  }
+
+  function updateTripStateFromPlannerData(data, context) {
+    const itinerary = flattenActivities(data);
+    tripState.destination = context.destination || tripState.destination || '';
+    tripState.itinerary = itinerary;
+    tripState.plannerData = data || null;
+    tripState.plannerContext = {
+      destination: context.destination || tripState.destination || '',
+      days: context.days || '',
+      budget: context.budget || T('common.unlimitedBudget'),
+      group: context.group || T('common.soloTraveler'),
+      notes: context.notes || ''
+    };
+    syncPlannerToSelfHealing();
+  }
+
   function plannerInputs() {
     return { dest: pDest.value, days: pDays.value, budget: pBudget.value, group: pGroup.value, notes: pNotes.value };
   }
@@ -859,6 +1169,13 @@ function initApp() {
     if (saved.group) pGroup.value = saved.group;
     if (saved.notes) pNotes.value = saved.notes;
     if (saved.data) {
+      updateTripStateFromPlannerData(saved.data, {
+        destination: saved.dest || '',
+        days: saved.days || '',
+        budget: saved.budget || '',
+        group: saved.group || '',
+        notes: saved.notes || ''
+      });
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(saved.data, saved.dest || '', currentLang, saved.days)}</div>`;
     }
   })();
@@ -876,6 +1193,7 @@ function initApp() {
 
     try {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
+      updateTripStateFromPlannerData(data, { destination: dest, days, budget, group, notes });
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}</div>`;
       savePlannerState({ data });
     } catch (err) { showError(pResult, err); }
@@ -1148,6 +1466,11 @@ function initApp() {
       healUsesDefaultItin = true;
       hItin.value = T('heal.defaultItinerary');
     }
+    if (!hDest.value && tripState.destination) hDest.value = tripState.destination;
+    if ((!hItin.value || healUsesDefaultItin) && Array.isArray(tripState.itinerary) && tripState.itinerary.length) {
+      hItin.value = tripState.itinerary.join('\n');
+      healUsesDefaultItin = false;
+    }
   })();
 
   document.getElementById('h-weather').addEventListener('click', async () => {
@@ -1176,16 +1499,24 @@ function initApp() {
   document.getElementById('h-run').addEventListener('click', async () => {
     const itin = hItin.value.split('\n').map(s => s.trim()).filter(Boolean);
     const event = hEvent.value.trim() || T('heal.defaultEvent');
+    const plannerContext = getPlannerContext();
+    const plannerData = tripState.plannerData || {
+      days: [{ day: 1, activities: dedupePlanItems(itin) }],
+      summary: ''
+    };
+
+    if (itin.length === 0) {
+      hResult.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(tr(currentLang, 'common.noResult'))}</div>`;
+      return;
+    }
+
+    tripState.itinerary = dedupePlanItems(itin);
+    tripState.destination = hDest.value.trim() || plannerContext.destination || tripState.destination;
+    if (!tripState.plannerContext) tripState.plannerContext = plannerContext;
     setLoading(hResult, true, T('heal.loading'));
-
-    const system = T('heal.systemPrompt');
-    const user = tr(currentLang, 'heal.userPrompt', itin, event);
-
-    try {
-      const data = await callClaude(system, user, { json: true, onChunk: streamPreview(hResult, T('heal.loading')) });
-      hResult.innerHTML = `<div class="result-box">${renderHealHtml(data, currentLang)}</div>`;
-      saveHealState({ data });
-    } catch (err) { showError(hResult, err); }
+    const data = buildSelfHealingPlan(plannerData, itin, event, plannerContext);
+    hResult.innerHTML = `<div class="result-box">${renderHealHtml(data, currentLang)}</div>`;
+    saveHealState({ data });
   });
 
   // ---------- TAB 5: Camera AI ----------
