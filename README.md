@@ -30,8 +30,23 @@ Tóm tắt nhanh:
 
 | File | Mô tả |
 |---|---|
-| `app.html` | Giao diện chính |
+| `app.html` | Markup của giao diện chính |
+| `style.css` | Toàn bộ style (bao gồm responsive cho mobile) |
+| `app.js` | Toàn bộ logic — gọi Ollama, render kết quả, lưu trạng thái vào localStorage |
 | `start-mac.command` | Khởi chạy nhanh trên macOS |
 | `start-windows.bat` | Khởi chạy nhanh trên Windows |
 | `setup-guide.html` | Hướng dẫn cài đặt chi tiết |
 | `AI Voice Travel Assistant.pdf` | Tài liệu Product Vision gốc |
+| `tests/app.test.js` | Unit test cho các hàm thuần trong `app.js` |
+
+Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang. Dữ liệu này chỉ nằm trên máy bạn, không gửi đi đâu.
+
+## Chạy test
+
+Cần Node.js ≥ 18 (dùng `node:test` có sẵn, không cần cài thêm gì):
+
+```bash
+npm test
+```
+
+CI chạy test này tự động trên mọi push/PR vào `main` (xem `.github/workflows/test.yml`).
