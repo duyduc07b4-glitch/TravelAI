@@ -4,148 +4,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Travel Companion — Local Prototype</title>
-<style>
-  :root{
-    --bg:#0f1115; --panel:#171a21; --panel2:#1e222b; --border:#2a2f3a;
-    --text:#e8eaed; --muted:#9aa3b2; --accent:#5b9cf6; --accent2:#7ee0c9;
-    --warn:#f6a15b; --danger:#f65b5b; --radius:12px;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    background:var(--bg); color:var(--text); min-height:100vh;
-  }
-  header{
-    padding:20px 24px; border-bottom:1px solid var(--border);
-    display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;
-    position:sticky; top:0; background:rgba(15,17,21,0.95); backdrop-filter:blur(6px); z-index:10;
-  }
-  header h1{font-size:18px; margin:0; font-weight:600;}
-  header h1 span{color:var(--muted); font-weight:400; font-size:13px; display:block; margin-top:2px;}
-  .apikey-row{display:flex; gap:8px; align-items:center; flex-wrap:wrap;}
-  input[type=password], input[type=text], input[type=number], textarea, select{
-    background:var(--panel2); border:1px solid var(--border); color:var(--text);
-    border-radius:8px; padding:8px 10px; font-size:13px; font-family:inherit;
-  }
-  input:focus, textarea:focus, select:focus{outline:1px solid var(--accent); border-color:var(--accent);}
-  button{
-    background:var(--accent); color:#0b1220; border:none; border-radius:8px;
-    padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer;
-  }
-  button.secondary{background:var(--panel2); color:var(--text); border:1px solid var(--border);}
-  button:disabled{opacity:0.5; cursor:not-allowed;}
-  button.small{padding:5px 10px; font-size:12px;}
-  .status-dot{width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px;}
-  .status-ok{background:var(--accent2);}
-  .status-off{background:var(--danger);}
-  .status-warn{background:var(--warn);}
-
-  main{max-width:960px; margin:0 auto; padding:20px 24px 80px;}
-  nav.tabs{display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; border-bottom:1px solid var(--border); padding-bottom:0;}
-  nav.tabs button{
-    background:transparent; color:var(--muted); border:none; border-bottom:2px solid transparent;
-    border-radius:0; padding:10px 14px; font-weight:500;
-  }
-  nav.tabs button.active{color:var(--text); border-bottom-color:var(--accent);}
-
-  .panel{display:none;}
-  .panel.active{display:block; animation:fade .15s ease;}
-  @keyframes fade{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);}}
-
-  .card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:16px;}
-  .card h3{margin:0 0 14px; font-size:15px;}
-  .field{margin-bottom:12px;}
-  .field label{display:block; font-size:12px; color:var(--muted); margin-bottom:5px;}
-  .field input, .field select{width:100%;}
-  .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-  .row3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;}
-  textarea{width:100%; min-height:70px; resize:vertical; line-height:1.5;}
-
-  .member-row{display:flex; gap:8px; margin-bottom:8px; align-items:center;}
-  .member-row input{flex:1;}
-
-  .result{margin-top:16px;}
-  .result-box{background:var(--panel2); border:1px solid var(--border); border-radius:10px; padding:16px; white-space:pre-wrap; font-size:13.5px; line-height:1.65;}
-  .result-box.empty{color:var(--muted); font-style:italic;}
-  .day-block{margin-bottom:14px;}
-  .day-block h4{margin:0 0 8px; color:var(--accent2); font-size:14px;}
-  .day-block ul{margin:0; padding-left:20px;}
-  .day-block li{margin-bottom:4px;}
-  .changed-item{background:rgba(126,224,201,0.08); border:1px solid rgba(126,224,201,0.5); border-radius:8px; padding:6px 8px; margin-bottom:6px; list-style:none; position:relative;}
-  .reason-tag{display:inline-block; background:rgba(246,161,91,0.12); color:var(--warn); border:1px solid rgba(246,161,91,0.5); border-radius:6px; padding:2px 6px; font-size:11px; margin-left:6px; vertical-align:middle;}
-  .map-link{color:var(--accent); text-decoration:none; font-size:12px; white-space:nowrap; margin-left:4px;}
-  .map-link:hover{text-decoration:underline;}
-  .warn-badge{color:var(--warn); font-size:11px; white-space:nowrap; margin-left:4px; cursor:help;}
-  .summary-note{margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); color:var(--muted); font-size:13px;}
-
-  table.score-table{width:100%; border-collapse:collapse; margin-top:8px;}
-  table.score-table th, table.score-table td{border:1px solid var(--border); padding:8px 10px; text-align:left; font-size:13px;}
-  table.score-table th{background:var(--panel2); color:var(--muted); font-weight:500;}
-
-  .loading{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:13px;}
-  .spinner{width:14px; height:14px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .error-box{background:rgba(246,91,91,0.1); border:1px solid var(--danger); color:#ffb3b3; border-radius:10px; padding:12px 14px; font-size:13px; margin-top:12px;}
-
-  .mic-area{display:flex; flex-direction:column; align-items:center; gap:16px; padding:30px 0;}
-  .mic-btn{
-    width:76px; height:76px; border-radius:50%; background:var(--accent); border:none; cursor:pointer;
-    display:flex; align-items:center; justify-content:center; font-size:28px; transition:transform .15s;
-  }
-  .mic-btn.recording{background:var(--danger); animation:pulse 1.2s infinite;}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(246,91,91,0.5);} 70%{box-shadow:0 0 0 18px rgba(246,91,91,0);} 100%{box-shadow:0 0 0 0 rgba(246,91,91,0);}}
-  .mic-hint{color:var(--muted); font-size:12px;}
-  .chat-log{display:flex; flex-direction:column; gap:10px; margin-top:6px;}
-  .msg{max-width:80%; padding:10px 13px; border-radius:12px; font-size:13.5px; line-height:1.5;}
-  .msg.user{align-self:flex-end; background:var(--accent); color:#0b1220;}
-  .msg.ai{align-self:flex-start; background:var(--panel2); border:1px solid var(--border); white-space:pre-wrap;}
-
-  .hint{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.7;}
-  .hint code{background:var(--panel2); border:1px solid var(--border); border-radius:4px; padding:1px 6px; color:var(--accent2); font-size:11.5px;}
-  .badge{display:inline-block; background:var(--panel2); border:1px solid var(--border); border-radius:6px; padding:2px 8px; font-size:11px; color:var(--muted); margin-left:6px;}
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1>AI Travel Companion <span>Local prototype · AI chạy trên máy bạn qua Ollama · dùng được cả từ điện thoại trong cùng mạng</span></h1>
+  <h1>AI Travel Companion <span id="appSubtitle" data-i18n="appSubtitle"></span></h1>
   <div class="apikey-row">
     <span id="statusDot" class="status-dot status-off"></span>
     <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
     <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
-    <button class="secondary small" id="loadModelBtn">Kiểm tra kết nối</button>
+    <button class="secondary small" id="loadModelBtn" data-i18n="checkConnBtn"></button>
+    <div class="lang-switch" role="group" aria-label="Language / 言語 / Ngôn ngữ">
+      <button type="button" class="lang-btn" data-lang="vi">VI</button>
+      <button type="button" class="lang-btn" data-lang="ja">JA</button>
+      <button type="button" class="lang-btn" data-lang="en">EN</button>
+    </div>
   </div>
 </header>
 <div style="max-width:960px; margin:0 auto; padding:0 24px;">
-  <div class="hint" id="loadProgress">
-    Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miễn phí, chạy hoàn toàn offline). Sau khi cài: mở Terminal chạy <code>ollama pull llama3.2</code> để tải model, rồi bấm "Kiểm tra kết nối".
-    Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.
-  </div>
+  <div class="hint" id="loadProgress"></div>
 </div>
 
 <main>
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="planner">🗺️ Lịch trình</button>
-    <button class="tab-btn" data-tab="group">👥 Group Matching</button>
-    <button class="tab-btn" data-tab="voice">🎙️ Trợ lý giọng nói</button>
-    <button class="tab-btn" data-tab="heal">🌧️ Self-Healing-AI</button>
-    <button class="tab-btn" data-tab="camera">📷 Camera AI</button>
+    <button class="tab-btn active" data-tab="planner" data-i18n="tabs.planner"></button>
+    <button class="tab-btn" data-tab="group" data-i18n="tabs.group"></button>
+    <button class="tab-btn" data-tab="voice" data-i18n="tabs.voice"></button>
+    <button class="tab-btn" data-tab="heal" data-i18n="tabs.heal"></button>
+    <button class="tab-btn" data-tab="camera" data-i18n="tabs.camera"></button>
   </nav>
 
   <!-- TAB 1: Dynamic Trip Planning -->
   <section class="panel active" id="panel-planner">
     <div class="card">
-      <h3>Tạo lịch trình tự động</h3>
+      <h3 data-i18n="planner.title"></h3>
       <div class="row2">
-        <div class="field"><label>Điểm đến</label><input type="text" id="p-dest" placeholder="Okinawa"></div>
-        <div class="field"><label>Số ngày</label><input type="number" id="p-days" value="4" min="1" max="14"></div>
+        <div class="field"><label data-i18n="planner.destLabel"></label><input type="text" id="p-dest" placeholder="Okinawa"></div>
+        <div class="field"><label data-i18n="planner.daysLabel"></label><input type="number" id="p-days" value="4" min="1" max="14"></div>
       </div>
       <div class="row2">
-        <div class="field"><label>Ngân sách (yên / tổng)</label><input type="number" id="p-budget" placeholder="80000"></div>
-        <div class="field"><label>Thành phần nhóm</label><input type="text" id="p-group" placeholder="Vợ chồng + 1 bé 5 tuổi"></div>
+        <div class="field"><label data-i18n="planner.budgetLabel"></label><input type="number" id="p-budget" data-i18n="planner.budgetPlaceholder" data-i18n-attr="placeholder" placeholder="80000"></div>
+        <div class="field"><label data-i18n="planner.groupLabel"></label><input type="text" id="p-group" data-i18n="planner.groupPlaceholder" data-i18n-attr="placeholder"></div>
       </div>
-      <div class="field"><label>Ghi chú thêm (phương tiện, sở thích...)</label><input type="text" id="p-notes" placeholder="Thuê xe, thích hải sản, thích biển"></div>
-      <button id="p-run">Tạo lịch trình</button>
+      <div class="field"><label data-i18n="planner.notesLabel"></label><input type="text" id="p-notes" data-i18n="planner.notesPlaceholder" data-i18n-attr="placeholder"></div>
+      <button id="p-run" data-i18n="planner.runBtn"></button>
       <div class="result" id="p-result"></div>
     </div>
   </section>
@@ -153,13 +56,13 @@
   <!-- TAB 2: Group Matching -->
   <section class="panel" id="panel-group">
     <div class="card">
-      <h3>Chấm điểm địa điểm cho cả nhóm</h3>
-      <div class="field"><label>Địa điểm cần đánh giá</label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
-      <div class="field"><label>Thành viên & sở thích</label>
+      <h3 data-i18n="group.title"></h3>
+      <div class="field"><label data-i18n="group.placeLabel"></label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
+      <div class="field"><label data-i18n="group.membersLabel"></label>
         <div id="g-members"></div>
-        <button type="button" class="secondary small" id="g-addMember">+ Thêm thành viên</button>
+        <button type="button" class="secondary small" id="g-addMember" data-i18n="group.addMemberBtn"></button>
       </div>
-      <button id="g-run">Chấm điểm phù hợp</button>
+      <button id="g-run" data-i18n="group.runBtn"></button>
       <div class="result" id="g-result"></div>
       <div class="chat-log" id="g-debate" style="margin-top:14px;"></div>
     </div>
@@ -168,20 +71,20 @@
   <!-- TAB 3: Voice Assistant -->
   <section class="panel" id="panel-voice">
     <div class="card">
-      <h3>Trợ lý du lịch bằng giọng nói <span class="badge" id="voiceSupport"></span></h3>
+      <h3><span data-i18n="voice.title"></span> <span class="badge" id="voiceSupport"></span></h3>
       <div class="field">
-        <label>Giọng đọc</label>
+        <label data-i18n="voice.voiceLabel"></label>
         <select id="v-voice" style="width:100%;"></select>
         <div class="hint" id="v-voiceHint"></div>
       </div>
       <div class="mic-area">
         <button class="mic-btn" id="v-mic">🎤</button>
-        <div class="mic-hint" id="v-hint">Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")</div>
+        <div class="mic-hint" id="v-hint"></div>
       </div>
-      <div class="field"><label>Hoặc gõ câu hỏi</label>
+      <div class="field"><label data-i18n="voice.orTypeLabel"></label>
         <div style="display:flex; gap:8px;">
-          <input type="text" id="v-text" placeholder="Tìm nơi ngắm hoàng hôn đẹp gần đây" style="flex:1;">
-          <button id="v-send" class="secondary">Gửi</button>
+          <input type="text" id="v-text" data-i18n="voice.textPlaceholder" data-i18n-attr="placeholder" style="flex:1;">
+          <button id="v-send" class="secondary" data-i18n="voice.sendBtn"></button>
         </div>
       </div>
       <div class="chat-log" id="v-log"></div>
@@ -191,21 +94,18 @@
   <!-- TAB 4: Self-Healing Itinerary -->
   <section class="panel" id="panel-heal">
     <div class="card">
-      <h3>Lịch trình tự thay đổi</h3>
-      <div class="field"><label>Lịch trình hiện tại (mỗi dòng 1 hoạt động)</label>
-        <textarea id="h-itin">Beach
-Sunset viewing
-Outdoor BBQ
-Dinner ngoài trời</textarea>
+      <h3 data-i18n="heal.title"></h3>
+      <div class="field"><label data-i18n="heal.itinLabel"></label>
+        <textarea id="h-itin"></textarea>
       </div>
       <div class="row2">
-        <div class="field"><label>Điểm đến (để lấy thời tiết thật)</label><input type="text" id="h-dest" placeholder="Okinawa"></div>
-        <div class="field"><label>Tình huống bất ngờ</label><input type="text" id="h-event" placeholder="Buổi sáng mưa lớn"></div>
+        <div class="field"><label data-i18n="heal.destLabel"></label><input type="text" id="h-dest" placeholder="Okinawa"></div>
+        <div class="field"><label data-i18n="heal.eventLabel"></label><input type="text" id="h-event" data-i18n="heal.eventPlaceholder" data-i18n-attr="placeholder"></div>
       </div>
-      <button type="button" class="secondary small" id="h-weather">🌦️ Lấy thời tiết thật</button>
+      <button type="button" class="secondary small" id="h-weather" data-i18n="heal.weatherBtn"></button>
       <div class="hint" id="h-weatherStatus"></div>
       <div style="height:10px;"></div>
-      <button id="h-run">Cập nhật lịch trình</button>
+      <button id="h-run" data-i18n="heal.runBtn"></button>
       <div class="result" id="h-result"></div>
     </div>
   </section>
@@ -213,1055 +113,28 @@ Dinner ngoài trời</textarea>
   <!-- TAB 5: Camera AI -->
   <section class="panel" id="panel-camera">
     <div class="card">
-      <h3>AI hiểu qua camera</h3>
+      <h3 data-i18n="camera.title"></h3>
       <div class="row2">
-        <div class="field"><label>Chế độ</label>
+        <div class="field"><label data-i18n="camera.modeLabel"></label>
           <select id="c-mode">
-            <option value="food">🍜 Món ăn</option>
-            <option value="landmark">🏯 Địa danh</option>
+            <option value="food" data-i18n="camera.modeFood"></option>
+            <option value="landmark" data-i18n="camera.modeLandmark"></option>
           </select>
         </div>
-        <div class="field"><label>Vision model (Ollama)</label><input type="text" id="c-model" placeholder="moondream" value="moondream"></div>
+        <div class="field"><label data-i18n="camera.visionModelLabel"></label><input type="text" id="c-model" placeholder="moondream" value="moondream"></div>
       </div>
-      <div class="hint">Model mặc định <code>moondream</code> nhẹ, chạy nhanh trên local nhưng nhận diện còn thô. Muốn chính xác hơn: <code>ollama pull llama3.2-vision</code> rồi đổi ô model.</div>
+      <div class="hint" data-i18n="camera.modelHint" data-i18n-html="1"></div>
       <div class="field" style="margin-top:12px;">
-        <label>Chụp hoặc chọn ảnh</label>
+        <label data-i18n="camera.fileLabel"></label>
         <input type="file" id="c-file" accept="image/*" capture="environment">
       </div>
       <img id="c-preview" style="display:none; max-width:100%; border-radius:10px; margin:10px 0; border:1px solid var(--border);">
-      <button id="c-run" disabled>Phân tích ảnh</button>
+      <button id="c-run" disabled data-i18n="camera.runBtn"></button>
       <div class="result" id="c-result"></div>
     </div>
   </section>
 </main>
 
-<script>
-// ---------- Ollama connection (AI chạy trên máy chủ Ollama, gọi qua mạng LAN) ----------
-const serverUrlInput = document.getElementById('serverUrl');
-const modelSelect = document.getElementById('modelSelect');
-const statusDot = document.getElementById('statusDot');
-const loadProgress = document.getElementById('loadProgress');
-const loadModelBtn = document.getElementById('loadModelBtn');
-const defaultHint = loadProgress.innerHTML;
-
-const savedUrl = localStorage.getItem('ollama_url');
-const savedModel = localStorage.getItem('ollama_model');
-serverUrlInput.value = savedUrl || 'http://localhost:11434';
-modelSelect.value = savedModel || 'llama3.2';
-
-const tripState = {
-  destination: '',
-  itinerary: [],
-  plannerData: null,
-  plannerContext: null
-};
-
-function dedupePlanItems(items) {
-  const seen = new Set();
-  return (Array.isArray(items) ? items : []).filter(item => {
-    const key = String(item || '').trim().toLowerCase();
-    if (!key || seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
-}
-
-function flattenActivities(planData) {
-  if (!planData || !Array.isArray(planData.days)) return [];
-  const flat = [];
-  planData.days.forEach(day => {
-    if (!day || !Array.isArray(day.activities)) return;
-    day.activities.forEach(activity => {
-      if (typeof activity === 'string' && activity.trim()) flat.push(activity.trim());
-    });
-  });
-  return dedupePlanItems(flat);
-}
-
-function renderTripPlan(resultEl, planData, itineraryOverride, prefixNote) {
-  const days = Array.isArray(planData && planData.days) ? planData.days : [];
-  const summary = planData && planData.summary ? String(planData.summary).trim() : '';
-  const flat = dedupePlanItems(Array.isArray(itineraryOverride) && itineraryOverride.length ? itineraryOverride : flattenActivities(planData));
-  let html = '';
-
-  if (days.length > 0 && flat.length > 0) {
-    let cursor = 0;
-    days.forEach((day, index) => {
-      const originalCount = Array.isArray(day && day.activities) ? day.activities.length : 0;
-      const nextCount = originalCount > 0 ? originalCount : Math.ceil(flat.length / days.length);
-      const items = flat.slice(cursor, cursor + nextCount);
-      cursor += nextCount;
-      if (!items.length) return;
-      html += `<div class="day-block"><h4>Day ${day.day || (index + 1)}</h4><ul>${items.map(a => `<li>${escapeHtml(a)} ${mapLink(a, tripState.destination)}${venueWarning(a)}</li>`).join('')}</ul></div>`;
-    });
-
-    if (cursor < flat.length) {
-      const remaining = flat.slice(cursor);
-      if (remaining.length) {
-        html += `<div class="day-block"><h4>Day ${days.length + 1}</h4><ul>${remaining.map(a => `<li>${escapeHtml(a)} ${mapLink(a, tripState.destination)}${venueWarning(a)}</li>`).join('')}</ul></div>`;
-      }
-    }
-  } else if (flat.length > 0) {
-    html += `<div class="day-block"><h4>Lịch trình</h4><ul>${flat.map(a => `<li>${escapeHtml(a)} ${mapLink(a, tripState.destination)}${venueWarning(a)}</li>`).join('')}</ul></div>`;
-  }
-
-  if (summary) html += `<div class="summary-note">${escapeHtml(summary)}</div>`;
-  if (prefixNote) html += `<div class="summary-note">${escapeHtml(prefixNote)}</div>`;
-  resultEl.innerHTML = `<div class="result-box">${html || 'Không có kết quả.'}</div>`;
-}
-
-function getPlannerContext() {
-  const fallback = tripState.plannerContext || {};
-  return {
-    destination: tripState.destination || document.getElementById('p-dest').value.trim() || fallback.destination || '',
-    days: document.getElementById('p-days').value || fallback.days || '',
-    budget: document.getElementById('p-budget').value || fallback.budget || 'không giới hạn',
-    group: document.getElementById('p-group').value.trim() || fallback.group || 'một mình',
-    notes: document.getElementById('p-notes').value.trim() || fallback.notes || ''
-  };
-}
-
-function buildPlannerContextSummary(context) {
-  const parts = [];
-  if (context.days) parts.push(`${context.days} ngày`);
-  if (context.budget) parts.push(`ngân sách ${context.budget} yên`);
-  if (context.group) parts.push(`nhóm: ${context.group}`);
-  if (context.notes) parts.push(`ghi chú: ${context.notes}`);
-  return parts.join(' • ');
-}
-
-function syncPlannerToSelfHealing(dest, itinerary) {
-  tripState.destination = dest || tripState.destination || '';
-  tripState.itinerary = Array.isArray(itinerary) ? itinerary.slice() : [];
-  const destField = document.getElementById('h-dest');
-  const itinField = document.getElementById('h-itin');
-  if (destField) destField.value = tripState.destination;
-  if (itinField) itinField.value = tripState.itinerary.join('\n');
-}
-
-function getCurrentItinerarySource() {
-  const manualItin = document.getElementById('h-itin').value.split('\n').map(s => s.trim()).filter(Boolean);
-  if (manualItin.length > 0) return manualItin;
-  if (tripState.itinerary.length > 0) return tripState.itinerary.slice();
-  return ['Beach', 'Sunset viewing', 'Outdoor BBQ', 'Dinner ngoài trời'];
-}
-
-function ollamaBase() {
-  return (serverUrlInput.value.trim() || 'http://localhost:11434').replace(/\/+$/, '');
-}
-
-function setStatus(state, text) {
-  statusDot.className = 'status-dot ' + (state === 'ready' ? 'status-ok' : state === 'loading' ? 'status-warn' : 'status-off');
-  if (text) loadProgress.innerHTML = text; else loadProgress.innerHTML = defaultHint;
-}
-
-loadModelBtn.addEventListener('click', checkConnection);
-
-async function checkConnection() {
-  localStorage.setItem('ollama_url', serverUrlInput.value.trim());
-  localStorage.setItem('ollama_model', modelSelect.value.trim());
-  loadModelBtn.disabled = true;
-  setStatus('loading', 'Đang kết nối tới Ollama...');
-  try {
-    const res = await fetch(`${ollamaBase()}/api/tags`);
-    if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
-    const data = await res.json();
-    const names = (data.models || []).map(m => m.name);
-    const model = modelSelect.value.trim();
-    if (names.length === 0) {
-      setStatus('off', '⚠️ Kết nối được nhưng chưa có model nào. Chạy: <code>ollama pull ' + (model || 'llama3.2') + '</code> rồi thử lại.');
-    } else if (!names.some(n => n === model || n.startsWith(model + ':'))) {
-      setStatus('off', `⚠️ Server có các model: ${names.join(', ')} — không thấy "${model}". Sửa lại tên model hoặc chạy <code>ollama pull ${model}</code>.`);
-    } else {
-      setStatus('ready', `✅ Đã kết nối Ollama, model "${model}" sẵn sàng — AI chạy trên máy này, hoàn toàn offline/miễn phí.`);
-    }
-  } catch (err) {
-    setStatus('off', `⚠️ Không kết nối được tới ${ollamaBase()}. Kiểm tra: Ollama đã chạy chưa, đúng địa chỉ IP chưa, và nếu gọi từ điện thoại/máy khác thì đã bật <code>OLLAMA_HOST=0.0.0.0</code> và <code>OLLAMA_ORIGINS=*</code> chưa. Lỗi: ${err.message}`);
-  } finally {
-    loadModelBtn.disabled = false;
-  }
-}
-
-// ---------- Tabs ----------
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
-  });
-});
-
-// ---------- Local LLM call (Ollama server, chạy trên máy/mạng LAN, không cloud) ----------
-async function callClaude(system, userText, { json = false } = {}) {
-  const model = modelSelect.value.trim() || 'llama3.2';
-  const body = {
-    model,
-    messages: [
-      { role: 'system', content: system },
-      { role: 'user', content: userText }
-    ],
-    stream: false
-  };
-  if (json) body.format = 'json';
-
-  let res;
-  try {
-    res = await fetch(`${ollamaBase()}/api/chat`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-  } catch (err) {
-    throw new Error(`Không gọi được tới ${ollamaBase()}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`);
-  }
-  if (!res.ok) {
-    let msg = res.status + ' ' + res.statusText;
-    try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
-    throw new Error(msg);
-  }
-  const data = await res.json();
-  const text = data.message?.content || '';
-  if (json) {
-    const match = text.match(/\{[\s\S]*\}/);
-    const cleaned = (match ? match[0] : text).replace(/```json/gi, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
-  }
-  return text;
-}
-
-function setLoading(el, on, label = 'Đang hỏi AI...') {
-  if (on) el.innerHTML = `<div class="loading"><div class="spinner"></div>${label}</div>`;
-}
-function showError(el, err) {
-  el.innerHTML = `<div class="error-box">⚠️ ${err.message}</div>`;
-}
-
-// ---------- TAB 1: Trip Planner ----------
-document.getElementById('p-run').addEventListener('click', async () => {
-  const dest = document.getElementById('p-dest').value.trim() || 'Okinawa';
-  const days = document.getElementById('p-days').value || 4;
-  const budget = document.getElementById('p-budget').value || 'không giới hạn';
-  const group = document.getElementById('p-group').value.trim() || 'một mình';
-  const notes = document.getElementById('p-notes').value.trim();
-  const resultEl = document.getElementById('p-result');
-  setLoading(resultEl, true, 'Đang tạo lịch trình...');
-
-  const system = `Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ hay số điện thoại của bất kỳ quán/địa điểm nào — chỉ gợi ý tên, người dùng sẽ tự kiểm tra giờ mở cửa thật trên Maps trước khi đi. Trả lời DUY NHẤT bằng JSON hợp lệ, không kèm text hay markdown code fence nào khác, theo đúng schema:
-{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}`;
-  const user = `Lên lịch trình du lịch ${dest}, ${days} ngày. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}
-Tối ưu theo: quãng đường di chuyển, kẹt xe, thời tiết, chi phí, trải nghiệm phù hợp cả nhóm. Không cần đảm bảo giờ mở cửa vì bạn không có dữ liệu thời gian thực.`;
-
-  try {
-    const data = await callClaude(system, user, { json: true });
-    const itinerary = flattenActivities(data);
-    if (itinerary.length > 0) {
-      tripState.destination = dest;
-      tripState.itinerary = itinerary;
-      tripState.plannerData = data;
-      tripState.plannerContext = { destination: dest, days, budget, group, notes };
-      syncPlannerToSelfHealing(dest, itinerary);
-    }
-    renderTripPlan(resultEl, data, null, '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên không biết chắc quán có mở cửa vào giờ đó không (nhiều quán ở Nhật chỉ mở buổi tối) — luôn kiểm tra qua Maps trước khi đến, đừng tin trực tiếp thứ tự lịch trình.');
-  } catch (err) { showError(resultEl, err); }
-});
-
-// ---------- TAB 2: Group Matching ----------
-const membersDiv = document.getElementById('g-members');
-function addMemberRow(name = '', pref = '') {
-  const row = document.createElement('div');
-  row.className = 'member-row';
-  row.innerHTML = `<input type="text" placeholder="Tên (VD: A)" class="g-name" value="${name}">
-    <input type="text" placeholder="Sở thích (VD: Hải sản, thích chụp ảnh)" class="g-pref" value="${pref}">
-    <button type="button" class="secondary small g-remove">✕</button>`;
-  row.querySelector('.g-remove').addEventListener('click', () => row.remove());
-  membersDiv.appendChild(row);
-}
-[['A','Hải sản'], ['B','Check-in, chụp ảnh'], ['C','Shopping'], ['D','Có trẻ em'], ['E','Orion Beer']].forEach(([n,p]) => addMemberRow(n,p));
-document.getElementById('g-addMember').addEventListener('click', () => addMemberRow());
-
-document.getElementById('g-run').addEventListener('click', async () => {
-  const place = document.getElementById('g-place').value.trim() || 'American Village';
-  const members = [...membersDiv.querySelectorAll('.member-row')].map(row => ({
-    name: row.querySelector('.g-name').value.trim(),
-    pref: row.querySelector('.g-pref').value.trim()
-  })).filter(m => m.name);
-  const resultEl = document.getElementById('g-result');
-  setLoading(resultEl, true, 'Đang chấm điểm...');
-
-  const system = `Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Trả lời DUY NHẤT bằng JSON hợp lệ theo schema:
-{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}
-Điểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).`;
-  const user = `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}`;
-  const debateEl = document.getElementById('g-debate');
-  debateEl.innerHTML = '';
-
-  try {
-    const data = await callClaude(system, user, { json: true });
-    let html = `<table class="score-table"><thead><tr><th>Tiêu chí</th><th>Điểm</th></tr></thead><tbody>`;
-    (data.criteria || []).forEach(c => { html += `<tr><td>${escapeHtml(c.name)}</td><td>${c.score}/10</td></tr>`; });
-    html += `</tbody></table>`;
-    resultEl.innerHTML = `<div class="result-box">${html}</div>`;
-
-    (data.debate || []).forEach(d => {
-      const div = document.createElement('div');
-      div.className = 'msg ai';
-      div.innerHTML = `<strong>${escapeHtml(d.name || '')}:</strong> ${escapeHtml(d.comment || '')}`;
-      debateEl.appendChild(div);
-    });
-    if (data.recommendation) {
-      const div = document.createElement('div');
-      div.className = 'msg user';
-      div.innerHTML = `<strong>🤖 AI chốt:</strong> ${escapeHtml(data.recommendation)}`;
-      debateEl.appendChild(div);
-    }
-  } catch (err) { showError(resultEl, err); }
-});
-
-// ---------- TAB 3: Voice Assistant ----------
-const vLog = document.getElementById('v-log');
-const micBtn = document.getElementById('v-mic');
-const vHint = document.getElementById('v-hint');
-let recognition = null;
-let recording = false;
-
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (SpeechRecognition) {
-  document.getElementById('voiceSupport').textContent = 'hỗ trợ trong trình duyệt này';
-  recognition = new SpeechRecognition();
-  recognition.lang = 'vi-VN';
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  recognition.onresult = (e) => {
-    const transcript = e.results[0][0].transcript;
-    document.getElementById('v-text').value = transcript;
-    sendVoiceQuery(transcript);
-  };
-  recognition.onend = () => { recording = false; micBtn.classList.remove('recording'); vHint.textContent = 'Nhấn để nói (VD: "Tôi muốn ăn sushi gần đây")'; };
-  recognition.onerror = (e) => { recording = false; micBtn.classList.remove('recording'); vHint.textContent = 'Lỗi mic: ' + e.error; };
-} else {
-  document.getElementById('voiceSupport').textContent = 'trình duyệt không hỗ trợ — hãy gõ câu hỏi bên dưới';
-  micBtn.disabled = true;
-}
-
-// ---------- Chọn giọng đọc (giọng mặc định của trình duyệt thường robot, nghe chán) ----------
-const voiceSelect = document.getElementById('v-voice');
-const voiceHint = document.getElementById('v-voiceHint');
-let availableVoices = [];
-
-function populateVoices() {
-  availableVoices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-  const viVoices = availableVoices.filter(v => v.lang && v.lang.toLowerCase().startsWith('vi'));
-  const list = viVoices.length ? viVoices : availableVoices;
-  const savedVoiceName = localStorage.getItem('voice_name');
-
-  voiceSelect.innerHTML = '';
-  if (list.length === 0) {
-    voiceSelect.innerHTML = '<option value="">(không có giọng đọc nào)</option>';
-    voiceHint.textContent = 'Trình duyệt chưa nạp xong danh sách giọng đọc, hoặc máy chưa cài giọng tiếng Việt nào.';
-    return;
-  }
-  list.forEach(v => {
-    const opt = document.createElement('option');
-    opt.value = v.name;
-    opt.textContent = `${v.name} (${v.lang})`;
-    if (v.name === savedVoiceName) opt.selected = true;
-    voiceSelect.appendChild(opt);
-  });
-  if (!viVoices.length) {
-    voiceHint.innerHTML = 'Máy chưa có giọng tiếng Việt nào ngoài giọng mặc định, nên đang phát toàn bộ giọng có sẵn (có thể không đọc đúng tiếng Việt). Trên macOS: vào System Settings → Accessibility → Spoken Content → System Voice → tải thêm giọng tiếng Việt (chọn bản "Enhanced/Premium" để nghe tự nhiên hơn nhiều so với giọng mặc định).';
-  } else {
-    voiceHint.textContent = `Tìm thấy ${viVoices.length} giọng tiếng Việt. Nếu vẫn thấy robot, thử cài thêm giọng "Enhanced/Premium" trong Cài đặt hệ thống để có giọng tự nhiên hơn.`;
-  }
-}
-if (window.speechSynthesis) {
-  populateVoices();
-  window.speechSynthesis.onvoiceschanged = populateVoices;
-}
-voiceSelect.addEventListener('change', () => localStorage.setItem('voice_name', voiceSelect.value));
-
-micBtn.addEventListener('click', () => {
-  if (!recognition) return;
-  if (recording) { recognition.stop(); return; }
-  recording = true;
-  micBtn.classList.add('recording');
-  vHint.textContent = 'Đang nghe...';
-  recognition.start();
-});
-
-document.getElementById('v-send').addEventListener('click', () => {
-  const text = document.getElementById('v-text').value.trim();
-  if (text) sendVoiceQuery(text);
-});
-document.getElementById('v-text').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') document.getElementById('v-send').click();
-});
-
-async function sendVoiceQuery(text) {
-  addMsg('user', text);
-  document.getElementById('v-text').value = '';
-  const thinking = addMsg('ai', '...');
-  const system = `Bạn là trợ lý du lịch AI bằng giọng nói, thân thiện, trả lời ngắn gọn (2-4 câu), thực tế, như đang đề xuất trực tiếp cho người dùng đang ở gần đó (nhà hàng, địa điểm ngắm cảnh...). Trả lời bằng tiếng Việt, không dùng markdown.`;
-  try {
-    const reply = await callClaude(system, text);
-    thinking.textContent = reply;
-    speak(reply);
-  } catch (err) {
-    thinking.textContent = '⚠️ ' + err.message;
-  }
-}
-
-function addMsg(role, text) {
-  const div = document.createElement('div');
-  div.className = 'msg ' + role;
-  div.textContent = text;
-  vLog.appendChild(div);
-  vLog.scrollTop = vLog.scrollHeight;
-  return div;
-}
-
-function speak(text) {
-  if (!window.speechSynthesis) return;
-  window.speechSynthesis.cancel();
-  const utter = new SpeechSynthesisUtterance(text);
-  const chosen = availableVoices.find(v => v.name === voiceSelect.value);
-  if (chosen) { utter.voice = chosen; utter.lang = chosen.lang; }
-  else { utter.lang = 'vi-VN'; }
-  utter.rate = 1.02;
-  utter.pitch = 1.0;
-  window.speechSynthesis.speak(utter);
-}
-
-// ---------- TAB 4: Self-Healing Itinerary ----------
-const WEATHER_CODE_VI = {
-  0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
-  45: 'sương mù', 48: 'sương mù đóng băng',
-  51: 'mưa phùn nhẹ', 53: 'mưa phùn vừa', 55: 'mưa phùn dày',
-  61: 'mưa nhẹ', 63: 'mưa vừa', 65: 'mưa to',
-  71: 'tuyết nhẹ', 73: 'tuyết vừa', 75: 'tuyết to',
-  80: 'mưa rào nhẹ', 81: 'mưa rào vừa', 82: 'mưa rào dữ dội',
-  95: 'giông bão', 96: 'giông kèm mưa đá nhẹ', 99: 'giông kèm mưa đá to'
-};
-
-const SELF_HEALING_POOLS = {
-  rain: ['Aquarium', 'Museum', 'Shopping Mall', 'Indoor Market', 'Café', 'Indoor Activity', 'Arcade', 'Spa', 'Cinema'],
-  storm: ['Aquarium', 'Museum', 'Shopping Mall', 'Indoor Market', 'Café', 'Indoor Activity', 'Arcade', 'Spa', 'Cinema'],
-  heat: ['Museum', 'Aquarium', 'Shopping Mall', 'Café', 'Indoor Activity', 'Arcade', 'Cinema', 'Spa', 'Food Hall'],
-  wind: ['Museum', 'Aquarium', 'Shopping Mall', 'Café', 'Indoor Activity', 'Arcade', 'Cinema', 'Food Hall'],
-  default: ['Museum', 'Aquarium', 'Shopping Mall', 'Café', 'Indoor Activity', 'Arcade', 'Cinema', 'Food Hall']
-};
-
-const SELF_HEALING_OUTDOOR_KEYWORDS = [
-  'beach', 'sunset', 'outdoor', 'park', 'hike', 'hiking', 'trail', 'viewpoint',
-  'garden', 'river', 'harbor', 'harbour', 'camp', 'bbq', 'barbecue', 'boat',
-  'cruise', 'bike', 'biking', 'walk', 'walking', 'sea', 'snorkel', 'surf'
-];
-
-const SELF_HEALING_INDOOR_KEYWORDS = [
-  'museum', 'aquarium', 'mall', 'shopping', 'café', 'cafe', 'restaurant',
-  'food court', 'arcade', 'spa', 'cinema', 'movie', 'indoor', 'market', 'shop'
-];
-
-function normalizeHealedText(text) {
-  return String(text || '').trim().toLowerCase();
-}
-
-function isSevereWeatherIncident(incident) {
-  if (!incident || !incident.type) return false;
-  return incident.severity === 'high' || /storm|rain|wind|heat/.test(incident.type);
-}
-
-function classifyIncident(eventText) {
-  const text = normalizeHealedText(eventText);
-  const rainy = /mưa|rain|drizzle|bão|giông|typhoon|lụt|flood/.test(text);
-  const hot = /nắng|nóng|heat|oi bức|sunny/.test(text);
-  const windy = /gió|wind/.test(text);
-  let type = 'default';
-  let severity = 'low';
-
-  if (/bão|giông|typhoon|lụt|flood|hurricane/.test(text)) {
-    type = 'storm';
-    severity = 'high';
-  } else if (rainy && /(mưa rất to|mưa to|mưa lớn|heavy rain|rainstorm|torrential|mưa dông)/.test(text)) {
-    type = 'rain';
-    severity = 'high';
-  } else if (windy && /(gió lớn|gió mạnh|strong wind|gust|windy)/.test(text)) {
-    type = 'wind';
-    severity = 'high';
-  } else if (hot && /(nắng gắt|nắng mạnh|nóng quá|heatwave|extreme heat)/.test(text)) {
-    type = 'heat';
-    severity = 'high';
-  } else if (rainy && /(mưa to|mưa lớn|heavy rain|rainstorm|torrential)/.test(text)) {
-    type = 'rain';
-    severity = 'high';
-  } else if (rainy) {
-    type = 'rain';
-    severity = 'medium';
-  } else if (windy) {
-    type = 'wind';
-    severity = 'medium';
-  }
-
-  return { type, severity, text };
-}
-
-function classifyActivity(item) {
-  const text = normalizeHealedText(item);
-  const indoor = SELF_HEALING_INDOOR_KEYWORDS.some(k => text.includes(k));
-  const outdoor = SELF_HEALING_OUTDOOR_KEYWORDS.some(k => text.includes(k));
-  const food = /lunch|dinner|breakfast|ăn|restaurant|café|cafe|izakaya|sushi|ramen|bbq|barbecue|food/.test(text);
-  const transit = /airport|flight|train|bus|car|drive|ferry|taxi|transit|transfer|station/.test(text);
-
-  let category = 'general';
-  if (food) category = 'food';
-  else if (transit) category = 'transit';
-  else if (indoor) category = 'indoor';
-  else if (outdoor) category = 'outdoor';
-
-  return {
-    category,
-    weatherSensitive: category === 'outdoor' || /beach|sunset|outdoor|park|hike|trail|garden|boat|cruise|snorkel|surf/.test(text)
-  };
-}
-
-function chooseReplacement(original, incidentType, used) {
-  const pool = SELF_HEALING_POOLS[incidentType] || SELF_HEALING_POOLS.default;
-  for (const candidate of pool) {
-    const normalizedCandidate = candidate.toLowerCase();
-    if (!used.has(normalizedCandidate) && normalizedCandidate !== normalizeHealedText(original)) {
-      used.add(normalizedCandidate);
-      return candidate;
-    }
-  }
-  return null;
-}
-
-function summarizeIncident(eventText, incident) {
-  const text = String(eventText || '').trim();
-  if (!text) return 'Không có mô tả tình huống cụ thể.';
-  if (incident.type === 'storm') return `Sự cố nghiêm trọng: ${text}`;
-  if (incident.type === 'rain') return `Thời tiết mưa: ${text}`;
-  if (incident.type === 'heat') return `Thời tiết nóng / nắng: ${text}`;
-  if (incident.type === 'wind') return `Thời tiết gió mạnh: ${text}`;
-  return text;
-}
-
-function buildFallbackSelfHealingPlan(planData, itin, eventText, context) {
-  const incident = classifyIncident(eventText);
-  const basePlan = buildHealingPlanFromDays(planData, eventText, context);
-
-  if (!isSevereWeatherIncident(incident)) {
-    return {
-      incident_summary: summarizeIncident(eventText, incident),
-      severity: incident.severity,
-      replacements: [],
-      updated_days: Array.isArray(planData && planData.days)
-        ? planData.days.map((day, index) => ({
-            day: day.day || (index + 1),
-            activities: dedupePlanItems(Array.isArray(day && day.activities) ? day.activities : []).map(activity => ({
-              original: activity,
-              text: activity,
-              changed: false,
-              reason: ''
-            }))
-          }))
-        : [{ day: 1, activities: dedupePlanItems(itin).map(activity => ({ original: activity, text: activity, changed: false, reason: '' })) }],
-      updated_itinerary: dedupePlanItems(itin),
-      notes: 'Thời tiết chưa chuyển xấu tới mức cần đổi lịch trình; giữ nguyên kế hoạch hiện tại.'
-    };
-  }
-
-  return basePlan;
-}
-
-function arraysEqualStrings(left, right) {
-  if (!Array.isArray(left) || !Array.isArray(right) || left.length !== right.length) return false;
-  for (let i = 0; i < left.length; i += 1) {
-    if (String(left[i]).trim() !== String(right[i]).trim()) return false;
-  }
-  return true;
-}
-
-function sanitizeSelfHealingPlan(data, planData, itin, eventText, context) {
-  const fallback = buildFallbackSelfHealingPlan(planData, itin, eventText, context);
-  if (!data || typeof data !== 'object') return fallback;
-
-  const incident = classifyIncident(eventText);
-
-  if (!isSevereWeatherIncident(incident)) {
-    return fallback;
-  }
-
-  return fallback;
-}
-
-function buildNoChangeReason(originalItin, eventText, incident) {
-  const original = Array.isArray(originalItin) ? originalItin : [];
-  const reasons = [];
-  const event = String(eventText || '').toLowerCase();
-
-  if (original.some(item => /beach|sunset|outdoor|park|hike|trail|garden|boat|surf|snorkel/i.test(item))) {
-    reasons.push('có hoạt động ngoài trời nhưng tình huống hiện tại chưa đủ mạnh để phá vỡ lịch trình');
-  }
-  if (/mưa|rain|rains|drizzle|nắng|heat|gió|wind/i.test(event)) {
-    reasons.push('dữ kiện thời tiết chỉ mang tính cảnh báo, chưa cần thay đổi toàn bộ lịch trình');
-  }
-  if (reasons.length === 0) {
-    reasons.push('không có hoạt động nào bị ảnh hưởng trực tiếp bởi sự cố này');
-  }
-  return reasons.join('; ');
-}
-
-function buildHealedDayGroups(planData, updatedItinerary, replacements) {
-  const days = Array.isArray(planData && planData.days) ? planData.days : [];
-  const updatedList = dedupePlanItems(updatedItinerary);
-  const replacementMap = new Map();
-  const groups = [];
-  let cursor = 0;
-
-  (Array.isArray(replacements) ? replacements : []).forEach(r => {
-    const key = normalizeHealedText(r && r.original);
-    if (key && !replacementMap.has(key)) replacementMap.set(key, r);
-  });
-
-  days.forEach((day, index) => {
-    const originalActs = dedupePlanItems(Array.isArray(day && day.activities) ? day.activities : []);
-    const count = Math.max(originalActs.length, 1);
-    const healedActs = updatedList.slice(cursor, cursor + count);
-    cursor += count;
-    const maxLen = Math.max(originalActs.length, healedActs.length);
-    const items = [];
-
-    for (let i = 0; i < maxLen; i += 1) {
-      const before = originalActs[i];
-      const after = healedActs[i];
-      const beforeKey = normalizeHealedText(before);
-      const replacement = replacementMap.get(beforeKey);
-      const changed = Boolean(before && after && normalizeHealedText(before) !== normalizeHealedText(after)) || Boolean(replacement);
-
-      if (before && after) {
-        items.push({
-          before,
-          after,
-          status: changed ? 'changed' : 'same',
-          reason: replacement && replacement.reason ? replacement.reason : ''
-        });
-      } else if (before && !after) {
-        items.push({ before, after: '—', status: 'removed', reason: replacement && replacement.reason ? replacement.reason : '' });
-      } else if (!before && after) {
-        items.push({ before: '—', after, status: 'added', reason: '' });
-      }
-    }
-
-    if (items.length) {
-      groups.push({ day: day.day || (index + 1), items });
-    }
-  });
-
-  if (cursor < updatedList.length) {
-    groups.push({
-      day: days.length + 1,
-      items: updatedList.slice(cursor).map(after => ({ before: '—', after, status: 'added', reason: '' }))
-    });
-  }
-
-  return groups;
-}
-
-function renderHealedPlanByDay(planData, updatedItinerary, replacements, context) {
-  const groups = buildHealedDayGroups(planData, updatedItinerary, replacements);
-  const summary = buildPlannerContextSummary(context || {});
-  let html = '';
-
-  if (summary) {
-    html += `<div class="summary-note"><strong>Bám theo plan Tab 1:</strong> ${escapeHtml(summary)}</div>`;
-  }
-
-  groups.forEach(group => {
-    html += `<div class="day-block"><h4>Day ${escapeHtml(group.day)}</h4><ul>${group.items.map(item => {
-      const changed = item.status !== 'same';
-      const target = item.after === '—' ? item.before : item.after;
-      const reason = item.status === 'changed'
-        ? item.reason || 'Đã thay thế do thời tiết xấu'
-        : item.status === 'added'
-          ? 'Được thêm để thay thế hoạt động không còn phù hợp'
-          : item.status === 'removed'
-            ? 'Hoạt động này bị lược bỏ vì không còn phù hợp'
-            : '';
-      const label = reason ? `<span class="reason-tag">Lý do: ${escapeHtml(reason)}</span>` : '';
-      const content = item.status === 'removed'
-        ? `<del>${escapeHtml(item.before)}</del>${label}`
-        : `${escapeHtml(item.after)}${label} ${mapLink(target, tripState.destination)}${venueWarning(target)}`;
-      return `<li class="${changed ? 'changed-item' : ''}">${content}</li>`;
-    }).join('')}</ul></div>`;
-  });
-
-  return html;
-}
-
-function shouldReplaceActivity(item, info, incident) {
-  if (!isSevereWeatherIncident(incident)) return false;
-  const text = normalizeHealedText(item);
-  const isBoatOrSeaTransit = /boat|cruise|ferry/.test(text);
-  const isOutdoorFood = /bbq|barbecue|picnic|outdoor dining|seafood grill/.test(text);
-  if (info.category === 'transit' && !isBoatOrSeaTransit) return false;
-  if (info.category === 'food' && !isOutdoorFood) return false;
-  return info.category === 'outdoor' || isBoatOrSeaTransit || isOutdoorFood;
-}
-
-function parseBudgetNumber(value) {
-  const match = String(value || '').replace(/[^\d]/g, '');
-  return match ? parseInt(match, 10) : null;
-}
-
-function rankReplacementCandidates(candidates, original, context, info, incidentType) {
-  const text = normalizeHealedText(original);
-  const group = normalizeHealedText(context && context.group);
-  const notes = normalizeHealedText(context && context.notes);
-  const budget = parseBudgetNumber(context && context.budget);
-  const ranked = [];
-  const seen = new Set();
-
-  (Array.isArray(candidates) ? candidates : []).forEach(candidate => {
-    const key = normalizeHealedText(candidate);
-    if (!key || seen.has(key)) return;
-    seen.add(key);
-    let score = 0;
-
-    if (/aquarium/.test(key)) score += 3;
-    if (/museum/.test(key)) score += 3;
-    if (/indoor activity/.test(key)) score += 2;
-    if (/food hall|restaurant|café|cafe/.test(key)) score += 2;
-    if (/shopping mall|indoor market/.test(key)) score += 1;
-    if (/spa/.test(key)) score += 0;
-    if (/arcade|cinema/.test(key)) score += 1;
-
-    if (/bé|baby|child|kid|trẻ em/.test(group) || /bé|baby|child|kid|trẻ em/.test(notes)) {
-      if (/aquarium|museum|indoor activity|cinema|arcade|food hall/.test(key)) score += 5;
-    }
-
-    if (budget !== null && budget <= 100000) {
-      if (/museum|indoor activity|café|cafe|indoor market|food hall|arcade|aquarium/.test(key)) score += 4;
-      if (/spa|shopping mall/.test(key)) score -= 2;
-    } else if (budget !== null && budget >= 180000) {
-      if (/spa|shopping mall/.test(key)) score += 2;
-    }
-
-    if (/beach|sunset|sea|ocean|snorkel|surf|boat|cruise|harbor|harbour/.test(notes) || /beach|sunset|sea|ocean|snorkel|surf|boat|cruise|harbor|harbour/.test(text)) {
-      if (/aquarium|museum|indoor market|food hall|café|cafe/.test(key)) score += 3;
-    }
-
-    if (/bbq|barbecue|food|eat|ẩm thực/.test(notes) || /bbq|barbecue|food|eat|ẩm thực/.test(text)) {
-      if (/food hall|restaurant|café|cafe|indoor market/.test(key)) score += 3;
-    }
-
-    if (incidentType === 'storm') {
-      if (/museum|aquarium|indoor activity|food hall|indoor market|café|cafe|cinema|arcade/.test(key)) score += 2;
-    } else if (incidentType === 'heat') {
-      if (/café|cafe|museum|aquarium|indoor activity|cinema/.test(key)) score += 2;
-    } else if (incidentType === 'wind' || incidentType === 'rain') {
-      if (/museum|aquarium|indoor market|food hall|café|cafe/.test(key)) score += 2;
-    }
-
-    ranked.push({ candidate, score });
-  });
-
-  ranked.sort((a, b) => b.score - a.score);
-  return ranked.map(item => item.candidate);
-}
-
-function getReplacementCandidates(original, incidentType, context, info) {
-  const text = normalizeHealedText(original);
-  const outdoorPool = ['Aquarium', 'Museum', 'Indoor Market', 'Food Hall', 'Café', 'Indoor Activity', 'Arcade', 'Cinema', 'Shopping Mall'];
-  const foodPool = ['Food Hall', 'Restaurant', 'Café', 'Indoor Market', 'Museum', 'Aquarium', 'Indoor Activity', 'Cinema'];
-  const heatPool = ['Museum', 'Aquarium', 'Café', 'Indoor Activity', 'Indoor Market', 'Cinema', 'Arcade', 'Shopping Mall'];
-  const defaultPool = ['Museum', 'Aquarium', 'Indoor Market', 'Food Hall', 'Café', 'Indoor Activity', 'Cinema', 'Arcade', 'Shopping Mall'];
-
-  let pool = defaultPool;
-  if (/bbq|barbecue|picnic|outdoor dining|grill|food/.test(text) || info.category === 'food') {
-    pool = foodPool;
-  } else if (/beach|sunset|sea|ocean|snorkel|surf|boat|cruise|harbor|harbour|viewpoint|park|hike|trail/.test(text) || info.category === 'outdoor') {
-    pool = outdoorPool;
-  } else if (incidentType === 'heat') {
-    pool = heatPool;
-  }
-
-  return rankReplacementCandidates(pool, original, context, info, incidentType);
-}
-
-function buildHealingPlanFromDays(planData, eventText, context) {
-  const incident = classifyIncident(eventText);
-  const sourceDays = Array.isArray(planData && planData.days) && planData.days.length
-    ? planData.days
-    : [{ day: 1, activities: dedupePlanItems(getCurrentItinerarySource()) }];
-  const updatedDays = [];
-  const replacements = [];
-  const used = new Set();
-
-  sourceDays.forEach((day, index) => {
-    const activities = [];
-    const originalItems = dedupePlanItems(Array.isArray(day && day.activities) ? day.activities : []);
-    originalItems.forEach(item => {
-      const info = classifyActivity(item);
-      const text = normalizeHealedText(item);
-      used.add(text);
-
-      if (!shouldReplaceActivity(item, info, incident)) {
-        activities.push({ original: item, text: item, changed: false, reason: '' });
-        return;
-      }
-
-      const candidate = getReplacementCandidates(item, incident.type, context, info).find(name => !used.has(normalizeHealedText(name)) && normalizeHealedText(name) !== text);
-      if (candidate) {
-        used.add(normalizeHealedText(candidate));
-        const reason = incident.type === 'storm'
-          ? 'Bão / gió lớn / mưa dông nên ưu tiên hoạt động trong nhà và gần nhau hơn'
-          : incident.type === 'heat'
-            ? 'Nắng nóng cực đoan, chuyển sang nơi có điều hòa'
-            : incident.type === 'rain'
-              ? 'Mưa to khiến hoạt động ngoài trời không còn phù hợp'
-              : 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế';
-        activities.push({ original: item, text: candidate, changed: true, reason });
-        replacements.push({ original: item, replacement: candidate, reason });
-      } else {
-        activities.push({ original: item, text: item, changed: false, reason: '' });
-      }
-    });
-
-    updatedDays.push({ day: day.day || (index + 1), activities });
-  });
-
-  return {
-    incident_summary: summarizeIncident(eventText, incident),
-    severity: incident.severity,
-    replacements,
-    updated_days: updatedDays,
-    updated_itinerary: updatedDays.flatMap(d => d.activities.map(a => a.text)),
-    notes: incident.type === 'storm'
-      ? 'Giữ lịch trình trong nhà, giảm di chuyển và ưu tiên điểm gần nhau.'
-      : incident.type === 'heat'
-        ? 'Ưu tiên điều hòa, nước uống và hạn chế nắng gắt.'
-        : incident.type === 'rain'
-          ? 'Chuyển sang các điểm trong nhà, tránh hoạt động ngoài trời kéo dài.'
-          : 'Điều chỉnh nhẹ để phù hợp với thời tiết hiện tại.'
-  };
-}
-
-function renderSelfHealingPlan(plan, resultEl, meta, originalItin) {
-  let html = '';
-  const replacements = Array.isArray(plan.replacements) ? plan.replacements : [];
-  const updatedDays = Array.isArray(plan.updated_days) ? plan.updated_days : [];
-  const original = Array.isArray(originalItin) ? originalItin : [];
-  const changed = updatedDays.some(day => Array.isArray(day.activities) && day.activities.some(activity => activity && activity.changed));
-
-  if (plan.incident_summary) {
-    html += `<div class="summary-note"><strong>Tình huống:</strong> ${escapeHtml(plan.incident_summary)}${plan.severity ? ` · Mức độ: ${escapeHtml(plan.severity)}` : ''}</div>`;
-  }
-
-  if (!changed) {
-    const reasonText = buildNoChangeReason(original, meta && meta.eventText ? meta.eventText : '', meta && meta.incident ? meta.incident : classifyIncident(meta && meta.eventText ? meta.eventText : ''));
-    html += `<div class="day-block"><h4>Không cần thay đổi</h4><p class="summary-note" style="margin-top:0; border-top:none; padding-top:0;">${escapeHtml(reasonText)}</p></div>`;
-  }
-
-  if (changed) {
-    html += `<div class="day-block"><h4>Thay đổi</h4><ul>`;
-    replacements.forEach(r => {
-      html += `<li><strong>${escapeHtml(r.original)}</strong> → <strong>${escapeHtml(r.replacement)}</strong> — ${escapeHtml(r.reason || 'Đổi vì phù hợp hơn với tình huống hiện tại.')}</li>`;
-    });
-    html += `</ul></div>`;
-
-    html += `<div class="day-block"><h4>Plan sau thay đổi</h4>${updatedDays.map(day => {
-      return `<div class="day-block"><h4>Day ${escapeHtml(day.day)}</h4><ul>${(day.activities || []).map(activity => {
-        const changedItem = !!activity.changed;
-        const displayText = escapeHtml(activity.text || activity.original || '');
-        const originalText = activity.original && activity.original !== activity.text
-          ? `<del>${escapeHtml(activity.original)}</del> → `
-          : '';
-        const reason = activity.changed ? `<span class="reason-tag">Lý do: ${escapeHtml(activity.reason || 'Đã thay thế để phù hợp với thời tiết')}</span>` : '';
-        return `<li class="${changedItem ? 'changed-item' : ''}">${originalText}<strong>${displayText}</strong>${reason} ${mapLink(activity.text || activity.original)}${venueWarning(activity.text || activity.original)}</li>`;
-      }).join('')}</ul></div>`;
-    }).join('')}</div>`;
-  }
-
-  if (plan.notes) {
-    html += `<div class="summary-note">${escapeHtml(plan.notes)}</div>`;
-  }
-  if (meta && meta.source === 'fallback') {
-    html += `<div class="summary-note">⚠️ Kết quả dự phòng do AI trả JSON chưa hợp lệ hoặc chưa đủ tốt. Lịch trình đã được tự động hiệu chỉnh bằng luật thay thế local.</div>`;
-  }
-  if (meta && meta.errorMessage) {
-    html += `<div class="summary-note">Chi tiết lỗi AI: ${escapeHtml(meta.errorMessage)}</div>`;
-  }
-  if (!html) html = 'Không có thay đổi.';
-  resultEl.innerHTML = `<div class="result-box">${html}</div>`;
-
-}
-
-document.getElementById('h-weather').addEventListener('click', async () => {
-  const dest = document.getElementById('h-dest').value.trim();
-  const statusEl = document.getElementById('h-weatherStatus');
-  if (!dest) { statusEl.textContent = '⚠️ Nhập điểm đến trước.'; return; }
-  statusEl.textContent = 'Đang tra vị trí và thời tiết thật...';
-  try {
-    const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=vi&name=${encodeURIComponent(dest)}`);
-    const geo = await geoRes.json();
-    const place = geo.results && geo.results[0];
-    if (!place) { statusEl.textContent = `⚠️ Không tìm thấy vị trí "${dest}".`; return; }
-
-    const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation`);
-    const w = await wRes.json();
-    const c = w.current;
-    const desc = WEATHER_CODE_VI[c.weather_code] || 'thời tiết không xác định';
-    const text = `Tại ${place.name}${place.country ? ', ' + place.country : ''} hiện đang ${desc}, ${c.temperature_2m}°C${c.precipitation > 0 ? `, lượng mưa ${c.precipitation}mm` : ''}.`;
-    document.getElementById('h-event').value = text;
-    statusEl.textContent = `✅ Dữ liệu thật từ Open-Meteo, cập nhật lúc ${c.time?.slice(11,16) || ''}.`;
-  } catch (err) {
-    statusEl.textContent = '⚠️ Không lấy được thời tiết: ' + err.message;
-  }
-});
-
-document.getElementById('h-run').addEventListener('click', async () => {
- const itin = getCurrentItinerarySource();
-  const event = document.getElementById('h-event').value.trim() || 'Buổi sáng mưa lớn';
-  const resultEl = document.getElementById('h-result');
- const plannerContext = getPlannerContext();
- if (itin.length === 0) {
-   resultEl.innerHTML = '<div class="error-box">⚠️ Nhập ít nhất 1 hoạt động cho lịch trình hiện tại.</div>';
-   return;
- }
- document.getElementById('h-itin').value = itin.join('\n');
- tripState.itinerary = itin.slice();
- setLoading(resultEl, true, 'Đang cập nhật lịch trình...');
-
- const incident = classifyIncident(event);
-
- const selfHealingContext = itin.map((item, index) => {
-   const info = classifyActivity(item);
-   return `${index + 1}. ${item} | loại=${info.category} | nhạy thời tiết=${info.weatherSensitive ? 'có' : 'không'}`;
- }).join('\n');
-
- const system = `Bạn là AI Self-Healing Itinerary Engine.
-Khi có tình huống bất ngờ, hãy tự động thay thế những hoạt động không còn phù hợp, nhưng giữ nguyên các hoạt động không bị ảnh hưởng.
-Ưu tiên thay outdoor sang indoor, giảm di chuyển không cần thiết, và không bịa địa điểm quá xa bối cảnh.
-Mọi đề xuất phải bám theo plan gốc từ Tab 1: giữ cùng tinh thần ngân sách, số ngày, thành phần nhóm, phương tiện và sở thích đã nhập trước đó.
-Không tự ý nâng cấp thành hoạt động đắt đỏ hoặc không phù hợp với trẻ em/nhóm nếu plan gốc không cho phép.
-Trả lời DUY NHẤT bằng JSON hợp lệ, không markdown, đúng schema:
-{"incident_summary":"...","severity":"low|medium|high","replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing"],"notes":"..."}
-`;
- const user = `Thông tin plan gốc từ Tab 1:
-- Điểm đến: ${plannerContext.destination || tripState.destination || 'chưa rõ'}
-- Số ngày: ${plannerContext.days || 'chưa rõ'}
-- Ngân sách: ${plannerContext.budget}
-- Thành phần nhóm: ${plannerContext.group}
-${plannerContext.notes ? `- Ghi chú / sở thích: ${plannerContext.notes}` : '- Ghi chú / sở thích: không có'}
-
-Lịch trình hiện tại:
-${itin.map(i => '- ' + i).join('\n')}
-
-Phân loại hiện tại:
-${selfHealingContext}
-
-Tình huống: ${event}
-Phân loại sự cố: type=${incident.type}, severity=${incident.severity}
-
-Yêu cầu: chỉ thay phần bị ảnh hưởng, còn lại giữ nguyên theo plan gốc; các hoạt động thay thế phải hợp ngân sách, hợp nhóm và hợp ghi chú/sở thích từ Tab 1.`;
-
- try {
-   const data = await callClaude(system, user, { json: true });
-   const plan = sanitizeSelfHealingPlan(data, tripState.plannerData, itin, event, getPlannerContext());
-   renderSelfHealingPlan(plan, resultEl, { source: 'llm', eventText: event, incident }, itin);
- } catch (err) {
-   const fallback = buildFallbackSelfHealingPlan(tripState.plannerData, itin, event, getPlannerContext());
-   renderSelfHealingPlan(fallback, resultEl, { source: 'fallback', errorMessage: err.message, eventText: event, incident }, itin);
- }
-});
-
-// ---------- TAB 5: Camera AI ----------
-const cFile = document.getElementById('c-file');
-const cPreview = document.getElementById('c-preview');
-const cRun = document.getElementById('c-run');
-let cImageBase64 = null;
-
-cFile.addEventListener('change', () => {
-  const file = cFile.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    cImageBase64 = reader.result.split(',')[1];
-    cPreview.src = reader.result;
-    cPreview.style.display = 'block';
-    cRun.disabled = false;
-  };
-  reader.readAsDataURL(file);
-});
-
-cRun.addEventListener('click', async () => {
-  if (!cImageBase64) return;
-  const mode = document.getElementById('c-mode').value;
-  const visionModel = document.getElementById('c-model').value.trim() || 'moondream';
-  const resultEl = document.getElementById('c-result');
-
-  try {
-    // Bước 1: model vision mô tả ảnh — hỏi bằng tiếng Anh (moondream không hiểu tiếng Việt,
-    // trả lời rỗng nếu hỏi thẳng). Dùng 1 prompt trung lập, ngắn cho cả 2 chế độ: moondream
-    // trả rỗng một cách khó đoán với vài từ cụ thể như "place"/"landmark" trong câu hỏi dài —
-    // để phần chuyên biệt (món ăn/địa danh) cho bước 2 xử lý.
-    setLoading(resultEl, true, 'Đang nhìn ảnh (bước 1/2)...');
-    const captionPrompt = 'Describe this image in detail, mentioning any text you can see.';
-    const caption = await callVision(captionPrompt, cImageBase64, visionModel);
-    if (!caption || !caption.trim()) throw new Error(`Model vision "${visionModel}" không trả về mô tả nào cho ảnh này — thử ảnh khác hoặc đổi model.`);
-
-    // Bước 2: model text (Ollama, ô Model chính) viết lại thành câu trả lời tiếng Việt hữu ích.
-    setLoading(resultEl, true, 'Đang phân tích & viết câu trả lời (bước 2/2)...');
-    const system = mode === 'food'
-      ? `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.`
-      : `Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.`;
-    const text = await callClaude(system, `Mô tả từ AI vision: "${caption}"`);
-    resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">⚠️ AI vision chạy local (${escapeHtml(visionModel)}) dễ nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.</div>`;
-  } catch (err) { showError(resultEl, err); }
-});
-
-async function callVision(prompt, imageBase64, model) {
-  let res;
-  try {
-    res = await fetch(`${ollamaBase()}/api/chat`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'user', content: prompt, images: [imageBase64] }],
-        stream: false
-      })
-    });
-  } catch (err) {
-    throw new Error(`Không gọi được tới ${ollamaBase()}. Kiểm tra Ollama đang chạy chưa.`);
-  }
-  if (!res.ok) {
-    let msg = res.status + ' ' + res.statusText;
-    try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
-    if (/not found/i.test(msg)) msg += ` — có thể chưa tải model. Chạy: ollama pull ${model}`;
-    throw new Error(msg);
-  }
-  const data = await res.json();
-  return data.message?.content || '(không có phản hồi)';
-}
-
-// ---------- utils ----------
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function mapLink(place, context) {
-  const q = encodeURIComponent(context ? `${place}, ${context}` : place);
-  return `<a href="https://www.google.com/maps/search/?api=1&query=${q}" target="_blank" rel="noopener" class="map-link">📍 Xem bản đồ</a>`;
-}
-const VENUE_KEYWORDS = ['ăn trưa','ăn tối','ăn sáng','nhà hàng','quán ','café','cafe','lunch','dinner','breakfast','restaurant','bar','beer','izakaya','shop','store','mall','shopping'];
-function venueWarning(text) {
-  const t = text.toLowerCase();
-  if (VENUE_KEYWORDS.some(k => t.includes(k))) {
-    return ' <span class="warn-badge" title="AI không có dữ liệu thời gian thực, giờ mở cửa có thể sai">⚠️ chưa xác minh giờ mở cửa</span>';
-  }
-  return '';
-}
-</script>
+<script src="app.js"></script>
 </body>
 </html>
