@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>デモスクリプト — AI Travel Companion</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --border: #2a2d3a;
+      --accent: #5b8dee;
+      --accent2: #7c5ce8;
+      --green: #00b894;
+      --yellow: #fdcb6e;
+      --red: #e17055;
+      --text: #e2e8f0;
+      --muted: #8892a4;
+      --tag-bg: #2a2d3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', 'Noto Sans JP', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 24px 16px 60px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.6rem;
+      color: var(--accent);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sub { color: var(--muted); font-size: 0.92rem; margin-bottom: 32px; }
+    .toc {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-bottom: 32px;
+    }
+    .toc h2 { font-size: 1rem; color: var(--muted); margin-bottom: 10px; letter-spacing: .05em; text-transform: uppercase; }
+    .toc ol { padding-left: 20px; }
+    .toc li { margin: 4px 0; }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    section {
+      margin-bottom: 36px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .section-num {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    h2 { font-size: 1.15rem; color: var(--text); }
+    .scene {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+    .scene + .scene { margin-top: 10px; }
+    .scene-title {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 9px;
+      border-radius: 99px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: .04em;
+    }
+    .badge-action { background: rgba(91,141,238,.18); color: var(--accent); }
+    .badge-speak { background: rgba(0,184,148,.15); color: var(--green); }
+    .badge-input { background: rgba(253,203,110,.15); color: var(--yellow); }
+    .badge-ui { background: rgba(124,92,232,.18); color: #a78bfa; }
+    .badge-note { background: rgba(225,112,85,.15); color: var(--red); }
+    .script-line {
+      display: flex;
+      gap: 10px;
+      margin: 8px 0;
+    }
+    .script-icon { flex-shrink: 0; font-size: 1.1rem; margin-top: 1px; }
+    .script-text { flex: 1; }
+    .speak-text {
+      background: rgba(0,184,148,.06);
+      border-left: 3px solid var(--green);
+      padding: 10px 14px;
+      border-radius: 0 8px 8px 0;
+      font-style: italic;
+      color: #b2f5ea;
+      line-height: 1.65;
+    }
+    .action-box {
+      background: rgba(91,141,238,.07);
+      border-left: 3px solid var(--accent);
+      padding: 8px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+      color: #c3d6ff;
+    }
+    .input-box {
+      background: rgba(253,203,110,.07);
+      border-left: 3px solid var(--yellow);
+      padding: 8px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.9rem;
+    }
+    .input-box strong { color: var(--yellow); }
+    .note-box {
+      background: rgba(225,112,85,.08);
+      border-left: 3px solid var(--red);
+      padding: 8px 14px;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.85rem;
+      color: #ffd5cc;
+    }
+    .tip-box {
+      background: rgba(124,92,232,.1);
+      border: 1px dashed rgba(124,92,232,.35);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 0.85rem;
+      color: #c4b5fd;
+      margin: 10px 0;
+    }
+    .timing {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--tag-bg);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      float: right;
+      margin-left: 8px;
+    }
+    .total-time {
+      background: linear-gradient(135deg, rgba(91,141,238,.15), rgba(124,92,232,.15));
+      border: 1px solid rgba(91,141,238,.3);
+      border-radius: 10px;
+      padding: 14px 18px;
+      text-align: center;
+      color: var(--accent);
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 28px;
+    }
+    .highlight { color: var(--yellow); font-weight: 600; }
+    .green { color: var(--green); }
+    .accent { color: var(--accent); }
+    hr { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+    .footer-note {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 40px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    @media print {
+      body { background: #fff; color: #111; max-width: 100%; padding: 20px; }
+      .speak-text { background: #f0fff4; border-left-color: #27ae60; color: #1a5c3a; }
+      .action-box { background: #f0f4ff; border-left-color: #3b6fd4; color: #1a3a7a; }
+      .input-box { background: #fffdf0; border-left-color: #c49a00; }
+      .note-box { background: #fff5f0; border-left-color: #c0392b; color: #7a1a0a; }
+      .tip-box { background: #f5f0ff; border-color: #7b5ea7; color: #4a2d8a; }
+    }
+  </style>
+</head>
+<body>
+
+<h1>🗺️ デモスクリプト — AI Travel Companion</h1>
+<p class="sub">目的地：沖縄 ／ 対象：審査員向けデモ（日本語） ／ 想定時間：約 12〜15 分</p>
+
+<div class="total-time">⏱ 推奨デモ時間：<strong>12〜15分</strong>（各タブ2〜3分 × 5タブ ＋ 導入・締め各1分）</div>
+
+<div class="toc">
+  <h2>目次</h2>
+  <ol>
+    <li><a href="#s0">導入：アプリの紹介・接続確認</a></li>
+    <li><a href="#s1">Tab 1：旅程作成</a></li>
+    <li><a href="#s2">Tab 2：グループマッチング</a></li>
+    <li><a href="#s3">Tab 3：音声アシスタント</a></li>
+    <li><a href="#s4">Tab 4：自動リカバリー（Self-Healing）</a></li>
+    <li><a href="#s5">Tab 5：カメラAI</a></li>
+    <li><a href="#s6">締め</a></li>
+  </ol>
+</div>
+
+<!-- ============================================================ -->
+<section id="s0">
+  <div class="section-header">
+    <div class="section-num">0</div>
+    <h2>導入：アプリの紹介・接続確認</h2>
+    <span class="timing">⏱ 約 2 分</span>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-speak">🎤 話す</span> アプリの紹介</div>
+    <div class="speak-text">
+      「こんにちは。今日は<strong>AI Travel Companion</strong>をご紹介します。<br>
+      これはAIを完全にローカル——つまりこのPCの中だけで動かす旅行プランニングアプリです。<br>
+      クラウドを使わず、アカウントも要らず、インターネットにデータを送ることもありません。<br>
+      <br>
+      今、私は<span class="highlight">スマートフォン</span>からこのアプリを使っています。<br>
+      PCとスマホが同じWi-Fiに繋がっていれば、スマホのブラウザからもそのままアクセスできます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> サーバー・モデルを指す</div>
+    <div class="action-box">画面上部の <strong>「Server」</strong> と <strong>「Model」</strong> 欄を指す</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「画面の上に<strong>ServerのURL</strong>と<strong>Modelの名前</strong>が入力されています。<br>
+      ここにはPCのIPアドレスを入れて、スマホからPC上のAIに接続しています。<br>
+      AIモデルは<strong>Ollama</strong>で動いており、今使っているのは <code>llama3.2</code> / <code>qwen2.5</code> などです。<br>
+      モデルはいつでも切り替えられます——大きいモデルほど賢いですが、少し時間がかかります。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 接続確認ボタンを押す</div>
+    <div class="action-box">「<strong>接続確認</strong>」ボタンをタップ → 緑の ✅ が出るまで待つ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「では接続確認をしてみます……<br>
+      ✅ <strong>モデルが準備できました</strong>。これでAIへの接続が確認できました。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 言語切り替えを見せる</div>
+    <div class="action-box">右上の <strong>VI → JA → EN</strong> を順番にタップしてUIが変わるのを見せる、最後は <strong>JA</strong> に戻す</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「アプリはベトナム語・日本語・英語の<strong>3言語</strong>に対応しています。<br>
+      右上のボタンでいつでも切り替えられ、全てのUI・AIの返答・音声認識も一緒に切り替わります。<br>
+      今日は<strong>日本語</strong>で進めます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-speak">🎤 話す</span> 主要機能の概要</div>
+    <div class="speak-text">
+      「このアプリには<strong>5つのタブ</strong>があります：<br>
+      🗺️ 旅程の自動作成、<br>
+      👥 グループメンバーの好みに合わせたスポット提案、<br>
+      🎙️ 音声アシスタント、<br>
+      🌧️ 天気などの急なトラブル時に旅程を自動修正する機能、<br>
+      📷 カメラで料理や観光地をAIが認識して解説する機能。<br>
+      では順番に見ていきましょう。」
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s1">
+  <div class="section-header">
+    <div class="section-num">1</div>
+    <h2>Tab 1 — 🗺️ 旅程作成</h2>
+    <span class="timing">⏱ 約 2〜3 分</span>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> Tab 1 を開く・入力内容を入れる</div>
+    <div class="action-box">「<strong>旅程</strong>」タブをタップして開く</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「まずは旅程の自動作成です。<br>
+      行き先・日数・予算・メンバーを入力するだけで、AIが日ごとのプランを作ってくれます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-input">✏️ 入力</span> 各フィールドを入力する</div>
+    <div class="input-box">
+      <strong>行き先：</strong> 沖縄<br>
+      <strong>日数：</strong> 3<br>
+      <strong>開始日：</strong> 今日の日付（または近い日付）<br>
+      <strong>予算：</strong> 80000 （円）<br>
+      <strong>グループ構成：</strong> 夫婦と子供1人（5歳）<br>
+      <strong>メモ：</strong> レンタカー利用、海鮮料理が好き、ビーチを楽しみたい
+    </div>
+    <div class="speak-text" style="margin-top:10px;">
+      「沖縄へ3日間、夫婦と子供1人の旅行として入力しました。<br>
+      予算は8万円、レンタカー使用で海鮮とビーチを希望しています。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 旅程作成ボタンを押す</div>
+    <div class="action-box">「<strong>旅程を作成</strong>」ボタンをタップ → AI が結果を生成するまで待つ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「ボタンを押すと、AIが考え始めます。<br>
+      ポイントは結果が<strong>ストリーミング</strong>で流れてくること——全部生成し終わるまで待つのではなく、トークンが来るたびにリアルタイムで表示されます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-speak">🎤 話す</span> 結果を見せながら解説</div>
+    <div class="speak-text">
+      「3日間のプランが出来上がりました。<br>
+      各アクティビティの横には <strong>📍 地図を見る</strong> リンクがあり、タップするとGoogle Mapsで実際の場所・営業時間を確認できます。<br>
+      <br>
+      AIはリアルタイムデータを持っていないので、営業時間は<strong>必ずGoogleマップで確認してください</strong>という注意書きも表示されています——誠実な設計です。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 共有ボタンを押す</div>
+    <div class="action-box">「<strong>📤 共有</strong>」ボタンをタップ → スマホなら共有シートが開く</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「この旅程は<strong>共有</strong>もできます。<br>
+      スマホから使っているので、ネイティブの共有シートが開き——LINEやメール、メモアプリに直接送れます。<br>
+      PCの場合はクリップボードにコピーされます。」
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <strong>もし生成に時間がかかる場合：</strong>「このように、ローカルAIは初回の読み込みに少し時間がかかることがありますが、クラウドに一切依存しない分、プライバシーは完全に守られています。」
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s2">
+  <div class="section-header">
+    <div class="section-num">2</div>
+    <h2>Tab 2 — 👥 グループマッチング</h2>
+    <span class="timing">⏱ 約 2 分</span>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> Tab 2 を開く</div>
+    <div class="action-box">「<strong>グループマッチング</strong>」タブをタップ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「次はグループマッチング機能です。<br>
+      旅行グループにはそれぞれ好みが違うメンバーがいますよね。<br>
+      このタブでは、あるスポットがメンバー全員の好みにどれだけ合っているかをAIが採点してくれます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-input">✏️ 入力</span> スポットとメンバーを設定</div>
+    <div class="input-box">
+      <strong>評価スポット：</strong> 美ら海水族館（沖縄）<br>
+      <strong>メンバー（デフォルトを使用）：</strong><br>
+      　A：魚介類が好き<br>
+      　B：写真映え・チェックイン重視<br>
+      　C：ショッピング好き<br>
+      　D：子供連れ<br>
+      　E：オリオンビール好き
+    </div>
+    <div class="speak-text" style="margin-top:10px;">
+      「デフォルトで5人のメンバーが入っています。<br>
+      スポットに<strong>美ら海水族館</strong>を入力して採点してみます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 採点ボタンを押す・結果解説</div>
+    <div class="action-box">「<strong>適合度を採点</strong>」ボタンをタップ → 結果が出たらスコア表・ディベートを指す</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「AIがスポットを複数の観点で採点し、<strong>スコア表</strong>が出てきます。<br>
+      さらに——それぞれのメンバーがどう思うか、まるで会話しているように<strong>ディベート形式</strong>で表示されます。<br>
+      最後にAIが全員にとって良い<strong>落としどころの提案</strong>をしてくれます。<br>
+      グループで行き先を決めるとき、みんなの意見を一度に整理できて便利です。」
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s3">
+  <div class="section-header">
+    <div class="section-num">3</div>
+    <h2>Tab 3 — 🎙️ 音声アシスタント</h2>
+    <span class="timing">⏱ 約 2 分</span>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> Tab 3 を開く</div>
+    <div class="action-box">「<strong>音声アシスタント</strong>」タブをタップ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「3つ目は音声アシスタントです。<br>
+      旅行中、地図を見ながら両手がふさがっているときでも、声だけで質問できます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> マイクボタンを押して話す</div>
+    <div class="action-box">🎤 ボタンをタップ → 声で質問する（以下のどれか）</div>
+    <div class="input-box" style="margin-top:8px;">
+      <strong>質問例：</strong>「沖縄でおすすめの夕日スポットはどこですか？」
+    </div>
+    <div class="speak-text" style="margin-top:10px;">
+      「（マイクのボタンを押して話します）<br>
+      『沖縄でおすすめの夕日スポットはどこですか？』<br>
+      ……AIが答えてくれて、<strong>声で読み上げ</strong>もしてくれます。<br>
+      まるで旅のガイドが隣にいるような感覚です。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> テキスト入力でも試す</div>
+    <div class="action-box">テキスト欄に入力して「<strong>送信</strong>」ボタンをタップ</div>
+    <div class="input-box" style="margin-top:8px;">
+      <strong>質問例：</strong>「子連れにおすすめの沖縄の観光スポットを3つ教えて」
+    </div>
+    <div class="speak-text" style="margin-top:10px;">
+      「マイクが使えない環境でもテキストで質問できます。<br>
+      チャット履歴も残るので、旅行中に会話の流れを振り返ることもできます。」
+    </div>
+  </div>
+
+  <div class="note-box">
+    ⚠️ <strong>注意：</strong>音声認識（マイク入力）はChromeのWeb Speech APIを使用しており、認識処理にインターネット接続が必要です。AI本体はローカルで動いていますが、音声認識だけはネット接続が必要な点をお伝えください。
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s4">
+  <div class="section-header">
+    <div class="section-num">4</div>
+    <h2>Tab 4 — 🌧️ 自動リカバリー（Self-Healing Itinerary）</h2>
+    <span class="timing">⏱ 約 2〜3 分</span>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> Tab 4 を開く</div>
+    <div class="action-box">「<strong>自動リカバリー</strong>」タブをタップ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「旅行中に突然天気が崩れることはよくありますよね。<br>
+      このタブでは、そういった<strong>急なトラブルが起きたとき</strong>に——AIが旅程を自動的に修正して、屋内の代替案を提案してくれます。<br>
+      Tab 1で作った旅程がそのまま引き継がれています。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 実際の天気データを取得</div>
+    <div class="action-box">目的地欄が「<strong>沖縄</strong>」になっていることを確認 → 「<strong>🌦️ 実際の天気を取得</strong>」ボタンをタップ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「まず今の沖縄の天気を取得してみます。<br>
+      これは<strong>Open-Meteo</strong>という気象APIから実際のデータを取ってきています——リアルタイムです。<br>
+      取得できたら、その天気情報が自動的に『突発的な状況』欄に入力されます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-input">✏️ 入力</span> 状況を確認・必要なら上書き</div>
+    <div class="input-box">
+      状況欄の内容を確認。もし天気が問題なければ手動で入力する：<br>
+      <strong>「沖縄では現在、大雨、強風、雷注意報が出ています。25°C」</strong>
+    </div>
+    <div class="speak-text" style="margin-top:10px;">
+      「今日が晴れている場合は、デモとして大雨のシナリオを手入力します。<br>
+      大雨と強風——これはビーチや屋外BBQには完全にNGな状況です。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 旅程を更新ボタンを押す</div>
+    <div class="action-box">「<strong>旅程を更新</strong>」ボタンをタップ → 結果を待つ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「AIが旅程を分析して修正します。<br>
+      ポイントは——<strong>全部を変えるわけではない</strong>こと。<br>
+      ランチやカフェ、移動のような天気に関係ないアクティビティはそのまま保持されます。<br>
+      ビーチや屋外BBQなど<strong>本当に影響を受けるもの</strong>だけが、水族館や美術館、ショッピングモールなどの屋内代替案に置き換えられます。<br>
+      変更された項目は<span class="highlight">ハイライト</span>されていて、理由も表示されます。」
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <strong>デモポイント：</strong>変更された行に <code>~~元のアクティビティ~~ → 新しいアクティビティ</code> と表示され、「理由：大雨のため屋外は不適切」のような説明が付くことを指さして見せましょう。
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s5">
+  <div class="section-header">
+    <div class="section-num">5</div>
+    <h2>Tab 5 — 📷 カメラAI</h2>
+    <span class="timing">⏱ 約 2 分</span>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> Tab 5 を開く</div>
+    <div class="action-box">「<strong>カメラAI</strong>」タブをタップ</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「最後はカメラAI機能です。<br>
+      旅行中に——『これは何の料理？』『この建物は何？』と思ったとき、写真を撮るだけでAIが解説してくれます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> モードを選んで写真を撮る（または選ぶ）</div>
+    <div class="action-box">
+      モードを <strong>🍜 料理</strong> または <strong>🏯 観光地</strong> に切り替える<br>
+      「<strong>写真を撮影または選択</strong>」をタップ → カメラを開いて写真を撮る（または用意した画像を選ぶ）
+    </div>
+    <div class="speak-text" style="margin-top:10px;">
+      「スマホのカメラから直接撮影できます。<br>
+      今日は沖縄料理の写真（またはお持ちの写真）で試してみます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-action">👆 操作</span> 分析ボタンを押す</div>
+    <div class="action-box">「<strong>画像を分析</strong>」ボタンをタップ → 2ステップの処理を見せる</div>
+    <div class="speak-text" style="margin-top:10px;">
+      「AIの処理は2段階です。<br>
+      まず<strong>Vision モデル</strong>が画像を見て『これは何が写っているか』を英語で説明します（ステップ1/2）。<br>
+      次に<strong>言語モデル</strong>がその説明を受け取って、日本語で詳しく解説します（ステップ2/2）。<br>
+      料理なら食材・似た料理の提案、観光地なら歴史・文化の背景が出てきます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-speak">🎤 話す</span> フォールバック設計について触れる</div>
+    <div class="speak-text">
+      「Visionモデルは他のモデルより認識精度が難しい部分です。<br>
+      もし画像が暗すぎたり、モデルが認識できなかった場合も、アプリは<strong>落ち着いたフォールバックメッセージ</strong>を表示します——エラーで止まるのではなく、『より鮮明な写真を試してください』という案内が出ます。<br>
+      必要であれば <code>llama3.2-vision</code> などより高精度なモデルに切り替えることもできます。」
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<section id="s6">
+  <div class="section-header">
+    <div class="section-num">6</div>
+    <h2>締め</h2>
+    <span class="timing">⏱ 約 1 分</span>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-speak">🎤 話す</span> まとめ・アプリの価値</div>
+    <div class="speak-text">
+      「以上が<strong>AI Travel Companion</strong>の5つの機能のデモでした。<br>
+      <br>
+      このアプリの一番の特徴は——<strong>全てのAI処理がローカル</strong>で完結することです。<br>
+      旅行中の個人情報・旅程・写真が外部に送信されることは一切ありません。<br>
+      <br>
+      スマートフォンからもPCのAIを使えるため、<strong>観光地の現場でリアルタイムに使える</strong>実用的なツールです。<br>
+      <br>
+      天気が崩れても、グループの意見が割れても、知らない料理に出会っても——<br>
+      <strong>このアプリが旅のパートナーとしてサポートします。</strong><br>
+      <br>
+      ご清聴ありがとうございました。ご質問はありますか？」
+    </div>
+  </div>
+</section>
+
+<hr>
+
+<!-- ============================================================ -->
+<section>
+  <div class="section-header">
+    <div class="section-num" style="background:var(--yellow);color:#111">!</div>
+    <h2>予備：想定されるQ&amp;Aと回答例</h2>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-note">Q</span> クラウドのAIと比べて精度は？</div>
+    <div class="speak-text">
+      「ローカルモデルは確かにGPT-4やClaudeには及ばない部分があります。ただ、このアプリの設計思想は<strong>プライバシーと完全オフライン動作</strong>を優先すること。モデルは <code>qwen2.5:14b</code> など強力なものに差し替えることができ、性能と速度のバランスを自分でコントロールできます。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-note">Q</span> 誰でも使えますか？技術的な知識が必要？</div>
+    <div class="speak-text">
+      「Ollamaのインストールとコマンド1行（<code>ollama pull llama3.2</code>）だけで動きます。その後は付属の <code>start-windows.bat</code> や <code>start-mac.command</code> をダブルクリックするだけで起動します。技術的な知識は最小限です。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-note">Q</span> スマホから使う場合の注意は？</div>
+    <div class="speak-text">
+      「同じWi-Fiに繋がっていれば使えます。企業のネットワークなど端末間通信が制限されている環境では繋がらないことがあります。その場合はUSBテザリングやモバイルルーター経由でつなぐ方法もあります。」
+    </div>
+  </div>
+
+  <div class="scene">
+    <div class="scene-title"><span class="badge badge-note">Q</span> 旅程の情報は正確ですか？</div>
+    <div class="speak-text">
+      「AIはリアルタイムデータを持っていないため、営業時間・住所・電話番号は必ずGoogle Mapsで確認が必要です。アプリ内でもその旨を明示しており、各アクティビティに『📍 地図を見る』リンクを設けてすぐに確認できるようにしています。」
+    </div>
+  </div>
+</section>
+
+<div class="footer-note">
+  このスクリプトは AI Travel Companion デモ用に作成されました。目的地：沖縄 ／ 言語：日本語 ／ 推奨総時間：12〜15分
+</div>
+
+</body>
+</html>
