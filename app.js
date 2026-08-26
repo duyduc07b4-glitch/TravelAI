@@ -129,6 +129,20 @@ const I18N = {
       weatherText: (place, country, desc, temp, precip) => `Tại ${place}${country ? ', ' + country : ''} hiện đang ${desc}, ${temp}°C${precip > 0 ? `, lượng mưa ${precip}mm` : ''}.`,
       weatherReady: (time) => `✅ Dữ liệu thật từ Open-Meteo, cập nhật lúc ${time}.`,
       weatherError: (msg) => `⚠️ Không lấy được thời tiết: ${msg}`,
+      incidentLabel: 'Tình huống:',
+      planLabel: 'Bám theo plan Tab 1:',
+      reasonPrefix: 'Lý do:',
+      severityLabel: 'Mức độ:',
+      reasonStorm: 'Bão / gió lớn / mưa dông nên ưu tiên hoạt động trong nhà và gần nhau hơn',
+      reasonRain: 'Mưa to khiến hoạt động ngoài trời không còn phù hợp',
+      reasonHeat: 'Nắng nóng cực đoan, chuyển sang nơi có điều hòa',
+      reasonWind: 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế',
+      reasonDefault: 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế',
+      summaryDefault: 'Không có mô tả tình huống cụ thể.',
+      summaryStorm: (text) => `Sự cố nghiêm trọng: ${text}`,
+      summaryRain: (text) => `Thời tiết mưa: ${text}`,
+      summaryHeat: (text) => `Thời tiết nóng / nắng: ${text}`,
+      summaryWind: (text) => `Thời tiết gió mạnh: ${text}`,
       systemPrompt: 'Bạn là AI Self-Healing Itinerary Engine. Khi có tình huống bất ngờ, tự động thay thế các hoạt động không còn phù hợp bằng lựa chọn thay thế hợp lý, giữ nguyên các hoạt động không bị ảnh hưởng. Trả lời DUY NHẤT bằng JSON (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
       userPrompt: (itin, event) => `Lịch trình hiện tại:\n${itin.map(i => '- ' + i).join('\n')}\n\nTình huống: ${event}`
     },
@@ -144,6 +158,10 @@ const I18N = {
       step1: 'Đang nhìn ảnh (bước 1/2)...',
       step2: 'Đang phân tích & viết câu trả lời (bước 2/2)...',
       noCaption: (model) => `Model vision "${model}" không trả về mô tả nào cho ảnh này — thử ảnh khác hoặc đổi model.`,
+      fallbackUnknown: (model) => `AI vision "${model}" chưa xác định được nội dung ảnh rõ ràng. Đây là fallback an toàn: ảnh có thể quá mờ, thiếu sáng hoặc model hiện tại quá nhẹ. Hãy thử chụp lại với ánh sáng tốt hơn, không che chữ trên ảnh, hoặc đổi sang model vision mạnh hơn như llama3.2-vision / qwen2.5vl.`,
+      fallbackFood: (guess) => `AI vision chưa đọc đủ chi tiết để khẳng định món ăn chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một món ăn'} — thử chụp ảnh gần hơn, góc chụp rõ hơn và tránh ánh sáng quá tối để model nhận diện tốt hơn.`,
+      fallbackLandmark: (guess) => `AI vision chưa nhận diện được địa danh này một cách chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một địa danh/công trình'} — thử chụp hình rộng hơn, rõ biển tên hoặc đổi sang model mạnh hơn để phân tích chính xác hơn.`,
+      fallbackAdvice: 'Nếu ảnh không ổn, hãy chụp lại ở góc sáng đủ, không che chữ trên biển hiệu/menu, và ưu tiên dùng ảnh rõ nét hơn.',
       disclaimer: (model) => `⚠️ AI vision chạy local (${model}) dễ nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.`,
       systemPromptFood: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.',
       systemPromptLandmark: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.',
@@ -281,6 +299,20 @@ const I18N = {
       weatherText: (place, country, desc, temp, precip) => `${place}${country ? '、' + country : ''}は現在${desc}、${temp}°C${precip > 0 ? `、降水量${precip}mm` : ''}です。`,
       weatherReady: (time) => `✅ Open-Meteoの実データ、${time}時点。`,
       weatherError: (msg) => `⚠️ 天気を取得できませんでした：${msg}`,
+      incidentLabel: '状況：',
+      planLabel: 'Tab 1 の計画に沿う：',
+      reasonPrefix: '理由：',
+      severityLabel: '重要度：',
+      reasonStorm: '大雨・強風・雷雨のため、屋内で近い場所を優先する',
+      reasonRain: '雨が強く、屋外アクティビティが適さない',
+      reasonHeat: '猛暑のため、冷房のある場所に切り替える',
+      reasonWind: '風が強く、屋外の予定を変更する必要がある',
+      reasonDefault: '悪天候のため、屋外の予定を変更する必要がある',
+      summaryDefault: '具体的な状況の説明はありません。',
+      summaryStorm: (text) => `重大な状況: ${text}`,
+      summaryRain: (text) => `雨天: ${text}`,
+      summaryHeat: (text) => `猛暑: ${text}`,
+      summaryWind: (text) => `強風: ${text}`,
       systemPrompt: 'あなたはAI Self-Healing Itinerary Engineです。突発的な状況が発生した場合、もう適さなくなったアクティビティを合理的な代替案に自動的に置き換え、影響を受けないアクティビティはそのまま維持してください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
       userPrompt: (itin, event) => `現在の旅程：\n${itin.map(i => '- ' + i).join('\n')}\n\n状況：${event}`
     },
@@ -296,6 +328,10 @@ const I18N = {
       step1: '画像を確認中（ステップ1/2）...',
       step2: '分析して回答を作成中（ステップ2/2）...',
       noCaption: (model) => `Visionモデル「${model}」がこの画像の説明を返しませんでした — 別の画像を試すか、モデルを変更してください。`,
+      fallbackUnknown: (model) => `Visionモデル「${model}」はこの画像の中身をはっきり認識できませんでした。これは安全側のフォールバックです。画像がぼやけている、暗すぎる、または現在のモデルが軽すぎる可能性があります。明るい場所で再撮影し、看板やメニューの文字が隠れないようにしてから、より強いvision modelに切り替えてください。`,
+      fallbackFood: (guess) => `Vision AIは料理の細部を十分に読み取れず、断定はできませんでした。現時点の情報からすると、これは${guess || '料理'}の可能性が高いです。より近くで、角度を変えて、明るく撮影した画像を試してください。`,
+      fallbackLandmark: (guess) => `Vision AIはこの場所を確実に識別できませんでした。現時点の情報からすると、これは${guess || '観光地・建造物'}の可能性が高いです。看板や全景を入れて再撮影するか、より強いモデルに切り替えると判定が安定します。`,
+      fallbackAdvice: '画像がうまく読めない場合は、曖昧な画角を避け、建物名・看板・食べ物の輪郭がはっきり見える写真を選びましょう。',
       disclaimer: (model) => `⚠️ ローカル動作のVision AI（${model}）は誤認識しやすく、特に画像内の文字（メニューや看板）やマイナーな料理・観光地では精度が落ちます。参考程度に留め、断定的な結論とはみなさないでください。`,
       systemPromptFood: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の料理と考えられるか。2) 見える材料。3) 似ていて試す価値のある料理を1〜2つ提案。価格やカロリーを正確に断定しないでください — 触れる場合は概算であることを明記してください。説明が曖昧すぎて判断できない場合は、正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
       systemPromptLandmark: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の観光地・建造物と考えられるか。2) 確かな情報があれば歴史・文化的背景を少し。3) 近くにありそうな似た種類の観光スポット。説明が曖昧すぎて識別できない場合は、当てずっぽうで答えず正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
@@ -433,6 +469,20 @@ const I18N = {
       weatherText: (place, country, desc, temp, precip) => `${place}${country ? ', ' + country : ''} currently has ${desc}, ${temp}°C${precip > 0 ? `, ${precip}mm of precipitation` : ''}.`,
       weatherReady: (time) => `✅ Real data from Open-Meteo, updated at ${time}.`,
       weatherError: (msg) => `⚠️ Couldn't fetch weather: ${msg}`,
+      incidentLabel: 'Situation:',
+      planLabel: 'Based on Tab 1 plan:',
+      reasonPrefix: 'Reason:',
+      severityLabel: 'Severity:',
+      reasonStorm: 'Heavy rain / strong wind / thunderstorm means indoor and compact alternatives are preferred',
+      reasonRain: 'Heavy rain makes the outdoor activity unsuitable',
+      reasonHeat: 'Extreme heat means moving to air-conditioned places',
+      reasonWind: 'Strong wind makes the outdoor activity unsuitable',
+      reasonDefault: 'Bad weather means the outdoor activity should be replaced',
+      summaryDefault: 'There is no specific incident description.',
+      summaryStorm: (text) => `Severe incident: ${text}`,
+      summaryRain: (text) => `Rainy conditions: ${text}`,
+      summaryHeat: (text) => `Heatwave: ${text}`,
+      summaryWind: (text) => `Strong wind: ${text}`,
       systemPrompt: 'You are the AI Self-Healing Itinerary Engine. When an unexpected situation comes up, automatically replace activities that no longer fit with reasonable alternatives, keeping unaffected activities unchanged. Reply with ONLY JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
       userPrompt: (itin, event) => `Current itinerary:\n${itin.map(i => '- ' + i).join('\n')}\n\nSituation: ${event}`
     },
@@ -448,6 +498,10 @@ const I18N = {
       step1: 'Looking at the image (step 1/2)...',
       step2: 'Analyzing and writing a reply (step 2/2)...',
       noCaption: (model) => `The vision model "${model}" returned no description for this image — try a different image or model.`,
+      fallbackUnknown: (model) => `The vision model "${model}" could not confidently identify the image. This is a safe fallback: the photo may be blurry, poorly lit, or the current model is too lightweight. Try taking a sharper photo with better lighting, avoid blocking text, or switch to a stronger vision model such as llama3.2-vision or qwen2.5vl.`,
+      fallbackFood: (guess) => `The vision model could not read enough detail to be certain. Based on the current description, this is likely ${guess || 'a dish'} — try a closer, brighter shot and avoid glare or dark corners for better recognition.`,
+      fallbackLandmark: (guess) => `The vision model could not confidently identify this place. Based on the current description, this is likely ${guess || 'a landmark/building'} — try a wider shot with visible signage or switch to a stronger model for more reliable results.`,
+      fallbackAdvice: 'If the image is still unclear, capture a cleaner photo with more contrast, visible signage, and better lighting.',
       disclaimer: (model) => `⚠️ The local vision AI (${model}) can misidentify things easily, especially text in the image (menus, signs) and less common dishes/landmarks. Treat this as a reference suggestion, not a firm conclusion.`,
       systemPromptFood: "You receive an English description (from a vision AI) of a photo of a dish. Based on it, write in English: 1) What this dish might be. 2) Visible ingredients. 3) 1-2 similar dishes worth trying. Do NOT make up exact prices/calories — if you mention them, clearly label them as estimates. If the description is too vague to guess, say plainly that you're not sure. Keep it brief, no markdown.",
       systemPromptLandmark: "You receive an English description (from a vision AI) of a photo of a landmark/structure. Based on it, write in English: 1) What this landmark might be. 2) A bit of history/culture if you're confident about it. 3) Similar types of attractions likely nearby. If the description is too vague to identify, say plainly that you're not sure instead of guessing. Keep it brief, no markdown.",
@@ -510,6 +564,36 @@ function venueWarning(text, lang) {
 function weatherDescription(code, lang) {
   const codes = tr(lang, 'weatherCodes');
   return (codes && codes[code]) || tr(lang, 'weatherCodes.unknown');
+}
+
+function buildGeoLookupCandidates(dest) {
+  const raw = String(dest || '').trim();
+  if (!raw) return [];
+  const cleaned = raw.replace(/[()（）]/g, '').replace(/\s+/g, ' ').trim();
+  const candidates = [];
+  const seen = new Set();
+  const add = (value) => {
+    const v = String(value || '').trim();
+    if (!v || seen.has(v)) return;
+    seen.add(v);
+    candidates.push(v);
+  };
+  add(cleaned);
+  add(cleaned.replace(/[都道府県]/g, ''));
+  add(cleaned.replace(/[都道府県市区町村]/g, ''));
+  add(`${cleaned} Japan`);
+  add(`${cleaned.replace(/[都道府県]/g, '')} Japan`);
+  if (/^[\u3040-\u30ff\u4e00-\u9fff]/.test(cleaned)) {
+    add(cleaned.replace(/県$/, ''));
+    add(cleaned.replace(/市$/, ''));
+  }
+  if (/^(?:okinawa|okinawa city|naha|naha city|沖縄|那覇)/i.test(cleaned)) {
+    add('Okinawa');
+    add('Naha');
+    add('沖縄');
+    add('那覇');
+  }
+  return candidates.slice(0, 8);
 }
 
 /**
@@ -762,11 +846,22 @@ function getReplacementCandidates(original, context, incidentType, info) {
   return rankReplacementCandidates(pool, original, context, incidentType);
 }
 
-function formatReplacementActivity(original, replacement) {
+function formatReplacementActivity(original, replacement, lang = DEFAULT_LANG) {
   const source = String(original || '').trim();
   const target = String(replacement || '').trim();
   const lower = normalizeHealedText(source);
   if (!source || !target) return target || source;
+  if (lang === 'ja') {
+    if (/^.*(visit|tham quan|trải nghiệm|観光|散策)/i.test(source)) return `${target}に変更`;
+    if (/ăn|lunch|dinner|breakfast|restaurant|quán|nhà hàng|レストラン|食事/.test(lower)) return `${target}で食事に変更`;
+    return `${target}に変更`;
+  }
+  if (lang === 'en') {
+    if (/^visit\s+/i.test(source)) return source.replace(/^visit\s+/i, `Visit ${target} instead of `);
+    if (/ăn|lunch|dinner|breakfast|restaurant|quán|nhà hàng/.test(lower)) return `Eat at ${target}`;
+    if (/ngắm|sunset|view|beach|biển/.test(lower)) return `Move indoors to ${target}`;
+    return `${target}`;
+  }
   if (/^đi đến\s+/i.test(source)) return source.replace(/^đi đến\s+/i, `Đi đến ${target} (thay thế cho) `);
   if (/^visit\s+/i.test(source)) return source.replace(/^visit\s+/i, `Visit ${target} (instead of) `);
   if (/^tham quan\s+/i.test(source)) return `Tham quan ${target}`;
@@ -775,17 +870,17 @@ function formatReplacementActivity(original, replacement) {
   return `${target}`;
 }
 
-function summarizeIncident(eventText, incident) {
+function summarizeIncident(eventText, incident, lang = DEFAULT_LANG) {
   const text = String(eventText || '').trim();
-  if (!text) return 'Không có mô tả tình huống cụ thể.';
-  if (incident.type === 'storm') return `Sự cố nghiêm trọng: ${text}`;
-  if (incident.type === 'rain') return `Thời tiết mưa: ${text}`;
-  if (incident.type === 'heat') return `Thời tiết nóng / nắng: ${text}`;
-  if (incident.type === 'wind') return `Thời tiết gió mạnh: ${text}`;
+  if (!text) return tr(lang, 'heal.summaryDefault');
+  if (incident.type === 'storm') return tr(lang, 'heal.summaryStorm', text);
+  if (incident.type === 'rain') return tr(lang, 'heal.summaryRain', text);
+  if (incident.type === 'heat') return tr(lang, 'heal.summaryHeat', text);
+  if (incident.type === 'wind') return tr(lang, 'heal.summaryWind', text);
   return text;
 }
 
-function buildSelfHealingPlan(planData, itin, eventText, context) {
+function buildSelfHealingPlan(planData, itin, eventText, context, lang = DEFAULT_LANG) {
   const incident = classifyIncident(eventText);
   const sourceDays = Array.isArray(planData && planData.days) && planData.days.length
     ? planData.days
@@ -818,14 +913,14 @@ function buildSelfHealingPlan(planData, itin, eventText, context) {
 
       used.add(normalizeHealedText(replacement));
       const reason = incident.type === 'storm'
-        ? 'Bão / gió lớn / mưa dông nên ưu tiên hoạt động trong nhà và gần nhau hơn'
+        ? tr(lang, 'heal.reasonStorm')
         : incident.type === 'heat'
-          ? 'Nắng nóng cực đoan, chuyển sang nơi có điều hòa'
+          ? tr(lang, 'heal.reasonHeat')
           : incident.type === 'rain'
-            ? 'Mưa to khiến hoạt động ngoài trời không còn phù hợp'
-            : 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế';
+            ? tr(lang, 'heal.reasonRain')
+            : tr(lang, 'heal.reasonDefault');
 
-      const replacementText = formatReplacementActivity(item, replacement);
+      const replacementText = formatReplacementActivity(item, replacement, lang);
       activities.push({ original: item, text: replacementText, changed: true, reason });
       replacements.push({ original: item, replacement: replacementText, reason });
     });
@@ -834,7 +929,7 @@ function buildSelfHealingPlan(planData, itin, eventText, context) {
 
   if (!isSevereWeatherIncident(incident)) {
     return {
-      incident_summary: summarizeIncident(eventText, incident),
+      incident_summary: summarizeIncident(eventText, incident, lang),
       severity: incident.severity,
       replacements: [],
       updated_days: updatedDays.map(day => ({
@@ -843,34 +938,34 @@ function buildSelfHealingPlan(planData, itin, eventText, context) {
       })),
       updated_itinerary: dedupePlanItems(sourceDays.flatMap(d => Array.isArray(d.activities) ? d.activities : [])),
       context_summary: buildPlannerContextSummary(context || {}),
-      notes: 'Thời tiết chưa chuyển xấu tới mức cần đổi lịch trình; giữ nguyên kế hoạch hiện tại.'
+      notes: tr(lang, 'heal.reasonDefault')
     };
   }
 
   return {
-    incident_summary: summarizeIncident(eventText, incident),
+    incident_summary: summarizeIncident(eventText, incident, lang),
     severity: incident.severity,
     replacements,
     updated_days: updatedDays,
     updated_itinerary: updatedDays.flatMap(day => day.activities.map(a => a.text)),
     context_summary: buildPlannerContextSummary(context || {}),
     notes: incident.type === 'storm'
-      ? 'Giữ lịch trình trong nhà, giảm di chuyển và ưu tiên điểm gần nhau.'
+      ? tr(lang, 'heal.reasonStorm')
       : incident.type === 'heat'
-        ? 'Ưu tiên điều hòa, nước uống và hạn chế nắng gắt.'
+        ? tr(lang, 'heal.reasonHeat')
         : incident.type === 'rain'
-          ? 'Chuyển sang các điểm trong nhà, tránh hoạt động ngoài trời kéo dài.'
-          : 'Điều chỉnh nhẹ để phù hợp với thời tiết hiện tại.'
+          ? tr(lang, 'heal.reasonRain')
+          : tr(lang, 'heal.reasonDefault')
   };
 }
 
 function renderHealHtml(data, lang) {
   let html = '';
   if (data.incident_summary) {
-    html += `<div class="summary-note"><strong>Tình huống:</strong> ${escapeHtml(data.incident_summary)}${data.severity ? ` · Mức độ: ${escapeHtml(data.severity)}` : ''}</div>`;
+    html += `<div class="summary-note"><strong>${tr(lang, 'heal.incidentLabel')}</strong> ${escapeHtml(data.incident_summary)}${data.severity ? ` · ${tr(lang, 'heal.severityLabel')} ${escapeHtml(data.severity)}` : ''}</div>`;
   }
   if (data.context_summary) {
-    html += `<div class="summary-note"><strong>Bám theo plan Tab 1:</strong> ${escapeHtml(data.context_summary)}</div>`;
+    html += `<div class="summary-note"><strong>${tr(lang, 'heal.planLabel')}</strong> ${escapeHtml(data.context_summary)}</div>`;
   }
   if ((data.replacements || []).length) {
     html += `<div class="day-block"><h4>${tr(lang, 'common.changesHeader')}</h4><ul>`;
@@ -886,7 +981,7 @@ function renderHealHtml(data, lang) {
         const changed = !!activity.changed;
         const original = String(activity.original || '');
         const text = String(activity.text || original);
-        const reason = changed && activity.reason ? `<span class="reason-tag">Lý do: ${escapeHtml(activity.reason)}</span>` : '';
+        const reason = changed && activity.reason ? `<span class="reason-tag">${tr(lang, 'heal.reasonPrefix')} ${escapeHtml(activity.reason)}</span>` : '';
         const before = changed && original && original !== text ? `<del>${escapeHtml(original)}</del> → ` : '';
         return `<li class="${changed ? 'changed-item' : ''}">${before}<strong>${escapeHtml(text)}</strong>${reason} ${mapLink(text, undefined, lang)}${venueWarning(text, lang)}</li>`;
       }).join('')}</ul></div>`;
@@ -896,6 +991,24 @@ function renderHealHtml(data, lang) {
   }
   if (data.notes) html += `<div class="summary-note">${escapeHtml(data.notes)}</div>`;
   return html || tr(lang, 'common.noChange');
+}
+
+function buildCameraFallback(mode, caption, model, lang = DEFAULT_LANG) {
+  const clean = String(caption || '').trim();
+  const lower = clean.toLowerCase();
+  const tastyWords = ['ramen', 'noodle', 'soup', 'rice', 'bowl', 'sushi', 'udon', 'soba', 'curry', 'burger', 'steak', 'dish', 'food', 'pizza', 'pasta', 'tempura', 'bbq', 'grill'];
+  const landmarkWords = ['temple', 'castle', 'tower', 'bridge', 'building', 'street', 'landmark', 'sign', 'statue', 'museum', 'market', 'station', 'pagoda'];
+  const detect = (words) => words.some(word => lower.includes(word));
+  const guess = mode === 'food'
+    ? (detect(tastyWords) ? (lower.includes('ramen') ? 'món mì ramen' : lower.includes('sushi') ? 'món sushi' : lower.includes('rice') || lower.includes('bowl') ? 'món cơm/bát' : 'một món ăn') : 'một món ăn')
+    : (detect(landmarkWords) ? (lower.includes('castle') ? 'một lâu đài' : lower.includes('temple') ? 'một ngôi chùa' : lower.includes('tower') ? 'một tòa tháp' : lower.includes('bridge') ? 'một cây cầu' : 'một địa danh/công trình') : 'một địa danh/công trình');
+
+  if (!clean || clean === '(no response)') {
+    return tr(lang, 'camera.fallbackUnknown', model || 'moondream');
+  }
+  return mode === 'food'
+    ? tr(lang, 'camera.fallbackFood', guess)
+    : tr(lang, 'camera.fallbackLandmark', guess);
 }
 
 // ---------- localStorage persistence (guarded — private mode can throw) ----------
@@ -947,6 +1060,7 @@ const AppCore = {
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   dedupePlanItems, flattenActivities, normalizeHealedText,
   classifyIncident, isSevereWeatherIncident, classifyActivity,
+  buildCameraFallback,
   parseBudgetNumber, buildPlannerContextSummary, buildSelfHealingPlan,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
 };
@@ -1647,17 +1761,24 @@ function initApp() {
     if (!dest) { statusEl.textContent = T('heal.needDest'); return; }
     statusEl.textContent = T('heal.lookingUp');
     try {
-      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=${encodeURIComponent(T('geocodeLang'))}&name=${encodeURIComponent(dest)}`);
-      const geo = await geoRes.json();
-      const place = geo.results && geo.results[0];
+      let place = null;
+      const searchQueries = buildGeoLookupCandidates(dest);
+      for (const query of searchQueries) {
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?count=1&language=${encodeURIComponent(T('geocodeLang'))}&name=${encodeURIComponent(query)}`);
+        if (!geoRes.ok) continue;
+        const geo = await geoRes.json();
+        const candidate = geo.results && geo.results[0];
+        if (candidate) { place = candidate; break; }
+      }
       if (!place) { statusEl.textContent = T('heal.notFound', dest); return; }
 
-      const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation`);
+      const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation&timezone=auto`);
       const w = await wRes.json();
       const c = w.current;
       const desc = weatherDescription(c.weather_code, currentLang);
       hEvent.value = tr(currentLang, 'heal.weatherText', place.name, place.country, desc, c.temperature_2m, c.precipitation);
-      statusEl.textContent = T('heal.weatherReady', c.time?.slice(11, 16) || '');
+      const timeText = String(c.time || '').slice(11, 16);
+      statusEl.textContent = T('heal.weatherReady', timeText);
       saveHealState({});
     } catch (err) {
       statusEl.textContent = T('heal.weatherError', err.message);
@@ -1682,7 +1803,25 @@ function initApp() {
     tripState.destination = hDest.value.trim() || plannerContext.destination || tripState.destination;
     if (!tripState.plannerContext) tripState.plannerContext = plannerContext;
     setLoading(hResult, true, T('heal.loading'));
-    const data = buildSelfHealingPlan(plannerData, itin, event, plannerContext);
+
+    let data = null;
+    try {
+      const system = T('heal.systemPrompt');
+      const user = tr(currentLang, 'heal.userPrompt', itin, event);
+      const ai = await callClaude(system, user, { json: true, onChunk: streamPreview(hResult, T('heal.loading')) });
+      if (ai && Array.isArray(ai.replacements)) {
+        data = {
+          ...buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang),
+          ...ai,
+          incident_summary: summarizeIncident(event, classifyIncident(event), currentLang),
+          context_summary: buildPlannerContextSummary(plannerContext)
+        };
+      }
+    } catch (err) {
+      data = buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang);
+    }
+
+    if (!data) data = buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang);
     hResult.innerHTML = `<div class="result-box">${renderHealHtml(data, currentLang)}</div>`;
     saveHealState({ data });
   });
@@ -1711,19 +1850,26 @@ function initApp() {
     const mode = document.getElementById('c-mode').value;
     const visionModel = document.getElementById('c-model').value.trim() || 'moondream';
     const resultEl = document.getElementById('c-result');
+    let caption = '';
 
     try {
       setLoading(resultEl, true, T('camera.step1'));
       const captionPrompt = 'Describe this image in detail, mentioning any text you can see.';
-      const caption = await callVision(captionPrompt, cImageBase64, visionModel);
-      if (!caption || !caption.trim()) throw new Error(T('camera.noCaption', visionModel));
+      caption = await callVision(captionPrompt, cImageBase64, visionModel);
+      const normalized = typeof caption === 'string' ? caption.trim() : '';
+      if (!normalized || normalized === '(no response)') {
+        throw new Error(T('camera.noCaption', visionModel));
+      }
 
       const system = mode === 'food' ? T('camera.systemPromptFood') : T('camera.systemPromptLandmark');
       const text = await callClaude(system, tr(currentLang, 'camera.userPrompt', caption), {
         onChunk: streamPreview(resultEl, T('camera.step2'))
       });
       resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(visionModel))}</div>`;
-    } catch (err) { showError(resultEl, err); }
+    } catch (err) {
+      const fallbackText = buildCameraFallback(mode, caption, visionModel, currentLang);
+      resultEl.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(err.message)}</div><div class="result-box">${escapeHtml(fallbackText)}</div><div class="summary-note">${T('camera.fallbackAdvice')}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(visionModel))}</div>`;
+    }
   });
 
   async function callVision(prompt, imageBase64, model) {
