@@ -34,6 +34,7 @@ const I18N = {
       aiFinal: '🤖 AI chốt:',
       copied: '✅ Đã copy lịch trình vào clipboard!',
       shareFailed: '⚠️ Không tự copy được — hãy chọn và copy đoạn văn bản dưới đây.',
+      shareFallback: 'Chia sẻ native không được hỗ trợ trên http LAN/điện thoại này, nên app đã tự sao chép lịch trình vào clipboard.',
       sharedVia: 'Tạo bằng AI Travel Companion 🗺️',
       criteriaHeader: 'Tiêu chí',
       scoreHeader: 'Điểm',
@@ -185,6 +186,7 @@ const I18N = {
       aiFinal: '🤖 AIの結論：',
       copied: '✅ 旅程をクリップボードにコピーしました！',
       shareFailed: '⚠️ 自動コピーできませんでした — 下のテキストを選択してコピーしてください。',
+      shareFallback: 'このLAN HTTP/モバイル環境ではネイティブ共有が使えないため、アプリが旅程をクリップボードに自動コピーしました。',
       sharedVia: 'AI Travel Companionで作成 🗺️',
       criteriaHeader: '項目',
       scoreHeader: 'スコア',
@@ -336,6 +338,7 @@ const I18N = {
       aiFinal: '🤖 AI\'s call:',
       copied: '✅ Itinerary copied to clipboard!',
       shareFailed: '⚠️ Could not auto-copy — select and copy the text below manually.',
+      shareFallback: 'Native sharing is not supported on this LAN HTTP/mobile browser, so the app copied the itinerary to the clipboard instead.',
       sharedVia: 'Made with AI Travel Companion 🗺️',
       criteriaHeader: 'Criteria',
       scoreHeader: 'Score',
@@ -1263,9 +1266,10 @@ function initApp() {
     if (result === 'copied') {
       pShareFeedback.textContent = T('common.copied');
     } else if (result === 'failed') {
-      showManualCopyBox(pShareFeedback, text, T('common.shareFailed'));
-    }
-    // 'shared' (native share sheet handled it) and 'cancelled' (user dismissed it) need no feedback.
+    pShareFeedback.innerHTML = `<div>${escapeHtml(T('common.shareFallback'))}</div>`;
+    showManualCopyBox(pShareFeedback, text, T('common.shareFailed'));
+  }
+  // 'shared' (native share sheet handled it) and 'cancelled' (user dismissed it) need no feedback.
   });
 
   function getPlannerContext() {

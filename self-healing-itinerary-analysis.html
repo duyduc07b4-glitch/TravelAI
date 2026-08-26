@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Healing Itinerary — Phân tích triển khai</title>
+  <style>
+    :root{
+      --bg:#0f1115;
+      --panel:#171a21;
+      --panel2:#1e222b;
+      --border:#2a2f3a;
+      --text:#e8eaed;
+      --muted:#9aa3b2;
+      --accent:#5b9cf6;
+      --accent2:#7ee0c9;
+      --warn:#f6a15b;
+      --radius:14px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+      line-height:1.65;
+    }
+    main{max-width:980px; margin:0 auto; padding:32px 20px 80px;}
+    .hero{
+      background:linear-gradient(180deg, rgba(91,156,246,.16), rgba(91,156,246,.04));
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:28px;
+      margin-bottom:18px;
+    }
+    h1,h2,h3{line-height:1.2; margin:0 0 12px;}
+    h1{font-size:30px;}
+    h2{font-size:20px; margin-top:28px;}
+    h3{font-size:16px; color:var(--accent2);}
+    p{margin:0 0 12px;}
+    .muted{color:var(--muted);}
+    .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px;
+    }
+    ul{margin:10px 0 0 18px; padding:0;}
+    li{margin-bottom:8px;}
+    .tag{
+      display:inline-block;
+      font-size:12px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:var(--panel2);
+      border:1px solid var(--border);
+      color:var(--muted);
+      margin:0 8px 8px 0;
+    }
+    .flow{
+      display:grid;
+      gap:10px;
+      margin-top:12px;
+    }
+    .step{
+      background:var(--panel2);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:14px 16px;
+    }
+    .step strong{color:var(--accent2);}
+    .diagram{
+      margin-top:14px;
+      background:var(--panel2);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:18px;
+      overflow:auto;
+    }
+    pre{
+      margin:0;
+      white-space:pre-wrap;
+      font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size:13px;
+      color:#dce7ff;
+    }
+    .note{
+      background:rgba(246,161,91,.10);
+      border:1px solid rgba(246,161,91,.35);
+      color:#ffd8b0;
+      border-radius:12px;
+      padding:14px 16px;
+      margin-top:16px;
+    }
+    .kpi{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+    .kpi .box{
+      background:var(--panel2);
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:14px;
+    }
+    .kpi .box div:first-child{color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:.08em;}
+    .kpi .box div:last-child{font-size:14px; margin-top:6px;}
+    a{color:var(--accent);}
+    .footer{margin-top:24px; color:var(--muted); font-size:13px;}
+    @media (max-width:780px){
+      .grid,.kpi{grid-template-columns:1fr;}
+      main{padding:20px 14px 60px;}
+      .hero{padding:20px;}
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <span class="tag">TAB 4 · Self-Healing Itinerary</span>
+      <h1>Phân tích chức năng “Tự chữa lịch trình”</h1>
+      <p class="muted">
+        Mục tiêu: khi thời tiết xấu hoặc có sự cố (mưa lớn, bão, nắng gắt...), AI tự đề xuất lịch trình thay thế
+        mà người dùng không cần chỉnh sửa thủ công.
+      </p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Khó khăn chính</h2>
+        <ul>
+          <li><strong>Dữ liệu đầu vào không đầy đủ:</strong> chỉ biết “mưa” hay “xấu” thì chưa đủ để đổi lịch đúng.</li>
+          <li><strong>Phân loại hoạt động:</strong> cần biết hoạt động nào ngoài trời, trong nhà, di chuyển xa, hay phụ thuộc giờ mở cửa.</li>
+          <li><strong>Giữ logic lịch trình:</strong> thay một điểm phải không phá vỡ thứ tự, tuyến đường, ngân sách và bối cảnh nhóm.</li>
+          <li><strong>AI dễ bịa thay thế:</strong> model local có thể đề xuất điểm nghe hợp lý nhưng không phù hợp thực tế.</li>
+          <li><strong>JSON / schema dễ lỗi:</strong> nếu output sai format thì UI khó render và khó cập nhật tự động.</li>
+          <li><strong>Thiếu xác thực thời gian thực:</strong> giờ mở cửa, tình trạng đóng/mở, quãng đường thực tế không chắc chắn.</li>
+          <li><strong>Xử lý fallback:</strong> khi Open-Meteo hoặc Ollama lỗi, vẫn phải có phương án dự phòng.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h2>Nên triển khai thế nào</h2>
+        <div class="flow">
+          <div class="step"><strong>1. Chuẩn hóa input</strong><br>Nhận vào itinerary hiện tại, tình huống thời tiết, điểm đến, mức độ khẩn cấp.</div>
+          <div class="step"><strong>2. Phân loại activity</strong><br>Gắn nhãn cho mỗi hoạt động: indoor / outdoor / transit / food / shopping / backup.</div>
+          <div class="step"><strong>3. Tạo luật thay thế</strong><br>Ưu tiên indoor khi mưa, ưu tiên gần vị trí hiện tại, giữ cùng khung giờ nếu có thể.</div>
+          <div class="step"><strong>4. Gọi LLM với schema chặt</strong><br>Yêu cầu trả JSON gồm replacements + updated_itinerary + reason.</div>
+          <div class="step"><strong>5. Validate trước khi render</strong><br>Kiểm tra mảng hợp lệ, field đủ, và độ dài hợp lý rồi mới cập nhật UI.</div>
+          <div class="step"><strong>6. Hiển thị diff rõ ràng</strong><br>Cho người dùng thấy “đã đổi gì”, “vì sao đổi”, và lịch trình mới.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Flow đề xuất</h2>
+      <div class="diagram">
+<pre>Itinerary hiện tại
+      ↓
+Weather / incident input
+      ↓
+Rule-based filtering
+  - bỏ hoạt động outdoor
+  - ưu tiên indoor gần đó
+  - giữ chi phí / tuyến đường
+      ↓
+LLM sinh phương án JSON
+      ↓
+Validate JSON + fallback
+      ↓
+Render thay đổi + lịch trình mới</pre>
+      </div>
+    </section>
+
+    <section class="grid" style="margin-top:16px;">
+      <div class="card">
+        <h2>Gợi ý cấu trúc dữ liệu</h2>
+        <div class="diagram">
+<pre>{
+  "incident": "Buổi sáng mưa lớn",
+  "updated_itinerary": ["Aquarium", "Museum", "Shopping Mall"],
+  "replacements": [
+    {
+      "original": "Beach",
+      "replacement": "Aquarium",
+      "reason": "Hoạt động trong nhà, phù hợp khi mưa"
+    }
+  ]
+}</pre>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Tiêu chí thành công</h2>
+        <div class="kpi">
+          <div class="box">
+            <div>Đúng ngữ cảnh</div>
+            <div>Thay thế phù hợp với mưa / nắng / bão.</div>
+          </div>
+          <div class="box">
+            <div>Ít lỗi schema</div>
+            <div>JSON luôn render được, có validate.</div>
+          </div>
+          <div class="box">
+            <div>Không phá lịch</div>
+            <div>Giữ được thứ tự, chi phí và trải nghiệm.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Khuyến nghị triển khai trong code hiện tại</h2>
+      <ul>
+        <li>Giữ <code>Open-Meteo</code> làm nguồn thời tiết thật, nhưng chỉ dùng như tín hiệu kích hoạt.</li>
+        <li>Tách logic thành 2 lớp: <strong>rule-based</strong> để lọc hoạt động không phù hợp, rồi <strong>LLM</strong> để viết lại lịch trình.</li>
+        <li>Chỉ chấp nhận output JSON đã validate; nếu fail thì hiển thị fallback thay vì sửa âm thầm.</li>
+        <li>Cho phép người dùng xem “thay đổi” và “lịch trình mới” riêng biệt, đúng như mockup trong ảnh.</li>
+        <li>Ưu tiên các thay thế an toàn: <em>aquarium, museum, shopping mall, indoor activities, café</em>.</li>
+      </ul>
+      <div class="note">
+        Lưu ý: TAB 4 hiện đã có khung cơ bản trong [app.html](./app.html), nhưng để “tự chữa” đáng tin cậy hơn thì cần
+        thêm phân loại hoạt động, validate JSON kỹ hơn và fallback khi AI trả lời không hợp lệ.
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:16px;">
+      <h2>Tóm tắt ngắn</h2>
+      <p>
+        Đây là một bài toán kết hợp giữa <strong>dữ liệu thời tiết</strong>, <strong>rule-based logic</strong> và <strong>LLM</strong>.
+        Khó nhất là giữ cho lịch trình vừa “thông minh” vừa “đúng thực tế”.
+      </p>
+      <p>
+        Cách làm tốt nhất là: <strong>phân loại hoạt động → lọc theo sự cố → sinh phương án thay thế → validate → render diff</strong>.
+      </p>
+    </section>
+
+    <p class="footer">
+      Tài liệu tham chiếu: [app.html](./app.html) · [README.md](./README.md)
+    </p>
+  </main>
+</body>
+</html>
