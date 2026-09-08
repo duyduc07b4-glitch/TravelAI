@@ -63,6 +63,7 @@
     <button class="tab-btn" data-tab="voice" data-i18n="tabs.voice"></button>
     <button class="tab-btn" data-tab="heal" data-i18n="tabs.heal"></button>
     <button class="tab-btn" data-tab="camera" data-i18n="tabs.camera"></button>
+    <button class="tab-btn" data-tab="diff" data-i18n="tabs.diff"></button>
   </nav>
 
   <!-- TAB 1: Dynamic Trip Planning -->
@@ -99,6 +100,7 @@
       </div>
       <button id="g-run" data-i18n="group.runBtn"></button>
       <div class="hint" id="g-ragHint"></div>
+      <div class="group-decision" id="g-decision"></div>
       <div class="result" id="g-result"></div>
       <div class="chat-log" id="g-debate" style="margin-top:14px;"></div>
     </div>
@@ -167,6 +169,25 @@
       <img id="c-preview" style="display:none; max-width:100%; border-radius:10px; margin:10px 0; border:1px solid var(--border);">
       <button id="c-run" disabled data-i18n="camera.runBtn"></button>
       <div class="result" id="c-result"></div>
+    </div>
+  </section>
+
+  <!-- TAB 6: Differentiation (why TravelAI, not just another AI travel planner) -->
+  <section class="panel" id="panel-diff">
+    <div class="card">
+      <h3 data-i18n="diff.title"></h3>
+      <p class="hint" data-i18n="diff.subtitle" style="margin:-4px 0 16px;"></p>
+      <div class="diff-cols">
+        <div class="diff-col trad">
+          <h5 data-i18n="diff.tradTitle"></h5>
+          <ul id="diff-trad-list"></ul>
+        </div>
+        <div class="diff-col us">
+          <h5 data-i18n="diff.usTitle"></h5>
+          <ul id="diff-us-list"></ul>
+        </div>
+      </div>
+      <p class="diff-mission" data-i18n="diff.mission"></p>
     </div>
   </section>
 </main>

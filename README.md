@@ -1,6 +1,6 @@
-# AI Travel Companion — Local Prototype
+# TravelAI — AI-Powered Group Travel Decision Platform
 
-Trợ lý lập kế hoạch du lịch chạy AI hoàn toàn trên máy — không cloud, không tài khoản, không thể phát sinh chi phí. AI chạy qua [Ollama](https://ollama.com) trên máy của bạn.
+Không chỉ lên lịch trình — TravelAI giúp cả nhóm ra quyết định du lịch cùng nhau, và cho thấy rõ vì sao AI đề xuất mỗi lựa chọn. Chạy AI hoàn toàn trên máy — không cloud, không tài khoản, không thể phát sinh chi phí — qua [Ollama](https://ollama.com).
 
 Ý tưởng gốc: [`AI Voice Travel Assistant.pdf`](./AI%20Voice%20Travel%20Assistant.pdf) (Product Vision).
 
@@ -17,7 +17,13 @@ Tóm tắt nhanh:
 ## Tính năng
 
 - 🗺️ **Dynamic Trip Planning** — tạo lịch trình theo ngày, có link Google Maps cho từng địa điểm
-- 👥 **AI Group Matching** — chấm điểm địa điểm theo sở thích từng thành viên trong nhóm, có thể ưu tiên dùng dữ liệu thật (giờ mở cửa, giá, đánh giá) từ RAG server local nếu đang chạy
+- 👥 **Group Decision Engine** — không chỉ chấm điểm, mà còn:
+  - 📊 **Điểm hài lòng theo từng thành viên** (không chỉ điểm trung bình chung)
+  - ⚠️ **Phát hiện xung đột sở thích** — ai thích, ai không, mức độ nghiêm trọng, lý do
+  - 💡 **3 phương án thay vì 1 lựa chọn trung bình hoá** — xếp hạng theo thành viên hài lòng thấp nhất (không ai bị bỏ lại), không phải theo điểm trung bình
+  - 🧾 **Giải thích được (Explainable AI)** — mỗi gợi ý kèm lý do cụ thể từ dữ liệu thật (giá, khoảng cách, đánh giá, thân thiện trẻ em...)
+  - Toàn bộ tính toán trên chạy **cục bộ, tức thời, không qua LLM** — cập nhật ngay khi bạn sửa sở thích thành viên, không cần bấm lại nút. Có thể ưu tiên dùng dữ liệu thật (giờ mở cửa, giá, đánh giá) từ RAG server local nếu đang chạy.
+- 🆚 **Vì sao TravelAI** — màn hình so sánh trực tiếp với AI Travel Planner truyền thống (tối ưu cá nhân) và TravelAI (tối ưu quyết định nhóm)
 - 🎙️ **Trợ lý giọng nói** — hỏi/đáp bằng giọng nói (Web Speech API)
 - 🌧️ **Self-Healing Itinerary** — tự đề xuất thay đổi lịch trình khi có sự cố (thời tiết...)
 - 🌐 **Đa ngôn ngữ Việt/Nhật/Anh** — nút VI/JA/EN ở góc trên bên phải đổi toàn bộ giao diện, nội dung AI trả về (lịch trình, group matching, giọng nói, self-healing, camera), nhận diện/phát giọng nói theo đúng ngôn ngữ đang chọn. Lựa chọn ngôn ngữ được lưu lại cho lần sau.
@@ -47,9 +53,9 @@ Tóm tắt nhanh:
 
 Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang. Dữ liệu này chỉ nằm trên máy bạn, không gửi đi đâu.
 
-## (Tùy chọn) Chạy RAG server cho Group Matching
+## (Tùy chọn) Chạy RAG server cho Group Decision
 
-Tab Group Matching sẽ tự dùng dữ liệu thật (giờ mở cửa, giá, đánh giá trong `knowledge/`) nếu server này đang chạy ở `http://localhost:8899`; nếu tắt, AI vẫn hoạt động bình thường nhưng tự suy đoán thay vì tra cứu dữ liệu.
+Tab Quyết định nhóm sẽ tự dùng dữ liệu thật (giờ mở cửa, giá, đánh giá trong `knowledge/`) nếu server này đang chạy ở `http://localhost:8899` — cả cho phần LLM (debate/recommendation) lẫn engine tính điểm hài lòng/xung đột/phương án (hoàn toàn cục bộ, không qua LLM). Nếu server tắt, tab vẫn hoạt động nhưng engine sẽ chỉ có tên địa điểm bạn nhập để chấm điểm, không có dữ liệu giá/giờ mở cửa/đánh giá thật để tham khảo.
 
 ```bash
 cd rag-server

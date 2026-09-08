@@ -13,7 +13,7 @@ const SUPPORTED_LANGS = ['vi', 'ja', 'en'];
 // Every leaf is either a string or a function(...) => string (for messages needing interpolation).
 const I18N = {
   vi: {
-    appSubtitle: 'Local prototype · AI chạy trên máy bạn qua Ollama · dùng được cả từ điện thoại trong cùng mạng',
+    appSubtitle: 'AI giúp cả nhóm quyết định cùng nhau · chạy local qua Ollama · dùng được cả từ điện thoại trong cùng mạng',
     checkConnBtn: 'Kiểm tra kết nối',
     connect: {
       defaultHint: 'Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miễn phí, chạy hoàn toàn offline). Sau khi cài: mở Terminal chạy <code>ollama pull llama3.2</code> để tải model, rồi bấm "Kiểm tra kết nối". Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.',
@@ -23,7 +23,7 @@ const I18N = {
       ready: (model) => `✅ Đã kết nối Ollama, model "${model}" sẵn sàng — AI chạy trên máy này, hoàn toàn offline/miễn phí.`,
       failed: (base, err) => `⚠️ Không kết nối được tới ${base}. Kiểm tra: Ollama đã chạy chưa, đúng địa chỉ IP chưa, và nếu gọi từ điện thoại/máy khác thì đã bật <code>OLLAMA_HOST=0.0.0.0</code> và <code>OLLAMA_ORIGINS=*</code> chưa. Lỗi: ${err}`
     },
-    tabs: { planner: '🗺️ Lịch trình', group: '👥 Group Matching', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera AI' },
+    tabs: { planner: '🗺️ Lịch trình', group: '👥 Quyết định nhóm', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Vì sao TravelAI' },
     common: {
       mapLink: '📍 Xem bản đồ',
       venueWarning: '⚠️ chưa xác minh giờ mở cửa',
@@ -82,7 +82,37 @@ const I18N = {
       systemPrompt: 'Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Nếu có "Dữ liệu tham khảo" bên dưới (giờ mở cửa, giá, đánh giá thật), hãy ưu tiên dùng thay vì đoán. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}\nĐiểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).',
       userPrompt: (place, members, context) => `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\nDữ liệu tham khảo (RAG, từ knowledge base thật):\n${context}` : ''}`,
       ragUsed: (sources) => `📚 Đã dùng dữ liệu từ: ${sources}`,
-      ragNone: '📚 Không tìm thấy dữ liệu liên quan trong knowledge base (RAG server tắt hoặc chưa index) — AI sẽ tự suy đoán.'
+      ragNone: '📚 Không tìm thấy dữ liệu liên quan trong knowledge base (RAG server tắt hoặc chưa index) — AI sẽ tự suy đoán.',
+      satisfactionTitle: '📊 Điểm hài lòng của nhóm',
+      overallLabel: 'Chung',
+      lowestWhy: (name) => `${name} đang có điểm thấp nhất — xem lý do trong phần xung đột bên dưới.`,
+      conflictTitle: '⚠️ Phát hiện xung đột sở thích',
+      severity: { low: 'Nhẹ', moderate: 'Vừa', high: 'Cao' },
+      likeLabel: 'Thích',
+      dislikeLabel: 'Không thích',
+      reasonKeys: {
+        conflictVegetarian: (name) => `${name} ăn chay, địa điểm này nghiêng về hải sản/thịt`,
+        matchBudget: (name) => `${name} muốn tiết kiệm — giá phù hợp`,
+        overBudget: (name) => `${name} muốn tiết kiệm — giá hơi cao`,
+        matchLuxury: (name) => `${name} thích cao cấp — giá phù hợp`,
+        tooBasic: (name) => `${name} thích cao cấp — chỗ này hơi bình dân`,
+        matchKids: (name) => `${name} đi cùng trẻ em — nơi này thân thiện với trẻ em`,
+        notKidFriendly: (name) => `${name} đi cùng trẻ em — nơi này chưa thân thiện với trẻ em`,
+        matchTag: (name) => `${name} hợp sở thích với địa điểm này`
+      },
+      compromiseTitle: '💡 3 phương án thay vì 1 lựa chọn trung bình hoá',
+      aiPick: '✓ AI đề xuất',
+      optionLabel: (label) => `Phương án ${label}`,
+      optionPro: (name, score) => `${name} hài lòng nhất (${score}%)`,
+      optionCon: (name, score) => `${name} hài lòng ít nhất (${score}%)`,
+      whyPicked: 'Không ai bị bỏ lại phía sau — điểm thấp nhất trong nhóm ở phương án này là cao nhất so với các phương án khác.',
+      whyAlt: 'Điểm trung bình có thể cao, nhưng có thành viên hài lòng thấp hơn hẳn.',
+      whyTitle: (name) => `🧾 Vì sao chọn "${name}"?`,
+      reasonPrefMatch: (count, total) => `${count}/${total} thành viên có sở thích khớp với địa điểm này`,
+      reasonBudget: (price) => `Mức giá: ${price}`,
+      reasonKidFriendly: 'Thân thiện với trẻ em',
+      reasonRating: (rating) => `Đánh giá thật: ${rating}/5`,
+      reasonAddress: (address) => `Địa chỉ: ${address}`
     },
     voice: {
       title: 'Trợ lý du lịch bằng giọng nói',
@@ -167,6 +197,25 @@ const I18N = {
       systemPromptLandmark: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.',
       userPrompt: (caption) => `Mô tả từ AI vision: "${caption}"`
     },
+    diff: {
+      title: 'AI Travel Planner vs. TravelAI',
+      subtitle: 'Không chỉ lên lịch trình — TravelAI giúp cả nhóm ra quyết định cùng nhau, và cho bạn thấy vì sao.',
+      tradTitle: 'AI Travel Planner truyền thống',
+      tradItems: [
+        'Tối ưu theo sở thích của 1 người dùng nhập vào',
+        'Ra đúng 1 lịch trình, chấp nhận hoặc bỏ qua',
+        'Im lặng khi các thành viên trong nhóm bất đồng',
+        '"AI đã quyết định" — không giải thích vì sao'
+      ],
+      usTitle: 'TravelAI',
+      usItems: [
+        'Tối ưu theo mức độ hài lòng chung của CẢ NHÓM',
+        'Phát hiện xung đột sở thích, rồi đưa ra các đánh đổi thật',
+        'Mỗi điểm số và mỗi thay đổi đều kèm lý do rõ ràng',
+        'Tự điều chỉnh giữa chuyến đi mà không âm thầm bỏ rơi ai'
+      ],
+      mission: '"TravelAI không lên lịch trình — nó giúp nhóm du lịch ra quyết định tốt hơn cùng nhau, và cho từng thành viên thấy rõ tiếng nói của họ đã ảnh hưởng tới kết quả thế nào."'
+    },
     weatherCodes: {
       0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
       45: 'sương mù', 48: 'sương mù đóng băng',
@@ -183,7 +232,7 @@ const I18N = {
     geocodeLang: 'vi'
   },
   ja: {
-    appSubtitle: 'ローカル試作版 · Ollama経由でこの端末上でAIが動作 · 同じネットワーク内ならスマホからも利用可',
+    appSubtitle: 'グループ全員で決める旅行をAIがサポート · Ollamaでローカル動作 · 同じネットワーク内ならスマホからも利用可',
     checkConnBtn: '接続確認',
     connect: {
       defaultHint: 'まずこの端末に<a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a>をインストールしてください（無料・完全オフライン動作）。インストール後、ターミナルで <code>ollama pull llama3.2</code> を実行してモデルを取得し、「接続確認」を押してください。スマホから使う場合：スマホは同じWi-Fiに接続し、Server欄の <code>localhost</code> をこの端末のLAN IPアドレスに置き換え（例：<code>http://192.168.3.23:11434</code>）、スマホでは <code>http://192.168.3.23:8765/app.html</code> を開いてください。',
@@ -193,7 +242,7 @@ const I18N = {
       ready: (model) => `✅ Ollamaに接続済み、モデル「${model}」使用可能 — この端末上で完全オフライン・無料で動作しています。`,
       failed: (base, err) => `⚠️ ${base} に接続できません。Ollamaが起動しているか、IPアドレスが正しいか確認してください。スマホ/他端末から接続する場合は <code>OLLAMA_HOST=0.0.0.0</code> と <code>OLLAMA_ORIGINS=*</code> を設定してください。エラー内容：${err}`
     },
-    tabs: { planner: '🗺️ 旅程', group: '👥 グループマッチング', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラAI' },
+    tabs: { planner: '🗺️ 旅程', group: '👥 グループ決定', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラAI', diff: '🆚 TravelAIの違い' },
     common: {
       mapLink: '📍 地図を見る',
       venueWarning: '⚠️ 営業時間未確認',
@@ -252,7 +301,37 @@ const I18N = {
       systemPrompt: 'あなたはAI Group Matching Engineです。ある旅行スポットが、グループの各メンバーの好みにどれだけ合っているかを評価し、実際の議論のように各メンバーの視点を短くシミュレートしてから、AIとしての提案をまとめてください。下に「参考データ」があれば（営業時間・料金・実際のレビューなど）、推測より優先して使ってください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"このスポットについてのこの人の視点・懸念を1文で、本人の立場で述べる"}],"recommendation":"グループ全員が納得できる落としどころをAIとして1〜2文で提案し、簡潔に理由も述べる"}\nスコアは1〜10段階で、各メンバーの好みから項目を推測してください。"debate"内の各メンバーは、それぞれの好みを反映した異なる意見を持つようにしてください（好みに応じて肯定的にも否定的にもなり得ます）。',
       userPrompt: (place, members, context) => `スポット：${place}\nメンバーと好み：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\n参考データ（RAG、実際のナレッジベースより）：\n${context}` : ''}`,
       ragUsed: (sources) => `📚 使用したデータ元：${sources}`,
-      ragNone: '📚 ナレッジベースに関連データが見つかりませんでした（RAGサーバーが停止しているか未インデックス）— AIが推測して回答します。'
+      ragNone: '📚 ナレッジベースに関連データが見つかりませんでした（RAGサーバーが停止しているか未インデックス）— AIが推測して回答します。',
+      satisfactionTitle: '📊 グループ満足度スコア',
+      overallLabel: '全体',
+      lowestWhy: (name) => `${name}のスコアが最も低い — 理由は下の「衝突」で確認できます。`,
+      conflictTitle: '⚠️ 好みの衝突を検出',
+      severity: { low: '軽度', moderate: '中程度', high: '高い' },
+      likeLabel: '好き',
+      dislikeLabel: '苦手',
+      reasonKeys: {
+        conflictVegetarian: (name) => `${name}はベジタリアン — このスポットは海鮮・肉料理中心`,
+        matchBudget: (name) => `${name}は節約志向 — 価格が合っている`,
+        overBudget: (name) => `${name}は節約志向 — 価格がやや高い`,
+        matchLuxury: (name) => `${name}は高級志向 — 価格が合っている`,
+        tooBasic: (name) => `${name}は高級志向 — ここはややカジュアル`,
+        matchKids: (name) => `${name}は子供連れ — ここは子供に優しい`,
+        notKidFriendly: (name) => `${name}は子供連れ — ここは子供向けではない`,
+        matchTag: (name) => `${name}の好みとこのスポットが合っている`
+      },
+      compromiseTitle: '💡 平均化した1案ではなく、3つの選択肢',
+      aiPick: '✓ AIのおすすめ',
+      optionLabel: (label) => `オプション${label}`,
+      optionPro: (name, score) => `${name}が最も満足（${score}%）`,
+      optionCon: (name, score) => `${name}が最も不満（${score}%）`,
+      whyPicked: '誰も置き去りにしない — このオプションはグループ内の最低スコアが他の案より高い。',
+      whyAlt: '平均は高いかもしれないが、著しく満足度が低いメンバーがいる。',
+      whyTitle: (name) => `🧾 なぜ「${name}」を選んだのか？`,
+      reasonPrefMatch: (count, total) => `${total}人中${count}人の好みがこのスポットと一致`,
+      reasonBudget: (price) => `価格帯：${price}`,
+      reasonKidFriendly: '子供連れに優しい',
+      reasonRating: (rating) => `実際の評価：${rating}/5`,
+      reasonAddress: (address) => `住所：${address}`
     },
     voice: {
       title: '音声旅行アシスタント',
@@ -337,6 +416,25 @@ const I18N = {
       systemPromptLandmark: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の観光地・建造物と考えられるか。2) 確かな情報があれば歴史・文化的背景を少し。3) 近くにありそうな似た種類の観光スポット。説明が曖昧すぎて識別できない場合は、当てずっぽうで答えず正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
       userPrompt: (caption) => `Vision AIによる説明：「${caption}」`
     },
+    diff: {
+      title: '従来のAI旅行プランナー vs. TravelAI',
+      subtitle: '旅程を作るだけでなく、グループ全員が一緒に決断できるよう、その理由まで見せます。',
+      tradTitle: '従来のAI Travel Planner',
+      tradItems: [
+        '入力した1人のユーザーの好みだけを最適化',
+        '旅程は1つだけ — 受け入れるか諦めるか',
+        'グループ内で意見が割れても何も示さない',
+        '「AIが決めました」— 理由の説明がない'
+      ],
+      usTitle: 'TravelAI',
+      usItems: [
+        'グループ全員の満足度の合計を最適化',
+        '好みの衝突を検出し、実際のトレードオフを提示',
+        'すべてのスコアと変更に明確な理由が付く',
+        '旅行中も誰かを置き去りにせず調整し続ける'
+      ],
+      mission: '「TravelAIは旅程を作るだけのツールではありません。旅行グループがより良い決断を一緒に下せるよう支援し、一人ひとりの声が結果にどう反映されたかを明確に示します。」'
+    },
     weatherCodes: {
       0: '快晴', 1: 'ほぼ晴れ', 2: '所により曇り', 3: '曇り',
       45: '霧', 48: '着氷性の霧',
@@ -353,7 +451,7 @@ const I18N = {
     geocodeLang: 'ja'
   },
   en: {
-    appSubtitle: 'Local prototype · AI runs on your machine via Ollama · usable from your phone on the same network',
+    appSubtitle: 'The AI that helps your group decide together · runs locally via Ollama · usable from your phone on the same network',
     checkConnBtn: 'Check connection',
     connect: {
       defaultHint: 'You need <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> installed on this machine first (free, fully offline). After installing: open a terminal and run <code>ollama pull llama3.2</code> to fetch the model, then click "Check connection". To use it from your phone: your phone must be on the same Wi-Fi, replace <code>localhost</code> in the Server field with this machine\'s LAN IP address (e.g. <code>http://192.168.3.23:11434</code>), and open this page on your phone via <code>http://192.168.3.23:8765/app.html</code>.',
@@ -363,7 +461,7 @@ const I18N = {
       ready: (model) => `✅ Connected to Ollama, model "${model}" is ready — running fully offline/free on this machine.`,
       failed: (base, err) => `⚠️ Couldn't connect to ${base}. Check that Ollama is running, the IP address is correct, and — if calling from a phone/other device — that <code>OLLAMA_HOST=0.0.0.0</code> and <code>OLLAMA_ORIGINS=*</code> are set. Error: ${err}`
     },
-    tabs: { planner: '🗺️ Itinerary', group: '👥 Group Matching', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera AI' },
+    tabs: { planner: '🗺️ Itinerary', group: '👥 Group Decision', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Why TravelAI' },
     common: {
       mapLink: '📍 View map',
       venueWarning: '⚠️ hours not verified',
@@ -422,7 +520,37 @@ const I18N = {
       systemPrompt: 'You are the AI Group Matching Engine. Assess how well a travel spot fits each group member\'s preferences, then briefly simulate each person\'s perspective like a real discussion before the AI settles on a recommendation. If "Reference data" is given below (real opening hours, prices, reviews), prefer it over guessing. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"One sentence giving this person\'s perspective/concern about the place, in their own voice"}],"recommendation":"1-2 sentences where the AI settles on a compromise that works for the whole group, with a brief reason"}\nScore on a 1-10 scale, inferring criteria from each member\'s preferences. Each person in "debate" should have a different opinion reflecting their own preference (can be positive or negative depending on their taste).',
       userPrompt: (place, members, context) => `Place: ${place}\nMembers and preferences:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\nReference data (RAG, from the real knowledge base):\n${context}` : ''}`,
       ragUsed: (sources) => `📚 Used data from: ${sources}`,
-      ragNone: '📚 No related data found in the knowledge base (RAG server is off or not indexed yet) — the AI will guess instead.'
+      ragNone: '📚 No related data found in the knowledge base (RAG server is off or not indexed yet) — the AI will guess instead.',
+      satisfactionTitle: '📊 Group satisfaction score',
+      overallLabel: 'Overall',
+      lowestWhy: (name) => `${name} has the lowest score — see why in the conflict below.`,
+      conflictTitle: '⚠️ Preference conflict detected',
+      severity: { low: 'Low', moderate: 'Moderate', high: 'High' },
+      likeLabel: 'Like',
+      dislikeLabel: 'Dislike',
+      reasonKeys: {
+        conflictVegetarian: (name) => `${name} is vegetarian — this place leans seafood/meat`,
+        matchBudget: (name) => `${name} wants to save money — price fits`,
+        overBudget: (name) => `${name} wants to save money — price runs a bit high`,
+        matchLuxury: (name) => `${name} prefers upscale — price fits`,
+        tooBasic: (name) => `${name} prefers upscale — this place is a bit casual`,
+        matchKids: (name) => `${name} is traveling with kids — this place is kid-friendly`,
+        notKidFriendly: (name) => `${name} is traveling with kids — this place isn't kid-friendly`,
+        matchTag: (name) => `${name}'s preference matches this place`
+      },
+      compromiseTitle: '💡 Three options instead of one averaged pick',
+      aiPick: '✓ AI pick',
+      optionLabel: (label) => `Option ${label}`,
+      optionPro: (name, score) => `${name} is most satisfied (${score}%)`,
+      optionCon: (name, score) => `${name} is least satisfied (${score}%)`,
+      whyPicked: 'Nobody is left behind — this option\'s lowest member score beats every other option\'s.',
+      whyAlt: 'The average may be higher, but at least one member scores notably lower.',
+      whyTitle: (name) => `🧾 Why "${name}"?`,
+      reasonPrefMatch: (count, total) => `${count} of ${total} members' preferences match this place`,
+      reasonBudget: (price) => `Price range: ${price}`,
+      reasonKidFriendly: 'Kid-friendly',
+      reasonRating: (rating) => `Real rating: ${rating}/5`,
+      reasonAddress: (address) => `Address: ${address}`
     },
     voice: {
       title: 'Voice travel assistant',
@@ -506,6 +634,25 @@ const I18N = {
       systemPromptFood: "You receive an English description (from a vision AI) of a photo of a dish. Based on it, write in English: 1) What this dish might be. 2) Visible ingredients. 3) 1-2 similar dishes worth trying. Do NOT make up exact prices/calories — if you mention them, clearly label them as estimates. If the description is too vague to guess, say plainly that you're not sure. Keep it brief, no markdown.",
       systemPromptLandmark: "You receive an English description (from a vision AI) of a photo of a landmark/structure. Based on it, write in English: 1) What this landmark might be. 2) A bit of history/culture if you're confident about it. 3) Similar types of attractions likely nearby. If the description is too vague to identify, say plainly that you're not sure instead of guessing. Keep it brief, no markdown.",
       userPrompt: (caption) => `Description from vision AI: "${caption}"`
+    },
+    diff: {
+      title: 'Traditional AI Travel Planner vs. TravelAI',
+      subtitle: "It's not just about building an itinerary — TravelAI helps the whole group decide together, and shows you why.",
+      tradTitle: 'Traditional AI Travel Planner',
+      tradItems: [
+        "Optimizes for one traveler's stated preferences",
+        'One itinerary — take it or leave it',
+        'Stays silent when the group disagrees',
+        '"AI decided" — no reasoning shown'
+      ],
+      usTitle: 'TravelAI',
+      usItems: [
+        "Optimizes for the whole group's combined satisfaction",
+        'Surfaces conflicts, then offers real trade-offs',
+        'Every score and swap ships with its reasoning',
+        "Adapts mid-trip without silently losing anyone's fit"
+      ],
+      mission: '"TravelAI doesn\'t plan trips — it helps travel groups make better decisions together, and shows every member exactly how their voice shaped the result."'
     },
     weatherCodes: {
       0: 'clear sky', 1: 'mainly clear', 2: 'partly cloudy', 3: 'overcast',
@@ -697,6 +844,237 @@ function renderGroupScoreTableHtml(data, lang) {
   (data.criteria || []).forEach(c => { html += `<tr><td>${escapeHtml(c.name)}</td><td>${c.score}/10</td></tr>`; });
   html += `</tbody></table>`;
   return html;
+}
+
+// ================================================================
+// Group Decision engine — deterministic, local, no LLM call.
+// Turns a RAG knowledge-base chunk + free-text member preferences into a
+// per-member satisfaction score, detected conflicts, and ranked compromise
+// options. Kept entirely rule-based on purpose: a local model is not
+// reliable enough to emit trustworthy per-member percentages live on stage.
+// ================================================================
+
+/** Parses one RAG chunk ("key: value" per line, see rag-server/shared.js) into a plain object. */
+function parseKnowledgeChunk(text) {
+  const obj = {};
+  String(text || '').split('\n').forEach(line => {
+    const idx = line.indexOf(':');
+    if (idx === -1) return;
+    const key = line.slice(0, idx).trim();
+    const value = line.slice(idx + 1).trim();
+    if (key) obj[key] = value;
+  });
+  return obj;
+}
+
+/** Rule-based keyword → preference-tag dictionary, one list per supported language. */
+const PREFERENCE_TAG_KEYWORDS = {
+  seafood: { vi: ['hải sản', 'tôm', 'cá ', 'sò', 'hàu', 'mực'], en: ['seafood', 'fish', 'shrimp', 'crab', 'oyster'], ja: ['海鮮', '魚', 'エビ', 'カニ', '寿司', '刺身'] },
+  meat: { vi: ['thịt nướng', 'bbq', 'nướng', 'thịt bò', 'yakiniku'], en: ['bbq', 'grill', 'meat', 'beef', 'yakiniku'], ja: ['焼肉', '肉', 'バーベキュー', '牛'] },
+  vegetarian: { vi: ['chay', 'ăn chay'], en: ['vegetarian', 'vegan'], ja: ['ベジタリアン', '菜食', 'ヴィーガン'] },
+  budget: { vi: ['tiết kiệm', 'giá rẻ', 'rẻ'], en: ['budget', 'cheap', 'affordable'], ja: ['安い', '格安', '予算重視'] },
+  luxury: { vi: ['sang trọng', 'cao cấp'], en: ['luxury', 'fine dining', 'upscale'], ja: ['高級', '贅沢'] },
+  photo: { vi: ['chụp ảnh', 'check-in', 'sống ảo'], en: ['photo', 'instagram', 'check-in', 'checkin'], ja: ['写真', 'インスタ', '映え'] },
+  shopping: { vi: ['mua sắm', 'shopping'], en: ['shopping', 'shop'], ja: ['ショッピング', '買い物'] },
+  kids: { vi: ['trẻ em', 'có con', 'em bé', 'gia đình'], en: ['kid', 'child', 'family'], ja: ['子供', '子連れ', 'ファミリー'] },
+  nightlife: { vi: ['bia', 'nhậu', 'tiệc'], en: ['beer', 'nightlife', 'bar', 'party'], ja: ['ビール', 'ナイトライフ', '飲み'] },
+  nature: { vi: ['thiên nhiên', 'biển', 'núi', 'ngoài trời'], en: ['nature', 'beach', 'outdoor', 'hiking'], ja: ['自然', 'ビーチ', 'アウトドア'] },
+  culture: { vi: ['văn hóa', 'lịch sử', 'bảo tàng', 'đền'], en: ['culture', 'history', 'museum', 'temple'], ja: ['文化', '歴史', '博物館'] },
+  quiet: { vi: ['yên tĩnh', 'thư giãn'], en: ['quiet', 'relax', 'peaceful'], ja: ['静か', 'リラックス'] },
+  adventure: { vi: ['mạo hiểm', 'phiêu lưu'], en: ['adventure', 'extreme'], ja: ['冒険', 'アドベンチャー'] }
+};
+
+/** Extracts preference tags from one member's free-text preference string. */
+function extractPreferenceTags(prefText, lang) {
+  const t = String(prefText || '').toLowerCase();
+  const tags = [];
+  for (const tag in PREFERENCE_TAG_KEYWORDS) {
+    const dict = PREFERENCE_TAG_KEYWORDS[tag];
+    const words = (dict[lang] || []).concat(dict.en || []); // English keywords always checked too — mixed-language input is common
+    if (words.some(w => t.includes(w.toLowerCase()))) tags.push(tag);
+  }
+  return tags;
+}
+
+function parsePriceYen(value) {
+  const nums = String(value || '').match(/\d[\d,]*/g);
+  if (!nums) return null;
+  return Math.max(...nums.map(n => parseInt(n.replace(/,/g, ''), 10)));
+}
+
+/** Scores one knowledge entry (restaurant/attraction) against one member's tags. Returns {score 0-100, reasons[]}. */
+function scoreEntryForMember(entry, tags, lang) {
+  let score = 60;
+  const reasons = [];
+  const haystack = [entry.name, entry.cuisine, entry.type, entry.notes].filter(Boolean).join(' ').toLowerCase();
+  const price = parsePriceYen(entry.priceRange || entry.ticketPrice);
+  const kidFriendly = String(entry.kidFriendly).toLowerCase() === 'true';
+
+  tags.forEach(tag => {
+    const words = (PREFERENCE_TAG_KEYWORDS[tag].vi || []).concat(PREFERENCE_TAG_KEYWORDS[tag].en || []);
+    const matches = words.some(w => haystack.includes(w.toLowerCase()));
+    if (tag === 'vegetarian' && (haystack.includes('hải sản') || haystack.includes('seafood') || haystack.includes('thịt') || haystack.includes('meat') || haystack.includes('bbq'))) {
+      score -= 25; reasons.push({ tag, delta: -25, key: 'conflictVegetarian' });
+    } else if (tag === 'budget' && price != null) {
+      if (price <= 1500) { score += 15; reasons.push({ tag, delta: 15, key: 'matchBudget' }); }
+      else if (price >= 4000) { score -= 15; reasons.push({ tag, delta: -15, key: 'overBudget' }); }
+    } else if (tag === 'luxury' && price != null) {
+      if (price >= 4000) { score += 15; reasons.push({ tag, delta: 15, key: 'matchLuxury' }); }
+      else if (price <= 1500) { score -= 10; reasons.push({ tag, delta: -10, key: 'tooBasic' }); }
+    } else if (tag === 'kids') {
+      if (kidFriendly) { score += 15; reasons.push({ tag, delta: 15, key: 'matchKids' }); }
+      else if (String(entry.kidFriendly).toLowerCase() === 'false') { score -= 15; reasons.push({ tag, delta: -15, key: 'notKidFriendly' }); }
+    } else if (matches) {
+      score += 18; reasons.push({ tag, delta: 18, key: 'matchTag' });
+    }
+  });
+
+  const rating = parseFloat(entry.rating);
+  if (!isNaN(rating)) {
+    if (rating >= 4.5) { score += 5; } else if (rating < 4) { score -= 5; }
+  }
+
+  score = Math.max(5, Math.min(100, Math.round(score)));
+  return { score, reasons };
+}
+
+/** Per-member + overall satisfaction for one knowledge entry. members: [{name, pref}]. */
+function computeGroupSatisfaction(members, entry, lang) {
+  const perMember = (members || []).map(m => {
+    const tags = extractPreferenceTags(m.pref, lang);
+    const { score, reasons } = scoreEntryForMember(entry || {}, tags, lang);
+    return { name: m.name, score, tags, reasons };
+  });
+  const overall = perMember.length ? Math.round(perMember.reduce((s, m) => s + m.score, 0) / perMember.length) : 0;
+  const sorted = [...perMember].sort((a, b) => a.score - b.score);
+  return { overall, perMember, lowest: sorted[0] || null, highest: sorted[sorted.length - 1] || null };
+}
+
+/** Detects a visible preference conflict for one entry: some members score high, others score low. */
+function detectPreferenceConflicts(members, entry, lang) {
+  const { perMember } = computeGroupSatisfaction(members, entry, lang);
+  const high = perMember.filter(m => m.score >= 70);
+  const low = perMember.filter(m => m.score <= 45);
+  if (!high.length || !low.length) return [];
+  const gap = (high.reduce((s, m) => s + m.score, 0) / high.length) - (low.reduce((s, m) => s + m.score, 0) / low.length);
+  const severity = gap >= 45 ? 'high' : gap >= 25 ? 'moderate' : 'low';
+  const topReasonKey = (m) => (m.reasons[0] && m.reasons[0].key) || null;
+  return [{
+    topic: entry.name || '',
+    like: high.map(m => m.name),
+    dislike: low.map(m => m.name),
+    severity,
+    score: Math.round(gap),
+    likeReasonKey: topReasonKey(high[0]),
+    dislikeReasonKey: topReasonKey(low[0])
+  }];
+}
+
+/**
+ * Ranks knowledge-entry candidates into up to 3 compromise options. Ranked by each
+ * option's WORST member score first (the floor), not the average — directly
+ * answers the "averaged plans nobody loves" failure mode: the highest-average
+ * option is not picked if it leaves someone far behind.
+ */
+
+/** Picks the RAG candidate that best matches the place the user typed in (exact, then substring, then first-available). */
+function pickPrimaryKnowledgeEntry(candidates, place) {
+  const named = (candidates || []).filter(c => c && c.name);
+  const p = String(place || '').trim().toLowerCase();
+  if (!p) return named[0] || { name: place || '' };
+  const exact = named.find(c => c.name.toLowerCase() === p);
+  if (exact) return exact;
+  const partial = named.find(c => p.includes(c.name.toLowerCase()) || c.name.toLowerCase().includes(p));
+  if (partial) return partial;
+  return named[0] || { name: place || '' };
+}
+
+function generateCompromiseOptions(candidates, members, lang) {
+  const named = (candidates || []).filter(c => c && c.name);
+  const scored = named.map(entry => {
+    const group = computeGroupSatisfaction(members, entry, lang);
+    const minScore = group.perMember.length ? Math.min(...group.perMember.map(m => m.score)) : group.overall;
+    return { entry, group, minScore };
+  });
+  scored.sort((a, b) => (b.minScore - a.minScore) || (b.group.overall - a.group.overall));
+  const labels = ['A', 'B', 'C'];
+  return scored.slice(0, 3).map((s, i) => ({
+    label: labels[i],
+    name: s.entry.name,
+    overall: s.group.overall,
+    minScore: s.minScore,
+    best: s.group.highest,
+    worst: s.group.lowest,
+    picked: i === 0
+  }));
+}
+
+/** Structured reasoning bullets for Explainable AI (Feature 4) — built from real RAG fields, not the LLM. */
+function buildReasoningReceipt(entry, group, members, lang) {
+  const lines = [];
+  const strongCount = group.perMember.filter(m => m.score >= 70).length;
+  if (members && members.length) lines.push(tr(lang, 'group.reasonPrefMatch', strongCount, members.length));
+  const price = entry.priceRange || entry.ticketPrice;
+  if (price) lines.push(tr(lang, 'group.reasonBudget', price));
+  if (String(entry.kidFriendly).toLowerCase() === 'true') lines.push(tr(lang, 'group.reasonKidFriendly'));
+  if (entry.rating) lines.push(tr(lang, 'group.reasonRating', entry.rating));
+  if (entry.address) lines.push(tr(lang, 'group.reasonAddress', entry.address));
+  return lines;
+}
+
+function scoreBarColor(score) {
+  return score >= 70 ? 'good' : score >= 45 ? 'warn' : 'crit';
+}
+
+function renderSatisfactionScoreHtml(group, lang) {
+  if (!group || !group.perMember.length) return '';
+  const bar = (label, score, overall) => `<div class="sat-row${overall ? ' overall' : ''}"><span class="sat-who">${escapeHtml(label)}</span><div class="sat-track"><div class="sat-fill ${scoreBarColor(score)}" style="width:${score}%;"></div></div><span class="sat-pct">${score}%</span></div>`;
+  let html = `<div class="sat-score"><div class="sat-score-label">${tr(lang, 'group.satisfactionTitle')}</div>`;
+  html += bar(tr(lang, 'group.overallLabel'), group.overall, true);
+  group.perMember.forEach(m => { html += bar(m.name, m.score, false); });
+  if (group.lowest && group.lowest.score < 70) {
+    html += `<div class="sat-why">${escapeHtml(tr(lang, 'group.lowestWhy', group.lowest.name))}</div>`;
+  }
+  html += `</div>`;
+  return html;
+}
+
+function renderConflictCardsHtml(conflicts, lang) {
+  if (!conflicts || !conflicts.length) return '';
+  return conflicts.map(c => {
+    const reason = [c.likeReasonKey && tr(lang, 'group.reasonKeys.' + c.likeReasonKey, c.like[0]), c.dislikeReasonKey && tr(lang, 'group.reasonKeys.' + c.dislikeReasonKey, c.dislike[0])]
+      .filter(Boolean).join(' · ');
+    return `<div class="conflict-card sev-${c.severity}">
+      <div class="conflict-top"><span class="conflict-topic">${escapeHtml(tr(lang, 'group.conflictTitle'))}${c.topic ? ': ' + escapeHtml(c.topic) : ''}</span><span class="sev-pill sev-${c.severity}">${tr(lang, 'group.severity.' + c.severity)} · ${c.score}</span></div>
+      <div class="conflict-sides">
+        <div class="c-side c-like"><div class="c-side-lbl">${tr(lang, 'group.likeLabel')}</div><div class="pill-row">${c.like.map(n => `<span class="person-pill like">${escapeHtml(n)}</span>`).join('')}</div></div>
+        <div class="c-side c-dislike"><div class="c-side-lbl">${tr(lang, 'group.dislikeLabel')}</div><div class="pill-row">${c.dislike.map(n => `<span class="person-pill dislike">${escapeHtml(n)}</span>`).join('')}</div></div>
+      </div>
+      ${reason ? `<div class="conflict-reason">${escapeHtml(reason)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderCompromiseOptionsHtml(options, lang) {
+  if (!options || !options.length) return '';
+  let html = `<div class="opt-heading">${escapeHtml(tr(lang, 'group.compromiseTitle'))}</div><div class="opt-grid">`;
+  html += options.map(o => `
+    <div class="opt-card${o.picked ? ' picked' : ''}">
+      ${o.picked ? `<div class="opt-pick-tag">${escapeHtml(tr(lang, 'group.aiPick'))}</div>` : ''}
+      <div class="opt-top"><span class="opt-label">${tr(lang, 'group.optionLabel', o.label)}</span><span class="opt-score">${o.overall}%</span></div>
+      <div class="opt-name">${escapeHtml(o.name)}</div>
+      ${o.best ? `<div class="opt-pro">+ ${escapeHtml(tr(lang, 'group.optionPro', o.best.name, o.best.score))}</div>` : ''}
+      ${o.worst ? `<div class="opt-con">− ${escapeHtml(tr(lang, 'group.optionCon', o.worst.name, o.worst.score))}</div>` : ''}
+      <div class="opt-why">${escapeHtml(o.picked ? tr(lang, 'group.whyPicked') : tr(lang, 'group.whyAlt'))}</div>
+    </div>`).join('');
+  html += `</div>`;
+  return html;
+}
+
+function renderReasoningReceiptHtml(entry, group, members, lang) {
+  const lines = buildReasoningReceipt(entry, group, members, lang);
+  if (!lines.length) return '';
+  return `<div class="receipt"><div class="receipt-head">${escapeHtml(tr(lang, 'group.whyTitle', entry.name || ''))}</div><ul>${lines.map(l => `<li>${escapeHtml(l)}</li>`).join('')}</ul></div>`;
 }
 
 function dedupePlanItems(items) {
@@ -1058,6 +1436,9 @@ const AppCore = {
   weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
+  parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
+  detectPreferenceConflicts, generateCompromiseOptions, buildReasoningReceipt, pickPrimaryKnowledgeEntry,
+  renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   dedupePlanItems, flattenActivities, normalizeHealedText,
   classifyIncident, isSevereWeatherIncident, classifyActivity,
   buildCameraFallback,
@@ -1110,6 +1491,15 @@ function initApp() {
       membersDiv.innerHTML = '';
       T('group.defaultMembers').forEach(([n, p]) => addMemberRow(n, p));
     }
+    renderDiffLists();
+  }
+
+  /** Fills the Differentiation screen's two comparison lists — arrays can't be set via a plain [data-i18n] text swap. */
+  function renderDiffLists() {
+    const tradList = document.getElementById('diff-trad-list');
+    const usList = document.getElementById('diff-us-list');
+    if (tradList) tradList.innerHTML = T('diff.tradItems').map(item => `<li>${escapeHtml(item)}</li>`).join('');
+    if (usList) usList.innerHTML = T('diff.usItems').map(item => `<li>${escapeHtml(item)}</li>`).join('');
   }
 
   // ---------- Ollama connection ----------
@@ -1131,8 +1521,8 @@ function initApp() {
     return (safeLoadString(STORAGE_KEYS.ragUrl) || 'http://localhost:8899').replace(/\/+$/, '');
   }
 
-  /** Fetches the most relevant document chunks for a question/place from the RAG server. Returns empty context if the server is off, unreachable, slow, or nothing is indexed. */
-  async function ragSearch(question) {
+  /** Fetches the raw top-K matching chunks from the RAG server. Empty array if the server is off, unreachable, slow, or nothing is indexed. */
+  async function ragSearchRaw(question) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 4000); // RAG is an optional enhancement — never let it stall the main AI call
     try {
@@ -1142,19 +1532,24 @@ function initApp() {
         body: JSON.stringify({ question }),
         signal: controller.signal
       });
-      if (!res.ok) return { context: '', sources: [] };
+      if (!res.ok) return [];
       const data = await res.json();
-      const results = data.results || [];
-      if (results.length === 0) return { context: '', sources: [] };
-      return {
-        context: results.map(r => `[${r.source}]\n${r.text}`).join('\n\n'),
-        sources: results.map(r => r.source)
-      };
+      return data.results || [];
     } catch (err) {
-      return { context: '', sources: [] };
+      return [];
     } finally {
       clearTimeout(timeoutId);
     }
+  }
+
+  /** Same as ragSearchRaw, but merged into one text blob for the LLM prompt (existing callers). */
+  async function ragSearch(question) {
+    const results = await ragSearchRaw(question);
+    if (results.length === 0) return { context: '', sources: [] };
+    return {
+      context: results.map(r => `[${r.source}]\n${r.text}`).join('\n\n'),
+      sources: results.map(r => r.source)
+    };
   }
 
   function setStatus(state, html) {
@@ -1473,12 +1868,34 @@ function initApp() {
     } catch (err) { showError(pResult, err); pShare.style.display = 'none'; }
   });
 
-  // ---------- TAB 2: Group Matching ----------
+  // ---------- TAB 2: Group Decision (was "Group Matching") ----------
   const membersDiv = document.getElementById('g-members');
   const gPlace = document.getElementById('g-place');
   const gResult = document.getElementById('g-result');
   const gDebate = document.getElementById('g-debate');
   const gRagHint = document.getElementById('g-ragHint');
+  const gDecision = document.getElementById('g-decision');
+
+  /** Computes + renders Group Decision (Satisfaction Score, Conflicts, Compromise Options, Explainable AI receipt) — all deterministic, no LLM call. */
+  function renderGroupDecision(candidates, place, members) {
+    const entry = pickPrimaryKnowledgeEntry(candidates, place);
+    const group = computeGroupSatisfaction(members, entry, currentLang);
+    const conflicts = detectPreferenceConflicts(members, entry, currentLang);
+    const options = generateCompromiseOptions(candidates, members, currentLang);
+    gDecision.innerHTML = renderSatisfactionScoreHtml(group, currentLang)
+      + renderConflictCardsHtml(conflicts, currentLang)
+      + renderCompromiseOptionsHtml(options, currentLang)
+      + renderReasoningReceiptHtml(entry, group, members, currentLang);
+    return { entry, candidates };
+  }
+
+  let lastRagCandidates = [];
+
+  /** Re-runs the deterministic Group Decision engine against the last RAG candidates — no LLM call, so this is instant. Lets a member's preference change re-score live without re-fetching anything. */
+  function refreshGroupDecisionLive() {
+    if (!lastRagCandidates.length) return;
+    renderGroupDecision(lastRagCandidates, gPlace.value.trim(), currentMembers());
+  }
 
   function addMemberRow(name = '', pref = '') {
     const row = document.createElement('div');
@@ -1486,9 +1903,9 @@ function initApp() {
     row.innerHTML = `<input type="text" placeholder="${escapeHtml(T('group.memberNamePlaceholder'))}" class="g-name" value="${escapeHtml(name)}">
       <input type="text" placeholder="${escapeHtml(T('group.memberPrefPlaceholder'))}" class="g-pref" value="${escapeHtml(pref)}">
       <button type="button" class="secondary small g-remove">✕</button>`;
-    row.querySelector('.g-remove').addEventListener('click', () => { row.remove(); groupUsesDefaultMembers = false; saveGroupState({}); });
-    row.querySelector('.g-name').addEventListener('input', () => { groupUsesDefaultMembers = false; saveGroupState({}); });
-    row.querySelector('.g-pref').addEventListener('input', () => { groupUsesDefaultMembers = false; saveGroupState({}); });
+    row.querySelector('.g-remove').addEventListener('click', () => { row.remove(); groupUsesDefaultMembers = false; saveGroupState({}); refreshGroupDecisionLive(); });
+    row.querySelector('.g-name').addEventListener('input', () => { groupUsesDefaultMembers = false; saveGroupState({}); refreshGroupDecisionLive(); });
+    row.querySelector('.g-pref').addEventListener('input', () => { groupUsesDefaultMembers = false; saveGroupState({}); refreshGroupDecisionLive(); });
     membersDiv.appendChild(row);
   }
 
@@ -1517,9 +1934,13 @@ function initApp() {
   if (savedGroup && savedGroup.ragSources && savedGroup.ragSources.length) {
     gRagHint.textContent = T('group.ragUsed', savedGroup.ragSources.join(', '));
   }
-  gPlace.addEventListener('input', () => saveGroupState({}));
+  if (savedGroup && Array.isArray(savedGroup.candidates) && savedGroup.candidates.length) {
+    lastRagCandidates = savedGroup.candidates;
+    renderGroupDecision(savedGroup.candidates, savedGroup.place || '', currentMembers());
+  }
+  gPlace.addEventListener('input', () => { saveGroupState({}); refreshGroupDecisionLive(); });
 
-  document.getElementById('g-addMember').addEventListener('click', () => { groupUsesDefaultMembers = false; addMemberRow(); saveGroupState({}); });
+  document.getElementById('g-addMember').addEventListener('click', () => { groupUsesDefaultMembers = false; addMemberRow(); saveGroupState({}); refreshGroupDecisionLive(); });
 
   function renderDebate(data) {
     gDebate.innerHTML = '';
@@ -1543,9 +1964,18 @@ function initApp() {
     setLoading(gResult, true, T('group.loading'));
     gRagHint.textContent = '';
     gDebate.innerHTML = '';
+    gDecision.innerHTML = '';
 
-    const { context, sources } = await ragSearch(`${place}. ${members.map(m => m.pref).join(', ')}`);
+    const rawResults = await ragSearchRaw(`${place}. ${members.map(m => m.pref).join(', ')}`);
+    const sources = rawResults.map(r => r.source);
+    const context = rawResults.length ? rawResults.map(r => `[${r.source}]\n${r.text}`).join('\n\n') : '';
     gRagHint.textContent = sources.length > 0 ? T('group.ragUsed', sources.join(', ')) : T('group.ragNone');
+
+    // Deterministic Group Decision engine (score, conflicts, compromise options, reasoning) needs
+    // no LLM call, so it renders immediately — the AI debate/recommendation streams in underneath.
+    const candidates = rawResults.map(r => parseKnowledgeChunk(r.text));
+    lastRagCandidates = candidates;
+    if (members.length) renderGroupDecision(candidates, place, members);
 
     const system = T('group.systemPrompt');
     const user = tr(currentLang, 'group.userPrompt', place, members, context);
@@ -1554,7 +1984,7 @@ function initApp() {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(gResult, T('group.loading')) });
       gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang)}</div>`;
       renderDebate(data);
-      saveGroupState({ data, ragSources: sources });
+      saveGroupState({ data, ragSources: sources, candidates });
     } catch (err) { showError(gResult, err); }
   });
 

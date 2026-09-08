@@ -5,6 +5,9 @@ const {
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   classifyIncident, buildSelfHealingPlan,
+  parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
+  detectPreferenceConflicts, generateCompromiseOptions, pickPrimaryKnowledgeEntry, buildReasoningReceipt,
+  renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
 
@@ -353,5 +356,194 @@ describe('extractChunkContent', () => {
     assert.equal(extractChunkContent('   '), '');
     assert.equal(extractChunkContent('not json'), '');
     assert.equal(extractChunkContent(undefined), '');
+  });
+});
+
+// ================================================================
+// Group Decision engine — deterministic scoring/conflict/compromise logic.
+// Fully rule-based (no LLM call), so every case here is exact and repeatable.
+// ================================================================
+
+describe('parseKnowledgeChunk', () => {
+  test('parses "key: value" lines from a RAG chunk into an object', () => {
+    const text = 'name: BBQ Naha Grill\ncuisine: Đồ nướng, Orion Beer\npriceRange: 2000-3000 yên/người\nkidFriendly: true\nrating: 4.8';
+    assert.deepEqual(parseKnowledgeChunk(text), {
+      name: 'BBQ Naha Grill', cuisine: 'Đồ nướng, Orion Beer', priceRange: '2000-3000 yên/người', kidFriendly: 'true', rating: '4.8'
+    });
+  });
+  test('ignores lines with no colon and tolerates values that contain a colon', () => {
+    const text = 'name: Naha Soba\nhours: 07:00-20:30\nnot a key-value line';
+    const parsed = parseKnowledgeChunk(text);
+    assert.equal(parsed.name, 'Naha Soba');
+    assert.equal(parsed.hours, '07:00-20:30');
+  });
+  test('returns an empty object for blank input', () => {
+    assert.deepEqual(parseKnowledgeChunk(''), {});
+    assert.deepEqual(parseKnowledgeChunk(undefined), {});
+  });
+});
+
+describe('extractPreferenceTags', () => {
+  test('matches Vietnamese keywords', () => {
+    assert.deepEqual(extractPreferenceTags('Hải sản, thích chụp ảnh', 'vi').sort(), ['photo', 'seafood']);
+  });
+  test('matches Japanese keywords', () => {
+    assert.deepEqual(extractPreferenceTags('海鮮と写真が好き', 'ja').sort(), ['photo', 'seafood']);
+  });
+  test('matches English keywords regardless of the active language', () => {
+    // Mixed-language input is common (e.g. Vietnamese sentence, English preference word) — English is always checked.
+    assert.deepEqual(extractPreferenceTags('I love seafood', 'vi'), ['seafood']);
+  });
+  test('returns an empty list when nothing matches', () => {
+    assert.deepEqual(extractPreferenceTags('xyz123', 'vi'), []);
+  });
+});
+
+describe('scoreEntryForMember', () => {
+  const seafoodPlace = { name: 'American Village Seafood House', cuisine: 'Hải sản', priceRange: '3000-5000 yên/người', kidFriendly: 'true', rating: '4.5' };
+  test('boosts the score when a tag matches the venue', () => {
+    const { score, reasons } = scoreEntryForMember(seafoodPlace, ['seafood'], 'vi');
+    assert.ok(score > 60);
+    assert.equal(reasons[0].key, 'matchTag');
+  });
+  test('penalizes a vegetarian member at a seafood/meat-heavy venue', () => {
+    const { score, reasons } = scoreEntryForMember(seafoodPlace, ['vegetarian'], 'vi');
+    assert.ok(score < 60);
+    assert.equal(reasons[0].key, 'conflictVegetarian');
+  });
+  test('rewards a budget-conscious member when the price is low', () => {
+    const cheap = { name: 'Naha Airport Soba House', priceRange: '700-1000 yên/người' };
+    const { score, reasons } = scoreEntryForMember(cheap, ['budget'], 'vi');
+    assert.ok(score > 60);
+    assert.equal(reasons[0].key, 'matchBudget');
+  });
+  test('flags a kid-traveling member down at a non-kid-friendly venue', () => {
+    const adultOnly = { name: 'Orion Beer Hall', kidFriendly: 'false' };
+    const { reasons } = scoreEntryForMember(adultOnly, ['kids'], 'vi');
+    assert.equal(reasons[0].key, 'notKidFriendly');
+  });
+  test('clamps the score to the 5-100 range', () => {
+    const { score } = scoreEntryForMember(seafoodPlace, ['vegetarian', 'budget', 'kids'], 'vi');
+    assert.ok(score >= 5 && score <= 100);
+  });
+});
+
+describe('computeGroupSatisfaction', () => {
+  const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+  const seafoodPlace = { name: 'Seafood House', cuisine: 'Hải sản' };
+  test('returns one score per member plus an overall figure', () => {
+    const g = computeGroupSatisfaction(members, seafoodPlace, 'vi');
+    assert.equal(g.perMember.length, 2);
+    assert.equal(typeof g.overall, 'number');
+  });
+  test('identifies the lowest and highest scoring member', () => {
+    const g = computeGroupSatisfaction(members, seafoodPlace, 'vi');
+    assert.equal(g.lowest.name, 'C');
+    assert.equal(g.highest.name, 'A');
+  });
+  test('handles an empty member list without throwing', () => {
+    const g = computeGroupSatisfaction([], seafoodPlace, 'vi');
+    assert.equal(g.overall, 0);
+    assert.equal(g.lowest, null);
+  });
+});
+
+describe('detectPreferenceConflicts', () => {
+  test('detects a conflict when some members score high and others score low', () => {
+    const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+    const conflicts = detectPreferenceConflicts(members, { name: 'Seafood House', cuisine: 'Hải sản' }, 'vi');
+    assert.equal(conflicts.length, 1);
+    assert.deepEqual(conflicts[0].like, ['A']);
+    assert.deepEqual(conflicts[0].dislike, ['C']);
+    assert.ok(['low', 'moderate', 'high'].includes(conflicts[0].severity));
+  });
+  test('reports no conflict when everyone scores similarly', () => {
+    const members = [{ name: 'A', pref: 'thích du lịch' }, { name: 'B', pref: 'thích tham quan' }];
+    const conflicts = detectPreferenceConflicts(members, { name: 'Generic Park' }, 'vi');
+    assert.deepEqual(conflicts, []);
+  });
+});
+
+describe('generateCompromiseOptions', () => {
+  const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+  const candidates = [
+    { name: 'Seafood House', cuisine: 'Hải sản' },
+    { name: 'Generic Park' },
+    { name: 'Vegetarian Cafe', notes: 'chay' },
+    { source: 'okinawa-notes.md', notes: 'General travel notes with no name field' } // simulates an unstructured .md chunk — must be dropped
+  ];
+  test('ranks candidates by their worst member score, not the average', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    // The seafood-only venue has a low floor (C dislikes it); a neutral/vegetarian-friendly
+    // venue should be ranked above it even if its average isn't the single highest.
+    const seafoodOption = options.find(o => o.name === 'Seafood House');
+    const topOption = options[0];
+    assert.notEqual(topOption.name, 'Seafood House');
+    if (seafoodOption) assert.ok(topOption.minScore >= seafoodOption.minScore);
+  });
+  test('drops candidates with no name (unstructured knowledge chunks)', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    assert.equal(options.length, 3); // only the 3 named candidates are eligible
+    assert.ok(options.every(o => o.name));
+  });
+  test('returns at most 3 options, labeled A/B/C, with exactly one picked', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    assert.ok(options.length <= 3);
+    assert.deepEqual(options.map(o => o.label), options.slice(0, options.length).map((_, i) => ['A', 'B', 'C'][i]));
+    assert.equal(options.filter(o => o.picked).length, 1);
+    assert.equal(options[0].picked, true);
+  });
+});
+
+describe('pickPrimaryKnowledgeEntry', () => {
+  const candidates = [{ name: 'American Village Seafood House' }, { name: 'American Village' }];
+  test('prefers an exact name match', () => {
+    assert.equal(pickPrimaryKnowledgeEntry(candidates, 'American Village').name, 'American Village');
+  });
+  test('falls back to a substring match', () => {
+    // Neither candidate name is an exact match for the full query string; the shorter
+    // "American Village" is found as a substring of it first, in candidate order.
+    assert.equal(pickPrimaryKnowledgeEntry(candidates, 'American Village, Okinawa').name, 'American Village');
+  });
+  test('falls back to a synthetic entry when nothing matches', () => {
+    assert.deepEqual(pickPrimaryKnowledgeEntry([], 'Some New Place'), { name: 'Some New Place' });
+  });
+});
+
+describe('buildReasoningReceipt', () => {
+  test('builds bullet reasons from real RAG fields', () => {
+    const entry = { name: 'Umi Seafood Table', priceRange: '3000-4000 yên', kidFriendly: 'true', rating: '4.7', address: 'Naha' };
+    const members = [{ name: 'A', pref: 'Hải sản' }];
+    const group = computeGroupSatisfaction(members, entry, 'vi');
+    const lines = buildReasoningReceipt(entry, group, members, 'vi');
+    assert.ok(lines.some(l => l.includes('3000-4000')));
+    assert.ok(lines.some(l => l.includes('Thân thiện')));
+    assert.ok(lines.some(l => l.includes('4.7')));
+  });
+});
+
+describe('Group Decision render functions', () => {
+  test('renderSatisfactionScoreHtml renders a bar per member plus overall', () => {
+    const group = computeGroupSatisfaction([{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }], { name: 'Seafood House', cuisine: 'Hải sản' }, 'vi');
+    const html = renderSatisfactionScoreHtml(group, 'vi');
+    assert.match(html, /sat-row overall/);
+    assert.match(html, /A/);
+    assert.match(html, /C/);
+  });
+  test('renderSatisfactionScoreHtml returns empty string with no members', () => {
+    assert.equal(renderSatisfactionScoreHtml({ perMember: [] }, 'vi'), '');
+  });
+  test('renderConflictCardsHtml renders like/dislike pills', () => {
+    const conflicts = detectPreferenceConflicts([{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }], { name: 'Seafood House', cuisine: 'Hải sản' }, 'vi');
+    const html = renderConflictCardsHtml(conflicts, 'vi');
+    assert.match(html, /person-pill like/);
+    assert.match(html, /person-pill dislike/);
+  });
+  test('renderCompromiseOptionsHtml marks exactly one option as the AI pick', () => {
+    const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+    const candidates = [{ name: 'Seafood House', cuisine: 'Hải sản' }, { name: 'Generic Park' }];
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi');
+    assert.equal((html.match(/opt-card picked/g) || []).length, 1);
   });
 });
