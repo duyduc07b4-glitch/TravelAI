@@ -58,8 +58,8 @@
 
 <main>
   <nav class="tabs">
-    <button class="tab-btn active" data-tab="planner" data-i18n="tabs.planner"></button>
-    <button class="tab-btn" data-tab="group" data-i18n="tabs.group"></button>
+    <button class="tab-btn active" data-tab="group" data-i18n="tabs.group"></button>
+    <button class="tab-btn" data-tab="planner" data-i18n="tabs.planner"></button>
     <button class="tab-btn" data-tab="voice" data-i18n="tabs.voice"></button>
     <button class="tab-btn" data-tab="heal" data-i18n="tabs.heal"></button>
     <button class="tab-btn" data-tab="camera" data-i18n="tabs.camera"></button>
@@ -67,7 +67,7 @@
   </nav>
 
   <!-- TAB 1: Dynamic Trip Planning -->
-  <section class="panel active" id="panel-planner">
+  <section class="panel" id="panel-planner">
     <div class="card">
       <h3 data-i18n="planner.title"></h3>
       <div class="row2">
@@ -95,7 +95,7 @@
   </section>
 
   <!-- TAB 2: Group Matching -->
-  <section class="panel" id="panel-group">
+  <section class="panel active" id="panel-group">
     <div class="card">
       <h3 data-i18n="group.title"></h3>
       <div class="field"><label data-i18n="group.placeLabel"></label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
@@ -191,6 +191,17 @@
         <div class="diff-col us">
           <h5 data-i18n="diff.usTitle"></h5>
           <ul id="diff-us-list"></ul>
+        </div>
+      </div>
+      <div class="diff-example">
+        <h5 data-i18n="diff.exampleTitle"></h5>
+        <div class="diff-example-row old">
+          <span class="diff-example-tag" data-i18n="diff.exampleOldTag"></span>
+          <p data-i18n="diff.exampleOldText"></p>
+        </div>
+        <div class="diff-example-row new">
+          <span class="diff-example-tag" data-i18n="diff.exampleNewTag"></span>
+          <p data-i18n="diff.exampleNewText"></p>
         </div>
       </div>
       <p class="diff-mission" data-i18n="diff.mission"></p>

@@ -233,7 +233,12 @@ const I18N = {
         'Mỗi điểm số và mỗi thay đổi đều kèm lý do rõ ràng',
         'Tự điều chỉnh giữa chuyến đi mà không âm thầm bỏ rơi ai'
       ],
-      mission: '"TravelAI không lên lịch trình — nó giúp nhóm du lịch ra quyết định tốt hơn cùng nhau, và cho từng thành viên thấy rõ tiếng nói của họ đã ảnh hưởng tới kết quả thế nào."'
+      mission: '"TravelAI không lên lịch trình — nó giúp nhóm du lịch ra quyết định tốt hơn cùng nhau, và cho từng thành viên thấy rõ tiếng nói của họ đã ảnh hưởng tới kết quả thế nào."',
+      exampleTitle: '📊 Ví dụ thật từ chính bộ máy chấm điểm',
+      exampleOldTag: 'Kiểu AI cá nhân hoá truyền thống',
+      exampleOldText: '3 người tìm chỗ ăn ở Naha (thích hải sản / ăn chay / không quan trọng) — AI chọn nơi "trung bình an toàn": cả 3 người đều chỉ hài lòng 60%, không ai ghét nhưng cũng chẳng ai thực sự thích.',
+      exampleNewTag: 'TravelAI',
+      exampleNewText: 'Cùng dữ liệu đó, TravelAI tìm ra phương án khiến người thích hải sản đạt 78% hài lòng — đồng thời hiện rõ người ăn chay chỉ đạt 35% để nhóm tự cân nhắc đánh đổi, thay vì AI âm thầm quyết định thay cả nhóm.'
     },
     risk: {
       title: '🚦 Kiểm tra rủi ro chuyến đi',
@@ -483,7 +488,12 @@ const I18N = {
         'すべてのスコアと変更に明確な理由が付く',
         '旅行中も誰かを置き去りにせず調整し続ける'
       ],
-      mission: '「TravelAIは旅程を作るだけのツールではありません。旅行グループがより良い決断を一緒に下せるよう支援し、一人ひとりの声が結果にどう反映されたかを明確に示します。」'
+      mission: '「TravelAIは旅程を作るだけのツールではありません。旅行グループがより良い決断を一緒に下せるよう支援し、一人ひとりの声が結果にどう反映されたかを明確に示します。」',
+      exampleTitle: '📊 実際のスコアリングエンジンによる実例',
+      exampleOldTag: '従来型の個人最適化AI',
+      exampleOldText: '那覇で食事場所を探す3人（海鮮好き／ベジタリアン／こだわりなし）— 従来のAIは「無難な平均」を選び、3人とも満足度はわずか60%。誰も不満はないが、誰も本当に満足していない。',
+      exampleNewTag: 'TravelAI',
+      exampleNewText: '同じデータでTravelAIは、海鮮好きのメンバーが78%の満足度を得られる選択肢を見つけ出し、同時にベジタリアンのメンバーは35%であることも明示する — AIが勝手にグループの代わりに決めるのではなく、グループ自身がトレードオフを判断できるようにする。'
     },
     risk: {
       title: '🚦 旅程のリスクチェック',
@@ -733,7 +743,12 @@ const I18N = {
         'Every score and swap ships with its reasoning',
         "Adapts mid-trip without silently losing anyone's fit"
       ],
-      mission: '"TravelAI doesn\'t plan trips — it helps travel groups make better decisions together, and shows every member exactly how their voice shaped the result."'
+      mission: '"TravelAI doesn\'t plan trips — it helps travel groups make better decisions together, and shows every member exactly how their voice shaped the result."',
+      exampleTitle: '📊 A real example from the actual scoring engine',
+      exampleOldTag: 'Traditional personalized AI',
+      exampleOldText: "3 people looking for a place to eat in Naha (a seafood lover / a vegetarian / no strong preference) — a typical AI picks the \"safe average\": all 3 land at just 60% satisfaction. Nobody's unhappy, but nobody's genuinely happy either.",
+      exampleNewTag: 'TravelAI',
+      exampleNewText: "With the same data, TravelAI surfaces an option where the seafood lover reaches 78% satisfaction — while clearly showing the vegetarian member only reaches 35%, so the group decides the trade-off themselves instead of the AI quietly deciding for them."
     },
     risk: {
       title: '🚦 Travel risk check',
@@ -1182,14 +1197,21 @@ function renderConflictCardsHtml(conflicts, lang) {
 function renderCompromiseOptionsHtml(options, lang) {
   if (!options || !options.length) return '';
   let html = `<div class="opt-heading">${escapeHtml(tr(lang, 'group.compromiseTitle'))}</div><div class="opt-grid">`;
+  // Kept deliberately compact — this card already carries a pick tag, score, name, trade-offs
+  // and sometimes a caveat, so the label and the pro/con lines are each merged into one row
+  // instead of stacking every signal on its own line.
   html += options.map(o => `
     <div class="opt-card${o.picked ? ' picked' : ''}">
       ${o.picked ? `<div class="opt-pick-tag">${escapeHtml(tr(lang, 'group.aiPick'))}</div>` : ''}
-      <div class="opt-top"><span class="opt-label">${tr(lang, 'group.optionLabel', o.label)}</span><span class="opt-score">${o.overall}%</span></div>
-      ${o.strategy ? `<div class="opt-strategy">${escapeHtml(tr(lang, 'group.strategy.' + o.strategy))}</div>` : ''}
+      <div class="opt-top">
+        <span class="opt-label">${tr(lang, 'group.optionLabel', o.label)}${o.strategy ? ' · ' + escapeHtml(tr(lang, 'group.strategy.' + o.strategy)) : ''}</span>
+        <span class="opt-score">${o.overall}%</span>
+      </div>
       <div class="opt-name">${escapeHtml(o.name)}</div>
-      ${o.best ? `<div class="opt-pro">+ ${escapeHtml(tr(lang, 'group.optionPro', o.best.name, o.best.score))}</div>` : ''}
-      ${o.worst ? `<div class="opt-con">− ${escapeHtml(tr(lang, 'group.optionCon', o.worst.name, o.worst.score))}</div>` : ''}
+      <div class="opt-prosandcons">
+        ${o.best ? `<span class="opt-pro">+ ${escapeHtml(tr(lang, 'group.optionPro', o.best.name, o.best.score))}</span>` : ''}
+        ${o.worst ? `<span class="opt-con">− ${escapeHtml(tr(lang, 'group.optionCon', o.worst.name, o.worst.score))}</span>` : ''}
+      </div>
       ${o.bland ? `<div class="opt-caveat">⚠️ ${escapeHtml(tr(lang, 'group.blandCaveat', o.maxScore))}</div>` : ''}
       <div class="opt-why">${escapeHtml(o.picked ? tr(lang, 'group.whyPicked') : tr(lang, 'group.whyAlt'))}</div>
     </div>`).join('');
