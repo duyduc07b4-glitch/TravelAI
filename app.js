@@ -66,8 +66,8 @@ const I18N = {
       runBtn: 'Tạo lịch trình',
       shareBtn: '📤 Chia sẻ',
       loading: 'Đang tạo lịch trình...',
-      systemPrompt: 'Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. QUAN TRỌNG VỀ SỐ NGÀY: mảng "days" PHẢI có ĐỦ và ĐÚNG số ngày người dùng yêu cầu — không được rút gọn hay chỉ trả về 1 ngày nếu người dùng yêu cầu nhiều ngày hơn. Đánh số "day" liên tục từ 1 đến hết số ngày được yêu cầu, mỗi ngày một phần tử riêng trong mảng. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt), không kèm text hay markdown code fence nào khác. Ví dụ schema cho chuyến 2 ngày (số phần tử trong "days" phải khớp đúng số ngày người dùng thực sự yêu cầu, không phải cố định theo ví dụ này):\n{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Ăn trưa gần đó","Cape Manzamo","Ăn tối hải sản"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}',
-      userPrompt: (dest, days, startDate, budget, group, notes) => `Lên lịch trình du lịch ${dest}, bắt đầu từ ngày ${startDate || 'chưa xác định'}, ĐÚNG ${days} ngày — mảng "days" phải có đủ ${days} phần tử, đánh số day từ 1 đến ${days}, không được thiếu ngày nào. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Nếu ${startDate} là ngày du lịch cụ thể, hãy tính đến ngày nghỉ lễ, cuối tuần hoặc thời điểm đi để chọn hoạt động phù hợp. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực. Nhắc lại: PHẢI có đủ ${days} ngày trong kết quả.`
+      systemPrompt: 'Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. QUAN TRỌNG VỀ SỐ NGÀY: mảng "days" PHẢI có ĐỦ và ĐÚNG số ngày người dùng yêu cầu — không được rút gọn hay chỉ trả về 1 ngày nếu người dùng yêu cầu nhiều ngày hơn. Đánh số "day" liên tục từ 1 đến hết số ngày được yêu cầu, mỗi ngày một phần tử riêng trong mảng. Nếu có danh sách "Sở thích riêng từng thành viên" bên dưới, hãy cố gắng chọn hoạt động cân bằng, phù hợp với nhiều người trong nhóm nhất có thể — có thể xen kẽ hoạt động ưu tiên từng người qua các ngày khác nhau, không dồn hết vào sở thích của một người. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt), không kèm text hay markdown code fence nào khác. Ví dụ schema cho chuyến 2 ngày (số phần tử trong "days" phải khớp đúng số ngày người dùng thực sự yêu cầu, không phải cố định theo ví dụ này):\n{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Ăn trưa gần đó","Cape Manzamo","Ăn tối hải sản"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}',
+      userPrompt: (dest, days, startDate, budget, group, notes, members) => `Lên lịch trình du lịch ${dest}, bắt đầu từ ngày ${startDate || 'chưa xác định'}, ĐÚNG ${days} ngày — mảng "days" phải có đủ ${days} phần tử, đánh số day từ 1 đến ${days}, không được thiếu ngày nào. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Nếu ${startDate} là ngày du lịch cụ thể, hãy tính đến ngày nghỉ lễ, cuối tuần hoặc thời điểm đi để chọn hoạt động phù hợp. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực. Nhắc lại: PHẢI có đủ ${days} ngày trong kết quả.${(members && members.length) ? `\n\nSở thích riêng từng thành viên (hãy cân đối hoạt động để phù hợp với nhiều người nhất có thể, không chỉ ưu tiên một người):\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`
     },
     group: {
       title: 'Chấm điểm địa điểm cho cả nhóm',
@@ -116,6 +116,15 @@ const I18N = {
       optionCon: (name, score) => `${name} hài lòng ít nhất (${score}%)`,
       whyPicked: 'Không ai bị bỏ lại phía sau — điểm thấp nhất trong nhóm ở phương án này là cao nhất so với các phương án khác.',
       whyAlt: 'Điểm trung bình có thể cao, nhưng có thành viên hài lòng thấp hơn hẳn.',
+      strategy: {
+        safest: 'An toàn nhất',
+        balanced: 'Hài lòng chung cao nhất',
+        delight: 'Có người mê nhất'
+      },
+      blandCaveat: (maxScore) => `An toàn nhưng chưa ai thực sự hào hứng — điểm cao nhất trong nhóm ở phương án này mới ${maxScore}%.`,
+      chooseBtn: 'Chọn phương án này',
+      chosenLabel: '✓ Đã chọn',
+      needPlanFirst: 'Hãy tạo lịch trình ở tab "Lịch trình" trước khi dùng Quyết định nhóm.',
       whyTitle: (name) => `🧾 Vì sao chọn "${name}"?`,
       reasonPrefMatch: (count, total) => `${count}/${total} thành viên có sở thích khớp với địa điểm này`,
       reasonBudget: (price) => `Mức giá: ${price}`,
@@ -236,7 +245,12 @@ const I18N = {
         'Mỗi điểm số và mỗi thay đổi đều kèm lý do rõ ràng',
         'Tự điều chỉnh giữa chuyến đi mà không âm thầm bỏ rơi ai'
       ],
-      mission: '"TravelAI không lên lịch trình — nó giúp nhóm du lịch ra quyết định tốt hơn cùng nhau, và cho từng thành viên thấy rõ tiếng nói của họ đã ảnh hưởng tới kết quả thế nào."'
+      mission: '"TravelAI không lên lịch trình — nó giúp nhóm du lịch ra quyết định tốt hơn cùng nhau, và cho từng thành viên thấy rõ tiếng nói của họ đã ảnh hưởng tới kết quả thế nào."',
+      exampleTitle: '📊 Ví dụ thật từ chính bộ máy chấm điểm',
+      exampleOldTag: 'Kiểu AI cá nhân hoá truyền thống',
+      exampleOldText: '3 người tìm chỗ ăn ở Naha (thích hải sản / ăn chay / không quan trọng) — AI chọn nơi "trung bình an toàn": cả 3 người đều chỉ hài lòng 60%, không ai ghét nhưng cũng chẳng ai thực sự thích.',
+      exampleNewTag: 'TravelAI',
+      exampleNewText: 'Cùng dữ liệu đó, TravelAI tìm ra phương án khiến người thích hải sản đạt 78% hài lòng — đồng thời hiện rõ người ăn chay chỉ đạt 35% để nhóm tự cân nhắc đánh đổi, thay vì AI âm thầm quyết định thay cả nhóm.'
     },
     risk: {
       title: '🚦 Kiểm tra rủi ro chuyến đi',
@@ -319,8 +333,8 @@ const I18N = {
       runBtn: '旅程を作成',
       shareBtn: '📤 共有',
       loading: '旅程を作成中...',
-      systemPrompt: 'あなたはAI Travel Companion、パーソナライズされた旅行プランニングアシスタントです。日数について重要：「days」配列には、ユーザーが要求した日数と必ず同じ数の要素を含めてください — ユーザーが複数日を要求した場合に1日分だけ返すことは禁止です。「day」は要求された日数の分だけ1から連番で振ってください（配列の要素ごとに1日）。各アクティビティにはGoogleマップで検索できる具体的な店名・施設名を含めてください（例：「昼食はランチのみ」ではなく「Yunangi Okinawan Cuisineで昼食」）。あなたはリアルタイム情報を持たないため、営業時間・住所・電話番号・実際の交通状況や移動距離を断定してはいけません — アクティビティの順序は一般的な妥当性（例：午後はビーチ、1日の終わりに夕日鑑賞）に基づく推測に留め、経路が最適化されている、または渋滞を確認したとは主張しないでください。必ずJSONのみで回答し（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）、それ以外のテキストやMarkdownのコードフェンスは付けないでください。2日間の旅行のスキーマ例（「days」の要素数は必ずユーザーが実際に要求した日数に合わせること。この例の日数に固定しないこと）：\n{"days":[{"day":1,"activities":["那覇空港","Yunangi Okinawan Cuisineで昼食","American Village","サンセットビーチ","Steak House 88で夕食"]},{"day":2,"activities":["美ら海水族館","近くで昼食","万座毛","海鮮の夕食"]}],"summary":"概算費用と主な注意点についての1〜2文。出発前に実際の営業時間を確認するよう促すこと"}',
-      userPrompt: (dest, days, startDate, budget, group, notes) => `${dest}への旅行プランを作成してください。開始日は${startDate || '未指定'}、日数は必ず${days}日間 — 「days」配列には${days}個の要素を含め、dayは1から${days}まで振ってください。欠けている日があってはいけません。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n開始日${startDate || '未指定'}を踏まえて、連休・週末・祝日などの影響も考慮し、1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。念のため繰り返しますが、結果には必ず${days}日分すべてを含めてください。`
+      systemPrompt: 'あなたはAI Travel Companion、パーソナライズされた旅行プランニングアシスタントです。日数について重要：「days」配列には、ユーザーが要求した日数と必ず同じ数の要素を含めてください — ユーザーが複数日を要求した場合に1日分だけ返すことは禁止です。「day」は要求された日数の分だけ1から連番で振ってください（配列の要素ごとに1日）。下に「メンバーごとの好み」の一覧がある場合は、できるだけ多くのメンバーに合うようバランス良くアクティビティを選んでください — 1人の好みだけに偏らせず、日ごとに優先するメンバーを変えても構いません。各アクティビティにはGoogleマップで検索できる具体的な店名・施設名を含めてください（例：「昼食はランチのみ」ではなく「Yunangi Okinawan Cuisineで昼食」）。あなたはリアルタイム情報を持たないため、営業時間・住所・電話番号・実際の交通状況や移動距離を断定してはいけません — アクティビティの順序は一般的な妥当性（例：午後はビーチ、1日の終わりに夕日鑑賞）に基づく推測に留め、経路が最適化されている、または渋滞を確認したとは主張しないでください。必ずJSONのみで回答し（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）、それ以外のテキストやMarkdownのコードフェンスは付けないでください。2日間の旅行のスキーマ例（「days」の要素数は必ずユーザーが実際に要求した日数に合わせること。この例の日数に固定しないこと）：\n{"days":[{"day":1,"activities":["那覇空港","Yunangi Okinawan Cuisineで昼食","American Village","サンセットビーチ","Steak House 88で夕食"]},{"day":2,"activities":["美ら海水族館","近くで昼食","万座毛","海鮮の夕食"]}],"summary":"概算費用と主な注意点についての1〜2文。出発前に実際の営業時間を確認するよう促すこと"}',
+      userPrompt: (dest, days, startDate, budget, group, notes, members) => `${dest}への旅行プランを作成してください。開始日は${startDate || '未指定'}、日数は必ず${days}日間 — 「days」配列には${days}個の要素を含め、dayは1から${days}まで振ってください。欠けている日があってはいけません。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n開始日${startDate || '未指定'}を踏まえて、連休・週末・祝日などの影響も考慮し、1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。念のため繰り返しますが、結果には必ず${days}日分すべてを含めてください。${(members && members.length) ? `\n\nメンバーごとの好み（できるだけ多くのメンバーに合うようバランス良く配置してください。1人だけに偏らないように）：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`
     },
     group: {
       title: 'グループ全員向けにスポットを採点',
@@ -369,6 +383,15 @@ const I18N = {
       optionCon: (name, score) => `${name}が最も不満（${score}%）`,
       whyPicked: '誰も置き去りにしない — このオプションはグループ内の最低スコアが他の案より高い。',
       whyAlt: '平均は高いかもしれないが、著しく満足度が低いメンバーがいる。',
+      strategy: {
+        safest: '最も安全',
+        balanced: '全体満足度が最も高い',
+        delight: '誰かが一番気に入る'
+      },
+      blandCaveat: (maxScore) => `安全ですが、まだ誰も本当に気に入っていません — このオプションのグループ内最高スコアは${maxScore}%です。`,
+      chooseBtn: 'このオプションを選ぶ',
+      chosenLabel: '✓ 選択済み',
+      needPlanFirst: 'グループ決定を使う前に、「旅程」タブで旅程を作成してください。',
       whyTitle: (name) => `🧾 なぜ「${name}」を選んだのか？`,
       reasonPrefMatch: (count, total) => `${total}人中${count}人の好みがこのスポットと一致`,
       reasonBudget: (price) => `価格帯：${price}`,
@@ -489,7 +512,12 @@ const I18N = {
         'すべてのスコアと変更に明確な理由が付く',
         '旅行中も誰かを置き去りにせず調整し続ける'
       ],
-      mission: '「TravelAIは旅程を作るだけのツールではありません。旅行グループがより良い決断を一緒に下せるよう支援し、一人ひとりの声が結果にどう反映されたかを明確に示します。」'
+      mission: '「TravelAIは旅程を作るだけのツールではありません。旅行グループがより良い決断を一緒に下せるよう支援し、一人ひとりの声が結果にどう反映されたかを明確に示します。」',
+      exampleTitle: '📊 実際のスコアリングエンジンによる実例',
+      exampleOldTag: '従来型の個人最適化AI',
+      exampleOldText: '那覇で食事場所を探す3人（海鮮好き／ベジタリアン／こだわりなし）— 従来のAIは「無難な平均」を選び、3人とも満足度はわずか60%。誰も不満はないが、誰も本当に満足していない。',
+      exampleNewTag: 'TravelAI',
+      exampleNewText: '同じデータでTravelAIは、海鮮好きのメンバーが78%の満足度を得られる選択肢を見つけ出し、同時にベジタリアンのメンバーは35%であることも明示する — AIが勝手にグループの代わりに決めるのではなく、グループ自身がトレードオフを判断できるようにする。'
     },
     risk: {
       title: '🚦 旅程のリスクチェック',
@@ -572,8 +600,8 @@ const I18N = {
       runBtn: 'Create itinerary',
       shareBtn: '📤 Share',
       loading: 'Creating itinerary...',
-      systemPrompt: 'You are AI Travel Companion, a personalized trip-planning assistant. IMPORTANT ABOUT DAY COUNT: the "days" array MUST contain exactly as many elements as the number of days the user asked for — never collapse a multi-day trip down to just 1 day. Number "day" consecutively from 1 through the requested number of days, one array element per day. Every activity should name a specific place/venue that can be looked up on Google Maps (e.g. "Lunch at Yunangi Okinawan Cuisine" instead of just "Lunch"). You have NO real-time data, so you must NOT assert opening hours, addresses, phone numbers, or real traffic conditions/travel distances for any place — the order of activities should only reflect general reasonable judgment (e.g. beach in the afternoon, sunset viewing at the end of the day), and you must not claim the route is optimized or that you checked real traffic. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English), with no other text or markdown code fences. Example schema for a 2-day trip (the number of elements in "days" must match whatever number of days the user actually asked for, not this example\'s count):\n{"days":[{"day":1,"activities":["Naha Airport","Lunch at Yunangi Okinawan Cuisine","American Village","Sunset Beach","Dinner at Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Lunch nearby","Cape Manzamo","Seafood dinner"]}],"summary":"1-2 sentences summarizing estimated cost and key notes, reminding the user to verify real opening hours before going"}',
-      userPrompt: (dest, days, startDate, budget, group, notes) => `Plan a trip to ${dest} starting on ${startDate || 'an unspecified date'} for EXACTLY ${days} days — the "days" array must contain ${days} elements, numbered day 1 through ${days}, with no day missing. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nConsider holidays, weekends, and the time of year represented by ${startDate || 'the chosen trip start date'} when ordering activities through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and group-friendly experiences. Since you do not have real-time data, you do not need to guarantee opening hours or exact travel distances. To be clear: the result must include all ${days} days.`
+      systemPrompt: 'You are AI Travel Companion, a personalized trip-planning assistant. IMPORTANT ABOUT DAY COUNT: the "days" array MUST contain exactly as many elements as the number of days the user asked for — never collapse a multi-day trip down to just 1 day. Number "day" consecutively from 1 through the requested number of days, one array element per day. If a "Per-member preferences" list is given below, try to balance activities across as many members as possible — you can favor a different member on different days rather than optimizing for just one person. Every activity should name a specific place/venue that can be looked up on Google Maps (e.g. "Lunch at Yunangi Okinawan Cuisine" instead of just "Lunch"). You have NO real-time data, so you must NOT assert opening hours, addresses, phone numbers, or real traffic conditions/travel distances for any place — the order of activities should only reflect general reasonable judgment (e.g. beach in the afternoon, sunset viewing at the end of the day), and you must not claim the route is optimized or that you checked real traffic. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English), with no other text or markdown code fences. Example schema for a 2-day trip (the number of elements in "days" must match whatever number of days the user actually asked for, not this example\'s count):\n{"days":[{"day":1,"activities":["Naha Airport","Lunch at Yunangi Okinawan Cuisine","American Village","Sunset Beach","Dinner at Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Lunch nearby","Cape Manzamo","Seafood dinner"]}],"summary":"1-2 sentences summarizing estimated cost and key notes, reminding the user to verify real opening hours before going"}',
+      userPrompt: (dest, days, startDate, budget, group, notes, members) => `Plan a trip to ${dest} starting on ${startDate || 'an unspecified date'} for EXACTLY ${days} days — the "days" array must contain ${days} elements, numbered day 1 through ${days}, with no day missing. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nConsider holidays, weekends, and the time of year represented by ${startDate || 'the chosen trip start date'} when ordering activities through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and group-friendly experiences. Since you do not have real-time data, you do not need to guarantee opening hours or exact travel distances. To be clear: the result must include all ${days} days.${(members && members.length) ? `\n\nPer-member preferences (balance activities to fit as many members as possible, don't optimize for just one person):\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`
     },
     group: {
       title: 'Score a place for the whole group',
@@ -622,6 +650,15 @@ const I18N = {
       optionCon: (name, score) => `${name} is least satisfied (${score}%)`,
       whyPicked: 'Nobody is left behind — this option\'s lowest member score beats every other option\'s.',
       whyAlt: 'The average may be higher, but at least one member scores notably lower.',
+      strategy: {
+        safest: 'Safest pick',
+        balanced: 'Best overall fit',
+        delight: "Someone's favorite"
+      },
+      blandCaveat: (maxScore) => `Safe, but nobody is genuinely excited yet — the highest score in the group for this option is only ${maxScore}%.`,
+      chooseBtn: 'Choose this option',
+      chosenLabel: '✓ Chosen',
+      needPlanFirst: 'Build an itinerary on the "Itinerary" tab before using Group Decision.',
       whyTitle: (name) => `🧾 Why "${name}"?`,
       reasonPrefMatch: (count, total) => `${count} of ${total} members' preferences match this place`,
       reasonBudget: (price) => `Price range: ${price}`,
@@ -742,7 +779,12 @@ const I18N = {
         'Every score and swap ships with its reasoning',
         "Adapts mid-trip without silently losing anyone's fit"
       ],
-      mission: '"TravelAI doesn\'t plan trips — it helps travel groups make better decisions together, and shows every member exactly how their voice shaped the result."'
+      mission: '"TravelAI doesn\'t plan trips — it helps travel groups make better decisions together, and shows every member exactly how their voice shaped the result."',
+      exampleTitle: '📊 A real example from the actual scoring engine',
+      exampleOldTag: 'Traditional personalized AI',
+      exampleOldText: "3 people looking for a place to eat in Naha (a seafood lover / a vegetarian / no strong preference) — a typical AI picks the \"safe average\": all 3 land at just 60% satisfaction. Nobody's unhappy, but nobody's genuinely happy either.",
+      exampleNewTag: 'TravelAI',
+      exampleNewText: "With the same data, TravelAI surfaces an option where the seafood lover reaches 78% satisfaction — while clearly showing the vegetarian member only reaches 35%, so the group decides the trade-off themselves instead of the AI quietly deciding for them."
     },
     risk: {
       title: '🚦 Travel risk check',
@@ -1091,13 +1133,6 @@ function detectPreferenceConflicts(members, entry, lang) {
   }];
 }
 
-/**
- * Ranks knowledge-entry candidates into up to 3 compromise options. Ranked by each
- * option's WORST member score first (the floor), not the average — directly
- * answers the "averaged plans nobody loves" failure mode: the highest-average
- * option is not picked if it leaves someone far behind.
- */
-
 /** Picks the RAG candidate that best matches the place the user typed in (exact, then substring, then first-available). */
 function pickPrimaryKnowledgeEntry(candidates, place) {
   const named = (candidates || []).filter(c => c && c.name);
@@ -1110,24 +1145,62 @@ function pickPrimaryKnowledgeEntry(candidates, place) {
   return named[0] || { name: place || '' };
 }
 
+// Below this score, no one in the group is genuinely excited about an option — it may still
+// clear the "floor" bar (nobody hates it) without anyone actually loving it either.
+const COMPROMISE_DELIGHT_THRESHOLD = 75;
+
+/**
+ * Ranks knowledge-entry candidates into up to 3 compromise options — but NOT by the same
+ * criterion three times. Sorting all three by "worst member score" (the floor) alone reliably
+ * produces the "averaged plan nobody loves" failure mode from the other direction: three
+ * flavors of the same safe, lukewarm middle, because a candidate that would thrill one person
+ * but only be "fine" for another never wins on floor score alone. Each option here comes from a
+ * different strategy, so a genuinely exciting pick for someone can surface even when it isn't
+ * the safest:
+ *   A = safest (highest floor — "no one is left behind", still the AI's default pick)
+ *   B = best overall fit (highest average across the group)
+ *   C = most delight (highest peak score for whoever likes it most)
+ * If the resulting pool of named candidates is too small for 3 distinct picks, the same venue
+ * can appear more than once under different strategies — genuinely winning on multiple axes is
+ * itself a signal worth showing, not a bug to hide.
+ */
 function generateCompromiseOptions(candidates, members, lang) {
   const named = (candidates || []).filter(c => c && c.name);
+  if (!named.length) return [];
   const scored = named.map(entry => {
     const group = computeGroupSatisfaction(members, entry, lang);
-    const minScore = group.perMember.length ? Math.min(...group.perMember.map(m => m.score)) : group.overall;
-    return { entry, group, minScore };
+    const scores = group.perMember.map(m => m.score);
+    const minScore = scores.length ? Math.min(...scores) : group.overall;
+    const maxScore = scores.length ? Math.max(...scores) : group.overall;
+    return { entry, group, minScore, maxScore };
   });
-  scored.sort((a, b) => (b.minScore - a.minScore) || (b.group.overall - a.group.overall));
+
+  const strategies = [
+    { key: 'safest', sort: (a, b) => (b.minScore - a.minScore) || (b.group.overall - a.group.overall) },
+    { key: 'balanced', sort: (a, b) => (b.group.overall - a.group.overall) || (b.minScore - a.minScore) },
+    { key: 'delight', sort: (a, b) => (b.maxScore - a.maxScore) || (b.group.overall - a.group.overall) }
+  ];
   const labels = ['A', 'B', 'C'];
-  return scored.slice(0, 3).map((s, i) => ({
-    label: labels[i],
-    name: s.entry.name,
-    overall: s.group.overall,
-    minScore: s.minScore,
-    best: s.group.highest,
-    worst: s.group.lowest,
-    picked: i === 0
-  }));
+  const used = new Set();
+
+  const count = Math.min(3, named.length);
+  return strategies.slice(0, count).map((strat, i) => {
+    const ranked = [...scored].sort(strat.sort);
+    const s = ranked.find(c => !used.has(c.entry.name)) || ranked[0];
+    used.add(s.entry.name);
+    return {
+      label: labels[i],
+      strategy: strat.key,
+      name: s.entry.name,
+      overall: s.group.overall,
+      minScore: s.minScore,
+      maxScore: s.maxScore,
+      best: s.group.highest,
+      worst: s.group.lowest,
+      bland: s.maxScore < COMPROMISE_DELIGHT_THRESHOLD,
+      picked: strat.key === 'safest'
+    };
+  });
 }
 
 /** Structured reasoning bullets for Explainable AI (Feature 4) — built from real RAG fields, not the LLM. */
@@ -1176,18 +1249,31 @@ function renderConflictCardsHtml(conflicts, lang) {
   }).join('');
 }
 
-function renderCompromiseOptionsHtml(options, lang) {
+function renderCompromiseOptionsHtml(options, lang, chosenName) {
   if (!options || !options.length) return '';
   let html = `<div class="opt-heading">${escapeHtml(tr(lang, 'group.compromiseTitle'))}</div><div class="opt-grid">`;
-  html += options.map(o => `
+  // Kept deliberately compact — this card already carries a pick tag, score, name, trade-offs
+  // and sometimes a caveat, so the label and the pro/con lines are each merged into one row
+  // instead of stacking every signal on its own line.
+  html += options.map(o => {
+    const isChosen = !!chosenName && o.name === chosenName;
+    return `
     <div class="opt-card${o.picked ? ' picked' : ''}">
       ${o.picked ? `<div class="opt-pick-tag">${escapeHtml(tr(lang, 'group.aiPick'))}</div>` : ''}
-      <div class="opt-top"><span class="opt-label">${tr(lang, 'group.optionLabel', o.label)}</span><span class="opt-score">${o.overall}%</span></div>
+      <div class="opt-top">
+        <span class="opt-label">${tr(lang, 'group.optionLabel', o.label)}${o.strategy ? ' · ' + escapeHtml(tr(lang, 'group.strategy.' + o.strategy)) : ''}</span>
+        <span class="opt-score">${o.overall}%</span>
+      </div>
       <div class="opt-name">${escapeHtml(o.name)}</div>
-      ${o.best ? `<div class="opt-pro">+ ${escapeHtml(tr(lang, 'group.optionPro', o.best.name, o.best.score))}</div>` : ''}
-      ${o.worst ? `<div class="opt-con">− ${escapeHtml(tr(lang, 'group.optionCon', o.worst.name, o.worst.score))}</div>` : ''}
+      <div class="opt-prosandcons">
+        ${o.best ? `<span class="opt-pro">+ ${escapeHtml(tr(lang, 'group.optionPro', o.best.name, o.best.score))}</span>` : ''}
+        ${o.worst ? `<span class="opt-con">− ${escapeHtml(tr(lang, 'group.optionCon', o.worst.name, o.worst.score))}</span>` : ''}
+      </div>
+      ${o.bland ? `<div class="opt-caveat">⚠️ ${escapeHtml(tr(lang, 'group.blandCaveat', o.maxScore))}</div>` : ''}
       <div class="opt-why">${escapeHtml(o.picked ? tr(lang, 'group.whyPicked') : tr(lang, 'group.whyAlt'))}</div>
-    </div>`).join('');
+      <button type="button" class="opt-choose-btn${isChosen ? ' chosen' : ''}" data-opt-name="${escapeHtml(o.name)}">${escapeHtml(isChosen ? tr(lang, 'group.chosenLabel') : tr(lang, 'group.chooseBtn'))}</button>
+    </div>`;
+  }).join('');
   html += `</div>`;
   return html;
 }
@@ -1733,8 +1819,13 @@ function initApp() {
     destination: '',
     itinerary: [],
     plannerData: null,
-    plannerContext: null
+    plannerContext: null,
+    // The compromise option (A/B/C) the group has actually chosen on the Group Decision tab —
+    // null until chosen. Purely a recorded decision (shown as "✓ Đã chọn"); it doesn't gate
+    // anything else — the itinerary itself is the prerequisite (see updateGroupDecisionGate()).
+    groupDecision: null
   };
+
   // Tracks fields still showing the built-in example content (not user-typed/saved),
   // so switching language can re-translate them instead of leaving stale text behind.
   let healUsesDefaultItin = false;
@@ -2035,7 +2126,23 @@ function initApp() {
   const pResult = document.getElementById('p-result');
   const pShare = document.getElementById('p-share');
   const pShareFeedback = document.getElementById('p-shareFeedback');
+  const pSatisfaction = document.getElementById('p-satisfaction');
   let lastPlannerShare = null;
+
+  /** Group Satisfaction Score for the actual generated itinerary (not just one venue) — reuses the same deterministic engine as the Group Decision tab, no LLM call. */
+  function computePlannerSatisfactionHtml(members, activities) {
+    const list = Array.isArray(members) ? members.filter(m => m.name) : [];
+    if (!list.length || !activities || !activities.length) return '';
+    const group = computeItinerarySatisfaction(list, activities, currentLang);
+    return group ? renderSatisfactionScoreHtml(group, currentLang) : '';
+  }
+  function renderPlannerSatisfaction(members, activities) {
+    if (pSatisfaction) pSatisfaction.innerHTML = computePlannerSatisfactionHtml(members, activities);
+  }
+  /** Re-scores the last generated itinerary against whatever the group members currently say — instant, no re-plan needed, mirroring refreshGroupDecisionLive(). */
+  function refreshPlannerSatisfactionLive() {
+    renderPlannerSatisfaction(currentMembers(), flattenActivities(tripState.plannerData));
+  }
 
   function updatePlannerShareState(data, dest) {
     const hasContent = (data.days || []).some(d => d && Array.isArray(d.activities) && d.activities.length);
@@ -2141,6 +2248,7 @@ function initApp() {
     if (debate) debate.innerHTML = '';
     if (ragHint) ragHint.textContent = '';
     lastRagCandidates = [];
+    tripState.groupDecision = null;
     saveGroupState({ data: null, ragSources: [], candidates: [] });
   }
 
@@ -2159,6 +2267,7 @@ function initApp() {
     };
     syncPlannerToSelfHealing();
     populateGroupPlaceOptions();
+    updateGroupDecisionGate();
   }
 
   /** Re-renders the Itinerary tab (Tab 1) from tripState.plannerData — used after Group Decision swaps an activity in place, so the itinerary display stays in sync without a new AI call. */
@@ -2170,7 +2279,9 @@ function initApp() {
     const budget = pBudget.value || T('common.unlimitedBudget');
     const group = pGroup.value.trim() || T('common.soloTraveler');
     const notes = pNotes.value.trim();
-    const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
+    const activities = flattenActivities(data);
+    const risks = detectTravelRisks(activities, { budget, days, group, notes }, null, currentLang);
+    renderPlannerSatisfaction(currentMembers(), activities);
     pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
     updatePlannerShareState(data, dest);
     savePlannerState({ data });
@@ -2230,15 +2341,18 @@ function initApp() {
     const budget = pBudget.value || T('common.unlimitedBudget');
     const group = pGroup.value.trim() || T('common.soloTraveler');
     const notes = pNotes.value.trim();
+    const members = currentMembers();
     setLoading(pResult, true, T('planner.loading'));
+    if (pSatisfaction) pSatisfaction.innerHTML = '';
 
     const system = T('planner.systemPrompt');
-    const user = tr(currentLang, 'planner.userPrompt', dest, days, startDate, budget, group, notes);
+    const user = tr(currentLang, 'planner.userPrompt', dest, days, startDate, budget, group, notes, members);
 
     try {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
+      renderPlannerSatisfaction(members, flattenActivities(data));
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
@@ -2248,10 +2362,38 @@ function initApp() {
   // ---------- TAB 2: Group Decision (was "Group Matching") ----------
   const membersDiv = document.getElementById('g-members');
   const gPlace = document.getElementById('g-place');
+  const gRunBtn = document.getElementById('g-run');
+  const gSwapBtn = document.getElementById('g-swap');
+  const gGateHint = document.getElementById('g-gateHint');
   const gResult = document.getElementById('g-result');
   const gDebate = document.getElementById('g-debate');
   const gRagHint = document.getElementById('g-ragHint');
   const gDecision = document.getElementById('g-decision');
+
+  let lastCompromiseOptions = [];
+
+  /** True once an itinerary exists to make a group decision about — Group Decision only makes sense once there's a trip on the table. */
+  function hasItinerary() {
+    return !!(tripState.plannerData && Array.isArray(tripState.plannerData.days) && tripState.plannerData.days.length);
+  }
+
+  /** Enables/disables the Group Decision "Chấm điểm phù hợp" action based on whether an itinerary has been generated yet, and updates the hint text next to it. */
+  function updateGroupDecisionGate() {
+    const ready = hasItinerary();
+    if (gRunBtn) gRunBtn.disabled = !ready;
+    if (gSwapBtn) gSwapBtn.disabled = !ready;
+    if (gGateHint) {
+      gGateHint.textContent = ready ? '' : ('🔒 ' + T('group.needPlanFirst'));
+      gGateHint.classList.toggle('locked', !ready);
+    }
+  }
+
+  /** Call at the top of the Group Decision action; shows the lock message in `resultEl` and returns false if there's no itinerary yet. */
+  function requireItineraryOrWarn(resultEl) {
+    if (hasItinerary()) return true;
+    resultEl.innerHTML = `<div class="error-box">🔒 ${escapeHtml(T('group.needPlanFirst'))}</div>`;
+    return false;
+  }
 
   /** Computes + renders Group Decision (Satisfaction Score, Conflicts, Compromise Options, Explainable AI receipt) — all deterministic, no LLM call. */
   function renderGroupDecision(candidates, place, members) {
@@ -2259,15 +2401,35 @@ function initApp() {
     const group = computeGroupSatisfaction(members, entry, currentLang);
     const conflicts = detectPreferenceConflicts(members, entry, currentLang);
     const options = generateCompromiseOptions(candidates, members, currentLang);
+    lastCompromiseOptions = options;
+    // If place/members changed enough that the group's earlier pick no longer appears among the
+    // freshly generated options, the decision no longer applies to what's on screen — clear it
+    // instead of silently keeping a choice that doesn't match anything shown.
+    if (tripState.groupDecision && !options.some(o => o.name === tripState.groupDecision.name)) {
+      tripState.groupDecision = null;
+      saveGroupState({});
+    }
     gDecision.innerHTML = renderSatisfactionScoreHtml(group, currentLang)
       + renderConflictCardsHtml(conflicts, currentLang)
-      + renderCompromiseOptionsHtml(options, currentLang)
+      + renderCompromiseOptionsHtml(options, currentLang, tripState.groupDecision ? tripState.groupDecision.name : null)
       + renderReasoningReceiptHtml(entry, group, members, currentLang);
     return { entry, candidates };
   }
 
-  /** Re-runs the deterministic Group Decision engine against the last RAG candidates — no LLM call, so this is instant. Lets a member's preference change re-score live without re-fetching anything. */
+  /** Event delegation: option cards are re-rendered on every score refresh, so listeners are attached once on the container rather than per-card. */
+  gDecision.addEventListener('click', (e) => {
+    const btn = e.target.closest('.opt-choose-btn');
+    if (!btn || btn.classList.contains('chosen')) return;
+    const chosen = lastCompromiseOptions.find(o => o.name === btn.dataset.optName);
+    if (!chosen) return;
+    tripState.groupDecision = { name: chosen.name, label: chosen.label, strategy: chosen.strategy, overall: chosen.overall };
+    saveGroupState({});
+    refreshGroupDecisionLive(); // re-renders with the "✓ Đã chọn" state
+  });
+
+  /** Re-runs the deterministic Group Decision engine against the last RAG candidates — no LLM call, so this is instant. Lets a member's preference change re-score live without re-fetching anything. Also re-scores the already-generated itinerary in the Planner tab, since both read the same member list. */
   function refreshGroupDecisionLive() {
+    refreshPlannerSatisfactionLive();
     if (!lastRagCandidates.length) return;
     renderGroupDecision(lastRagCandidates, gPlace.value.trim(), currentMembers());
   }
@@ -2295,7 +2457,7 @@ function initApp() {
   // data/ragSources/candidates, which are still valid for the same place.
   function saveGroupState(extra) {
     const prev = safeLoad(STORAGE_KEYS.group) || {};
-    safeSave(STORAGE_KEYS.group, Object.assign({}, prev, { place: gPlace.value, members: currentMembers() }, extra));
+    safeSave(STORAGE_KEYS.group, Object.assign({}, prev, { place: gPlace.value, members: currentMembers(), chosenOption: tripState.groupDecision }, extra));
   }
 
   populateGroupPlaceOptions();
@@ -2308,6 +2470,7 @@ function initApp() {
     T('group.defaultMembers').forEach(([n, p]) => addMemberRow(n, p));
   }
   if (savedGroup && savedGroup.place) gPlace.value = savedGroup.place;
+  if (savedGroup && savedGroup.chosenOption && savedGroup.chosenOption.name) tripState.groupDecision = savedGroup.chosenOption;
   if (savedGroup && savedGroup.data) {
     gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang)}</div>`;
     renderDebate(savedGroup.data);
@@ -2359,6 +2522,7 @@ function initApp() {
       gDecision.innerHTML = '';
       gRagHint.textContent = '';
       lastRagCandidates = [];
+      tripState.groupDecision = null;
       saveGroupState({ data: null, ragSources: [], candidates: [] });
       return { candidates: [], sources: [], context: '' };
     }
@@ -2396,7 +2560,8 @@ function initApp() {
     } catch (err) { showError(gResult, err); }
   }
 
-  document.getElementById('g-run').addEventListener('click', () => {
+  gRunBtn.addEventListener('click', () => {
+    if (!requireItineraryOrWarn(gResult)) return;
     const place = gPlace.value.trim();
     if (!place) {
       showError(gResult, new Error(T('group.placeRequiredError')));
@@ -2412,7 +2577,8 @@ function initApp() {
    * it back into tripState.plannerData at the exact day it came from, refreshes the Itinerary tab
    * display, and re-scores the new place the same way "Score fit" would.
    */
-  document.getElementById('g-swap').addEventListener('click', async () => {
+  gSwapBtn.addEventListener('click', async () => {
+    if (!requireItineraryOrWarn(gResult)) return;
     const place = gPlace.value.trim();
     if (!place) {
       showError(gResult, new Error(T('group.placeRequiredError')));
@@ -2645,21 +2811,26 @@ function initApp() {
       const budget = slots.budget || T('common.unlimitedBudget');
       const group = slots.group || T('common.soloTraveler');
       const notes = slots.notes || '';
+      // Shares whatever member list is already set up in the Group Decision / Itinerary tabs,
+      // same as a normal "Tạo lịch trình" click — the voice flow doesn't collect its own.
+      const members = currentMembers();
 
       const system = T('planner.systemPrompt');
-      const user = tr(currentLang, 'planner.userPrompt', dest, days, startDate, budget, group, notes);
+      const user = tr(currentLang, 'planner.userPrompt', dest, days, startDate, budget, group, notes, members);
       const data = await callClaude(system, user, { json: true });
 
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
-      const html = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+      const satisfactionHtml = computePlannerSatisfactionHtml(members, flattenActivities(data));
+      const html = `<div class="result-box">${satisfactionHtml}${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
       vItinResult.innerHTML = html;
 
       // Mirror into the Itinerary tab too, so it's there to review/edit/share, not stranded in the chat log.
       // Fields the user never actually mentioned stay blank here (matching how an untouched Itinerary
       // field behaves) — `budget`/`group` above already carry the applied default for the prompt/context.
       pDest.value = dest; pDays.value = days; pStart.value = slots.startDate; pBudget.value = slots.budget; pGroup.value = slots.group; pNotes.value = slots.notes;
-      pResult.innerHTML = html;
+      renderPlannerSatisfaction(members, flattenActivities(data));
+      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
 
@@ -2882,6 +3053,13 @@ function initApp() {
   }
 
   applyStaticTranslations();
+  // Members restore (TAB 2) runs before this line, so this picks up any cached itinerary
+  // (TAB 1's own restore ran earlier, before members existed yet) with the correct group.
+  refreshPlannerSatisfactionLive();
+  // Locks/unlocks Group Decision based on whether an itinerary exists — already set as a side
+  // effect of updateTripStateFromPlannerData() when there IS one; this covers the fresh-session
+  // case where that function is never called at all.
+  updateGroupDecisionGate();
 }
 
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -16,13 +16,14 @@ Tóm tắt nhanh:
 
 ## Tính năng
 
-- 🗺️ **Dynamic Trip Planning** — tạo lịch trình theo ngày, có link Google Maps cho từng địa điểm
+- 🗺️ **Dynamic Trip Planning** — tạo lịch trình theo ngày, có link Google Maps cho từng địa điểm. Có thể khai sở thích riêng từng thành viên (mục "Thành viên & sở thích" ngay trong tab này) — AI sẽ cố cân bằng hoạt động cho nhiều người nhất có thể thay vì chỉ tối ưu chung chung, và **📊 Điểm hài lòng của nhóm** hiện ngay sau khi tạo lịch trình (tính cục bộ, không qua LLM) — sửa sở thích một thành viên là điểm cập nhật tức thì, không cần tạo lại lịch trình.
 - 👥 **Group Decision Engine** — không chỉ chấm điểm, mà còn:
   - 📊 **Điểm hài lòng theo từng thành viên** (không chỉ điểm trung bình chung)
   - ⚠️ **Phát hiện xung đột sở thích** — ai thích, ai không, mức độ nghiêm trọng, lý do
-  - 💡 **3 phương án thay vì 1 lựa chọn trung bình hoá** — xếp hạng theo thành viên hài lòng thấp nhất (không ai bị bỏ lại), không phải theo điểm trung bình
+  - 💡 **3 phương án theo 3 chiến lược khác nhau** — A = an toàn nhất (điểm sàn cao nhất, không ai bị bỏ lại), B = hài lòng chung cao nhất (điểm trung bình), C = có người mê nhất (điểm đỉnh cao nhất). Tránh được tình huống cả 3 phương án đều là "không ai ghét nhưng cũng chẳng ai thích" — nếu có lựa chọn khiến ai đó thực sự hào hứng, nó sẽ lộ diện ở phương án C thay vì bị lọc mất vì thuật toán chỉ nhìn điểm sàn. Phương án nào mà điểm cao nhất trong nhóm vẫn thấp sẽ bị gắn cảnh báo "an toàn nhưng chưa ai thực sự hào hứng"
   - 🧾 **Giải thích được (Explainable AI)** — mỗi gợi ý kèm lý do cụ thể từ dữ liệu thật (giá, khoảng cách, đánh giá, thân thiện trẻ em...)
   - Toàn bộ tính toán trên chạy **cục bộ, tức thời, không qua LLM** — cập nhật ngay khi bạn sửa sở thích thành viên, không cần bấm lại nút. Có thể ưu tiên dùng dữ liệu thật (giờ mở cửa, giá, đánh giá) từ RAG server local nếu đang chạy.
+  - 🔒 **Phải có lịch trình rồi mới dùng được Quyết định nhóm** — tab Lịch trình chạy trước (tạo bộ khung chuyến đi), sau đó nút "Chấm điểm phù hợp" ở tab Quyết định nhóm mới mở khoá, để nhóm chọn giữa 3 phương án cho những chỗ còn phân vân trong lịch đó. Bấm "Chọn phương án này" trên 1 trong 3 card A/B/C để ghi lại quyết định của nhóm (✓ Đã chọn) — không bắt buộc, chỉ để có bằng chứng nhóm đã thực sự bàn bạc thay vì AI tự quyết.
 - 🆚 **Vì sao TravelAI** — màn hình so sánh trực tiếp với AI Travel Planner truyền thống (tối ưu cá nhân) và TravelAI (tối ưu quyết định nhóm)
 - 🎙️ **Trợ lý giọng nói → tự tạo lịch trình** — không chỉ hỏi/đáp (Web Speech API): nói chuyện xong, bấm "Tạo lịch trình từ cuộc trò chuyện" (hoặc chỉ cần nói "tạo lịch trình cho tôi") là trợ lý tự đọc lại toàn bộ cuộc trò chuyện, trích xuất điểm đến/số ngày/ngân sách/nhóm đi cùng, rồi tạo lịch trình đầy đủ y như tab Lịch trình — và đưa luôn kết quả sang tab đó. Nếu cuộc trò chuyện còn thiếu thông tin bắt buộc (chưa biết đi đâu hoặc mấy ngày), trợ lý **chủ động hỏi lại đúng phần còn thiếu** thay vì im lặng hoặc tạo bừa.
 - 🌧️ **Self-Healing Itinerary (giải thích được)** — khi có sự cố (thời tiết...), không chỉ đổi hoạt động mà còn cho thấy: **📉 mức độ hài lòng nhóm thay đổi thế nào** (VD: 64% → 63%) và **thay đổi theo từng thành viên** (VD: A -5%) — dựa trên sở thích thành viên đã khai ở tab Quyết định nhóm, tính cục bộ không qua LLM

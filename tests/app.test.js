@@ -80,6 +80,15 @@ describe('tr', () => {
     // 'xx' is not a supported language, so normalizeLang() coerces it to 'vi'.
     assert.equal(tr('xx', 'planner.runBtn'), 'Tạo lịch trình');
   });
+  test('planner.userPrompt includes a per-member preferences block only when members are given', () => {
+    const withMembers = tr('vi', 'planner.userPrompt', 'Đà Nẵng', 3, '', '', 'Gia đình', '', [{ name: 'A', pref: 'thích biển' }, { name: 'B', pref: 'mua sắm' }]);
+    assert.match(withMembers, /A: thích biển/);
+    assert.match(withMembers, /B: mua sắm/);
+    const withoutMembers = tr('vi', 'planner.userPrompt', 'Đà Nẵng', 3, '', '', 'Gia đình', '', []);
+    assert.doesNotMatch(withoutMembers, /thích biển/);
+    const noArgAtAll = tr('vi', 'planner.userPrompt', 'Đà Nẵng', 3, '', '', 'Gia đình', '');
+    assert.equal(noArgAtAll, withoutMembers);
+  });
 });
 
 describe('mapLink', () => {
@@ -519,6 +528,50 @@ describe('generateCompromiseOptions', () => {
     assert.equal(options.filter(o => o.picked).length, 1);
     assert.equal(options[0].picked, true);
   });
+  test('each option carries its strategy (safest/balanced/delight), matching the picked one', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    assert.deepEqual(options.map(o => o.strategy), ['safest', 'balanced', 'delight']);
+    assert.equal(options.find(o => o.picked).strategy, 'safest');
+  });
+});
+
+describe('generateCompromiseOptions — avoiding the "nobody loves it" compromise', () => {
+  // A: loves seafood. B: vegetarian (actively conflicts with seafood places). C: no strong preference.
+  const members = [
+    { name: 'A', pref: 'Hải sản' },
+    { name: 'B', pref: 'Ăn chay' },
+    { name: 'C', pref: 'Không quan trọng' }
+  ];
+  // Two interchangeable, nobody-excited venues plus one A loves and one B loves.
+  const candidates = [
+    { name: 'Neutral Cafe 1' },
+    { name: 'Neutral Cafe 2' },
+    { name: 'Vegetarian Cafe', notes: 'chay' },
+    { name: 'Seafood House', cuisine: 'Hải sản' }
+  ];
+
+  test('surfaces a high-peak option via the "delight" strategy instead of dropping it for a bland duplicate', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    // Seafood House has the worst floor (B dislikes it), so floor-only ranking alone would drop it
+    // in favor of the two "Neutral Cafe" duplicates that nobody dislikes — but nobody loves either.
+    const delightOption = options.find(o => o.strategy === 'delight');
+    assert.equal(delightOption.name, 'Seafood House');
+    assert.notEqual(delightOption.strategy, 'safest');
+  });
+  test('flags an option as bland when it clears the floor but excites nobody', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const balancedOption = options.find(o => o.strategy === 'balanced'); // a Neutral Cafe: everyone lands around the same middling score
+    assert.equal(balancedOption.bland, true);
+    const delightOption = options.find(o => o.strategy === 'delight'); // Seafood House: A is thrilled
+    assert.equal(delightOption.bland, false);
+  });
+  test('renderCompromiseOptionsHtml shows the bland caveat only on options nobody is excited about', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi');
+    const caveatCount = (html.match(/opt-caveat/g) || []).length;
+    assert.equal(caveatCount, options.filter(o => o.bland).length);
+    assert.ok(caveatCount >= 1);
+  });
 });
 
 describe('pickPrimaryKnowledgeEntry', () => {
@@ -571,6 +624,22 @@ describe('Group Decision render functions', () => {
     const options = generateCompromiseOptions(candidates, members, 'vi');
     const html = renderCompromiseOptionsHtml(options, 'vi');
     assert.equal((html.match(/opt-card picked/g) || []).length, 1);
+  });
+  test('renderCompromiseOptionsHtml gives every option a choose button, unchosen by default', () => {
+    const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+    const candidates = [{ name: 'Seafood House', cuisine: 'Hải sản' }, { name: 'Generic Park' }];
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi');
+    assert.equal((html.match(/opt-choose-btn/g) || []).length, options.length);
+    assert.doesNotMatch(html, /opt-choose-btn chosen/);
+  });
+  test('renderCompromiseOptionsHtml marks the matching option as chosen when a chosenName is given', () => {
+    const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+    const candidates = [{ name: 'Seafood House', cuisine: 'Hải sản' }, { name: 'Generic Park' }];
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi', 'Generic Park');
+    assert.equal((html.match(/opt-choose-btn chosen/g) || []).length, 1);
+    assert.match(html, /data-opt-name="Generic Park"[^>]*>✓ Đã chọn/);
   });
 });
 

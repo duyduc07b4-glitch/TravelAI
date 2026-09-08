@@ -89,6 +89,7 @@
       <button id="p-run" data-i18n="planner.runBtn"></button>
       <button id="p-share" class="secondary" style="display:none;" data-i18n="planner.shareBtn"></button>
       <div class="hint" id="p-shareFeedback"></div>
+      <div class="group-decision" id="p-satisfaction"></div>
       <div class="result" id="p-result"></div>
     </div>
   </section>
@@ -98,6 +99,7 @@
     <div class="card">
       <h3 data-i18n="group.title"></h3>
       <div class="field"><label data-i18n="group.placeLabel"></label><select id="g-place"></select></div>
+      <div class="hint gate-hint" id="g-gateHint"></div>
       <button id="g-run" data-i18n="group.runBtn"></button>
       <button type="button" class="secondary" id="g-swap" data-i18n="group.swapBtn"></button>
       <div class="hint" id="g-ragHint"></div>
@@ -191,6 +193,17 @@
         <div class="diff-col us">
           <h5 data-i18n="diff.usTitle"></h5>
           <ul id="diff-us-list"></ul>
+        </div>
+      </div>
+      <div class="diff-example">
+        <h5 data-i18n="diff.exampleTitle"></h5>
+        <div class="diff-example-row old">
+          <span class="diff-example-tag" data-i18n="diff.exampleOldTag"></span>
+          <p data-i18n="diff.exampleOldText"></p>
+        </div>
+        <div class="diff-example-row new">
+          <span class="diff-example-tag" data-i18n="diff.exampleNewTag"></span>
+          <p data-i18n="diff.exampleNewText"></p>
         </div>
       </div>
       <p class="diff-mission" data-i18n="diff.mission"></p>
