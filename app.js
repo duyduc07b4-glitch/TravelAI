@@ -113,6 +113,10 @@ const I18N = {
         delight: 'Có người mê nhất'
       },
       blandCaveat: (maxScore) => `An toàn nhưng chưa ai thực sự hào hứng — điểm cao nhất trong nhóm ở phương án này mới ${maxScore}%.`,
+      chooseBtn: 'Chọn phương án này',
+      chosenLabel: '✓ Đã chọn',
+      decisionGateLocked: 'Cả nhóm cần chọn 1 trong 3 phương án ở tab "Quyết định nhóm" trước khi dùng tính năng này.',
+      decisionGateChosen: (name) => `Nhóm đã chọn: ${name}. Có thể đổi lại bất cứ lúc nào ở tab "Quyết định nhóm".`,
       whyTitle: (name) => `🧾 Vì sao chọn "${name}"?`,
       reasonPrefMatch: (count, total) => `${count}/${total} thành viên có sở thích khớp với địa điểm này`,
       reasonBudget: (price) => `Mức giá: ${price}`,
@@ -368,6 +372,10 @@ const I18N = {
         delight: '誰かが一番気に入る'
       },
       blandCaveat: (maxScore) => `安全ですが、まだ誰も本当に気に入っていません — このオプションのグループ内最高スコアは${maxScore}%です。`,
+      chooseBtn: 'このオプションを選ぶ',
+      chosenLabel: '✓ 選択済み',
+      decisionGateLocked: 'この機能を使う前に、「グループ決定」タブで3つの選択肢から1つを選んでください。',
+      decisionGateChosen: (name) => `グループの選択：${name}。「グループ決定」タブでいつでも変更できます。`,
       whyTitle: (name) => `🧾 なぜ「${name}」を選んだのか？`,
       reasonPrefMatch: (count, total) => `${total}人中${count}人の好みがこのスポットと一致`,
       reasonBudget: (price) => `価格帯：${price}`,
@@ -623,6 +631,10 @@ const I18N = {
         delight: "Someone's favorite"
       },
       blandCaveat: (maxScore) => `Safe, but nobody is genuinely excited yet — the highest score in the group for this option is only ${maxScore}%.`,
+      chooseBtn: 'Choose this option',
+      chosenLabel: '✓ Chosen',
+      decisionGateLocked: 'The group needs to choose one of the 3 options on the "Group Decision" tab before using this.',
+      decisionGateChosen: (name) => `The group chose: ${name}. Change it anytime on the "Group Decision" tab.`,
       whyTitle: (name) => `🧾 Why "${name}"?`,
       reasonPrefMatch: (count, total) => `${count} of ${total} members' preferences match this place`,
       reasonBudget: (price) => `Price range: ${price}`,
@@ -1194,13 +1206,15 @@ function renderConflictCardsHtml(conflicts, lang) {
   }).join('');
 }
 
-function renderCompromiseOptionsHtml(options, lang) {
+function renderCompromiseOptionsHtml(options, lang, chosenName) {
   if (!options || !options.length) return '';
   let html = `<div class="opt-heading">${escapeHtml(tr(lang, 'group.compromiseTitle'))}</div><div class="opt-grid">`;
   // Kept deliberately compact — this card already carries a pick tag, score, name, trade-offs
   // and sometimes a caveat, so the label and the pro/con lines are each merged into one row
   // instead of stacking every signal on its own line.
-  html += options.map(o => `
+  html += options.map(o => {
+    const isChosen = !!chosenName && o.name === chosenName;
+    return `
     <div class="opt-card${o.picked ? ' picked' : ''}">
       ${o.picked ? `<div class="opt-pick-tag">${escapeHtml(tr(lang, 'group.aiPick'))}</div>` : ''}
       <div class="opt-top">
@@ -1214,7 +1228,9 @@ function renderCompromiseOptionsHtml(options, lang) {
       </div>
       ${o.bland ? `<div class="opt-caveat">⚠️ ${escapeHtml(tr(lang, 'group.blandCaveat', o.maxScore))}</div>` : ''}
       <div class="opt-why">${escapeHtml(o.picked ? tr(lang, 'group.whyPicked') : tr(lang, 'group.whyAlt'))}</div>
-    </div>`).join('');
+      <button type="button" class="opt-choose-btn${isChosen ? ' chosen' : ''}" data-opt-name="${escapeHtml(o.name)}">${escapeHtml(isChosen ? tr(lang, 'group.chosenLabel') : tr(lang, 'group.chooseBtn'))}</button>
+    </div>`;
+  }).join('');
   html += `</div>`;
   return html;
 }
@@ -1760,8 +1776,24 @@ function initApp() {
     destination: '',
     itinerary: [],
     plannerData: null,
-    plannerContext: null
+    plannerContext: null,
+    // The compromise option (A/B/C) the group has actually chosen on the Group Decision tab —
+    // null until chosen. Gates itinerary generation elsewhere (see updateDecisionGate()) so the
+    // app's core promise ("the group decides together") isn't just a suggestion nobody has to act on.
+    groupDecision: null
   };
+
+  // Decision-gate elements, declared early and together: updateDecisionGate() (defined in the
+  // Group Decision section) can run during that very section's own restore-from-localStorage —
+  // before the Voice/Self-Healing sections further down this file would otherwise have declared
+  // their own element consts, which previously threw "Cannot access before initialization".
+  const pRunBtn = document.getElementById('p-run');
+  const pGateHint = document.getElementById('p-gateHint');
+  const hRunBtn = document.getElementById('h-run');
+  const hGateHint = document.getElementById('h-gateHint');
+  const vBuildBtn = document.getElementById('v-build');
+  const vGateHint = document.getElementById('v-gateHint');
+
   // Tracks fields still showing the built-in example content (not user-typed/saved),
   // so switching language can re-translate them instead of leaving stale text behind.
   let healUsesDefaultItin = false;
@@ -2162,7 +2194,8 @@ function initApp() {
     }
   })();
 
-  document.getElementById('p-run').addEventListener('click', async () => {
+  pRunBtn.addEventListener('click', async () => {
+    if (!requireGroupDecisionOrWarn(pResult)) return;
     const dest = pDest.value.trim() || 'Okinawa';
     const days = pDays.value || 4;
     const startDate = pStart.value || '';
@@ -2195,18 +2228,62 @@ function initApp() {
   const gRagHint = document.getElementById('g-ragHint');
   const gDecision = document.getElementById('g-decision');
 
+  let lastCompromiseOptions = [];
+
+  /** True once the group has actually picked one of the 3 compromise options — gates itinerary generation elsewhere (see updateDecisionGate()). */
+  function isGroupDecisionMade() {
+    return !!(tripState.groupDecision && tripState.groupDecision.name);
+  }
+
+  /** Enables/disables the itinerary-generating actions on other tabs based on whether the group has chosen an option yet, and updates the hint text next to each. */
+  function updateDecisionGate() {
+    const made = isGroupDecisionMade();
+    const label = (made ? '✓ ' : '🔒 ') + (made ? tr(currentLang, 'group.decisionGateChosen', tripState.groupDecision.name) : T('group.decisionGateLocked'));
+    [[pRunBtn, pGateHint], [hRunBtn, hGateHint], [vBuildBtn, vGateHint]].forEach(([btn, hint]) => {
+      if (btn) btn.disabled = !made;
+      if (hint) { hint.textContent = label; hint.classList.toggle('locked', !made); hint.classList.toggle('chosen', made); }
+    });
+  }
+
+  /** Call at the top of any action the gate protects; shows the lock message in `resultEl` and returns false if the group hasn't decided yet. */
+  function requireGroupDecisionOrWarn(resultEl) {
+    if (isGroupDecisionMade()) return true;
+    resultEl.innerHTML = `<div class="error-box">🔒 ${escapeHtml(T('group.decisionGateLocked'))}</div>`;
+    return false;
+  }
+
   /** Computes + renders Group Decision (Satisfaction Score, Conflicts, Compromise Options, Explainable AI receipt) — all deterministic, no LLM call. */
   function renderGroupDecision(candidates, place, members) {
     const entry = pickPrimaryKnowledgeEntry(candidates, place);
     const group = computeGroupSatisfaction(members, entry, currentLang);
     const conflicts = detectPreferenceConflicts(members, entry, currentLang);
     const options = generateCompromiseOptions(candidates, members, currentLang);
+    lastCompromiseOptions = options;
+    // If place/members changed enough that the group's earlier pick no longer appears among the
+    // freshly generated options, the decision no longer applies to what's on screen — clear it and
+    // re-lock the gated tabs instead of silently keeping a choice that doesn't match anything shown.
+    if (tripState.groupDecision && !options.some(o => o.name === tripState.groupDecision.name)) {
+      tripState.groupDecision = null;
+      saveGroupState({});
+    }
     gDecision.innerHTML = renderSatisfactionScoreHtml(group, currentLang)
       + renderConflictCardsHtml(conflicts, currentLang)
-      + renderCompromiseOptionsHtml(options, currentLang)
+      + renderCompromiseOptionsHtml(options, currentLang, tripState.groupDecision ? tripState.groupDecision.name : null)
       + renderReasoningReceiptHtml(entry, group, members, currentLang);
+    updateDecisionGate();
     return { entry, candidates };
   }
+
+  /** Event delegation: option cards are re-rendered on every score refresh, so listeners are attached once on the container rather than per-card. */
+  gDecision.addEventListener('click', (e) => {
+    const btn = e.target.closest('.opt-choose-btn');
+    if (!btn || btn.classList.contains('chosen')) return;
+    const chosen = lastCompromiseOptions.find(o => o.name === btn.dataset.optName);
+    if (!chosen) return;
+    tripState.groupDecision = { name: chosen.name, label: chosen.label, strategy: chosen.strategy, overall: chosen.overall };
+    saveGroupState({});
+    refreshGroupDecisionLive(); // re-renders with the "✓ Đã chọn" state and lifts the gate
+  });
 
   let lastRagCandidates = [];
 
@@ -2236,7 +2313,7 @@ function initApp() {
     })).filter(m => m.name);
   }
   function saveGroupState(extra) {
-    safeSave(STORAGE_KEYS.group, Object.assign({ place: gPlace.value, members: currentMembers() }, extra));
+    safeSave(STORAGE_KEYS.group, Object.assign({ place: gPlace.value, members: currentMembers(), chosenOption: tripState.groupDecision }, extra));
   }
 
   const savedGroup = safeLoad(STORAGE_KEYS.group);
@@ -2247,6 +2324,7 @@ function initApp() {
     T('group.defaultMembers').forEach(([n, p]) => addMemberRow(n, p));
   }
   if (savedGroup && savedGroup.place) gPlace.value = savedGroup.place;
+  if (savedGroup && savedGroup.chosenOption && savedGroup.chosenOption.name) tripState.groupDecision = savedGroup.chosenOption;
   if (savedGroup && savedGroup.data) {
     gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(savedGroup.data, currentLang)}</div>`;
     renderDebate(savedGroup.data);
@@ -2456,7 +2534,6 @@ function initApp() {
   }
 
   // ---------- Voice Assistant: "Build itinerary from this conversation" ----------
-  const vBuildBtn = document.getElementById('v-build');
   const vItinResult = document.getElementById('v-itinResult');
 
   function collectVoiceMessages() {
@@ -2480,6 +2557,14 @@ function initApp() {
    * planner prompt as TAB 1 and mirrors the result into the Itinerary tab too.
    */
   async function buildItineraryFromConversation() {
+    // The auto-trigger path (a spoken "tạo lịch trình cho tôi") never touches the button, so the
+    // gate has to be enforced here too, not just via vBuildBtn.disabled.
+    if (!isGroupDecisionMade()) {
+      const msg = '🔒 ' + T('group.decisionGateLocked');
+      addMsg('ai', msg);
+      speak(msg);
+      return;
+    }
     if (!collectVoiceMessages().some(m => m.role === 'user')) {
       const msg = T('voice.needConversation');
       addMsg('ai', msg);
@@ -2627,7 +2712,8 @@ function initApp() {
     }
   });
 
-  document.getElementById('h-run').addEventListener('click', async () => {
+  hRunBtn.addEventListener('click', async () => {
+    if (!requireGroupDecisionOrWarn(hResult)) return;
     const itin = hItin.value.split('\n').map(s => s.trim()).filter(Boolean);
     const event = hEvent.value.trim() || T('heal.defaultEvent');
     const plannerContext = getPlannerContext();
@@ -2751,6 +2837,10 @@ function initApp() {
   // Members restore (TAB 2) runs before this line, so this picks up any cached itinerary
   // (TAB 1's own restore ran earlier, before members existed yet) with the correct group.
   refreshPlannerSatisfactionLive();
+  // Locks/unlocks the gated tabs based on the restored decision (or the lack of one) — needed
+  // unconditionally here since a fresh session with no saved RAG candidates never calls
+  // renderGroupDecision(), which is where this otherwise gets set.
+  updateDecisionGate();
 }
 
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -602,6 +602,22 @@ describe('Group Decision render functions', () => {
     const html = renderCompromiseOptionsHtml(options, 'vi');
     assert.equal((html.match(/opt-card picked/g) || []).length, 1);
   });
+  test('renderCompromiseOptionsHtml gives every option a choose button, unchosen by default', () => {
+    const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+    const candidates = [{ name: 'Seafood House', cuisine: 'Hải sản' }, { name: 'Generic Park' }];
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi');
+    assert.equal((html.match(/opt-choose-btn/g) || []).length, options.length);
+    assert.doesNotMatch(html, /opt-choose-btn chosen/);
+  });
+  test('renderCompromiseOptionsHtml marks the matching option as chosen when a chosenName is given', () => {
+    const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+    const candidates = [{ name: 'Seafood House', cuisine: 'Hải sản' }, { name: 'Generic Park' }];
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi', 'Generic Park');
+    assert.equal((html.match(/opt-choose-btn chosen/g) || []).length, 1);
+    assert.match(html, /data-opt-name="Generic Park"[^>]*>✓ Đã chọn/);
+  });
 });
 
 // ================================================================
