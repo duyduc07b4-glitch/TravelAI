@@ -82,6 +82,10 @@
         <div class="field"><label data-i18n="planner.groupLabel"></label><input type="text" id="p-group" data-i18n="planner.groupPlaceholder" data-i18n-attr="placeholder"></div>
         <div class="field"><label data-i18n="planner.notesLabel"></label><input type="text" id="p-notes" data-i18n="planner.notesPlaceholder" data-i18n-attr="placeholder"></div>
       </div>
+      <div class="field"><label data-i18n="group.membersLabel"></label>
+        <div id="g-members"></div>
+        <button type="button" class="secondary small" id="g-addMember" data-i18n="group.addMemberBtn"></button>
+      </div>
       <button id="p-run" data-i18n="planner.runBtn"></button>
       <button id="p-share" class="secondary" style="display:none;" data-i18n="planner.shareBtn"></button>
       <div class="hint" id="p-shareFeedback"></div>
@@ -94,10 +98,6 @@
     <div class="card">
       <h3 data-i18n="group.title"></h3>
       <div class="field"><label data-i18n="group.placeLabel"></label><input type="text" id="g-place" placeholder="American Village, Okinawa"></div>
-      <div class="field"><label data-i18n="group.membersLabel"></label>
-        <div id="g-members"></div>
-        <button type="button" class="secondary small" id="g-addMember" data-i18n="group.addMemberBtn"></button>
-      </div>
       <button id="g-run" data-i18n="group.runBtn"></button>
       <div class="hint" id="g-ragHint"></div>
       <div class="group-decision" id="g-decision"></div>
