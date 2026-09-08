@@ -2364,7 +2364,6 @@ function initApp() {
   const gPlace = document.getElementById('g-place');
   const gRunBtn = document.getElementById('g-run');
   const gSwapBtn = document.getElementById('g-swap');
-  const gGateHint = document.getElementById('g-gateHint');
   const gResult = document.getElementById('g-result');
   const gDebate = document.getElementById('g-debate');
   const gRagHint = document.getElementById('g-ragHint');
@@ -2377,14 +2376,24 @@ function initApp() {
     return !!(tripState.plannerData && Array.isArray(tripState.plannerData.days) && tripState.plannerData.days.length);
   }
 
-  /** Enables/disables the Group Decision "Chấm điểm phù hợp" action based on whether an itinerary has been generated yet, and updates the hint text next to it. */
+  /**
+   * Enables/disables the Group Decision "Chấm điểm phù hợp" action based on whether an itinerary has
+   * been generated yet, and updates the hint text next to it. Looked up fresh via getElementById
+   * (not the closed-over gRunBtn/gSwapBtn/gGateHint consts) because this can run — via
+   * updateTripStateFromPlannerData(), during restorePlanner()'s restore-from-storage — before the
+   * Group Decision tab's own script section (where those consts are declared) has executed yet;
+   * referencing them that early would throw a TDZ ReferenceError and abort all of initApp().
+   */
   function updateGroupDecisionGate() {
     const ready = hasItinerary();
-    if (gRunBtn) gRunBtn.disabled = !ready;
-    if (gSwapBtn) gSwapBtn.disabled = !ready;
-    if (gGateHint) {
-      gGateHint.textContent = ready ? '' : ('🔒 ' + T('group.needPlanFirst'));
-      gGateHint.classList.toggle('locked', !ready);
+    const runBtn = document.getElementById('g-run');
+    const swapBtn = document.getElementById('g-swap');
+    const gateHint = document.getElementById('g-gateHint');
+    if (runBtn) runBtn.disabled = !ready;
+    if (swapBtn) swapBtn.disabled = !ready;
+    if (gateHint) {
+      gateHint.textContent = ready ? '' : ('🔒 ' + T('group.needPlanFirst'));
+      gateHint.classList.toggle('locked', !ready);
     }
   }
 
