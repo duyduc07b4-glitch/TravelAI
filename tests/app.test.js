@@ -505,6 +505,50 @@ describe('generateCompromiseOptions', () => {
     assert.equal(options.filter(o => o.picked).length, 1);
     assert.equal(options[0].picked, true);
   });
+  test('each option carries its strategy (safest/balanced/delight), matching the picked one', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    assert.deepEqual(options.map(o => o.strategy), ['safest', 'balanced', 'delight']);
+    assert.equal(options.find(o => o.picked).strategy, 'safest');
+  });
+});
+
+describe('generateCompromiseOptions — avoiding the "nobody loves it" compromise', () => {
+  // A: loves seafood. B: vegetarian (actively conflicts with seafood places). C: no strong preference.
+  const members = [
+    { name: 'A', pref: 'Hải sản' },
+    { name: 'B', pref: 'Ăn chay' },
+    { name: 'C', pref: 'Không quan trọng' }
+  ];
+  // Two interchangeable, nobody-excited venues plus one A loves and one B loves.
+  const candidates = [
+    { name: 'Neutral Cafe 1' },
+    { name: 'Neutral Cafe 2' },
+    { name: 'Vegetarian Cafe', notes: 'chay' },
+    { name: 'Seafood House', cuisine: 'Hải sản' }
+  ];
+
+  test('surfaces a high-peak option via the "delight" strategy instead of dropping it for a bland duplicate', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    // Seafood House has the worst floor (B dislikes it), so floor-only ranking alone would drop it
+    // in favor of the two "Neutral Cafe" duplicates that nobody dislikes — but nobody loves either.
+    const delightOption = options.find(o => o.strategy === 'delight');
+    assert.equal(delightOption.name, 'Seafood House');
+    assert.notEqual(delightOption.strategy, 'safest');
+  });
+  test('flags an option as bland when it clears the floor but excites nobody', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const balancedOption = options.find(o => o.strategy === 'balanced'); // a Neutral Cafe: everyone lands around the same middling score
+    assert.equal(balancedOption.bland, true);
+    const delightOption = options.find(o => o.strategy === 'delight'); // Seafood House: A is thrilled
+    assert.equal(delightOption.bland, false);
+  });
+  test('renderCompromiseOptionsHtml shows the bland caveat only on options nobody is excited about', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi');
+    const caveatCount = (html.match(/opt-caveat/g) || []).length;
+    assert.equal(caveatCount, options.filter(o => o.bland).length);
+    assert.ok(caveatCount >= 1);
+  });
 });
 
 describe('pickPrimaryKnowledgeEntry', () => {

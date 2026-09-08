@@ -20,7 +20,7 @@ Tóm tắt nhanh:
 - 👥 **Group Decision Engine** — không chỉ chấm điểm, mà còn:
   - 📊 **Điểm hài lòng theo từng thành viên** (không chỉ điểm trung bình chung)
   - ⚠️ **Phát hiện xung đột sở thích** — ai thích, ai không, mức độ nghiêm trọng, lý do
-  - 💡 **3 phương án thay vì 1 lựa chọn trung bình hoá** — xếp hạng theo thành viên hài lòng thấp nhất (không ai bị bỏ lại), không phải theo điểm trung bình
+  - 💡 **3 phương án theo 3 chiến lược khác nhau** — A = an toàn nhất (điểm sàn cao nhất, không ai bị bỏ lại), B = hài lòng chung cao nhất (điểm trung bình), C = có người mê nhất (điểm đỉnh cao nhất). Tránh được tình huống cả 3 phương án đều là "không ai ghét nhưng cũng chẳng ai thích" — nếu có lựa chọn khiến ai đó thực sự hào hứng, nó sẽ lộ diện ở phương án C thay vì bị lọc mất vì thuật toán chỉ nhìn điểm sàn. Phương án nào mà điểm cao nhất trong nhóm vẫn thấp sẽ bị gắn cảnh báo "an toàn nhưng chưa ai thực sự hào hứng"
   - 🧾 **Giải thích được (Explainable AI)** — mỗi gợi ý kèm lý do cụ thể từ dữ liệu thật (giá, khoảng cách, đánh giá, thân thiện trẻ em...)
   - Toàn bộ tính toán trên chạy **cục bộ, tức thời, không qua LLM** — cập nhật ngay khi bạn sửa sở thích thành viên, không cần bấm lại nút. Có thể ưu tiên dùng dữ liệu thật (giờ mở cửa, giá, đánh giá) từ RAG server local nếu đang chạy.
 - 🆚 **Vì sao TravelAI** — màn hình so sánh trực tiếp với AI Travel Planner truyền thống (tối ưu cá nhân) và TravelAI (tối ưu quyết định nhóm)

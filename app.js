@@ -107,6 +107,12 @@ const I18N = {
       optionCon: (name, score) => `${name} hài lòng ít nhất (${score}%)`,
       whyPicked: 'Không ai bị bỏ lại phía sau — điểm thấp nhất trong nhóm ở phương án này là cao nhất so với các phương án khác.',
       whyAlt: 'Điểm trung bình có thể cao, nhưng có thành viên hài lòng thấp hơn hẳn.',
+      strategy: {
+        safest: 'An toàn nhất',
+        balanced: 'Hài lòng chung cao nhất',
+        delight: 'Có người mê nhất'
+      },
+      blandCaveat: (maxScore) => `An toàn nhưng chưa ai thực sự hào hứng — điểm cao nhất trong nhóm ở phương án này mới ${maxScore}%.`,
       whyTitle: (name) => `🧾 Vì sao chọn "${name}"?`,
       reasonPrefMatch: (count, total) => `${count}/${total} thành viên có sở thích khớp với địa điểm này`,
       reasonBudget: (price) => `Mức giá: ${price}`,
@@ -351,6 +357,12 @@ const I18N = {
       optionCon: (name, score) => `${name}が最も不満（${score}%）`,
       whyPicked: '誰も置き去りにしない — このオプションはグループ内の最低スコアが他の案より高い。',
       whyAlt: '平均は高いかもしれないが、著しく満足度が低いメンバーがいる。',
+      strategy: {
+        safest: '最も安全',
+        balanced: '全体満足度が最も高い',
+        delight: '誰かが一番気に入る'
+      },
+      blandCaveat: (maxScore) => `安全ですが、まだ誰も本当に気に入っていません — このオプションのグループ内最高スコアは${maxScore}%です。`,
       whyTitle: (name) => `🧾 なぜ「${name}」を選んだのか？`,
       reasonPrefMatch: (count, total) => `${total}人中${count}人の好みがこのスポットと一致`,
       reasonBudget: (price) => `価格帯：${price}`,
@@ -595,6 +607,12 @@ const I18N = {
       optionCon: (name, score) => `${name} is least satisfied (${score}%)`,
       whyPicked: 'Nobody is left behind — this option\'s lowest member score beats every other option\'s.',
       whyAlt: 'The average may be higher, but at least one member scores notably lower.',
+      strategy: {
+        safest: 'Safest pick',
+        balanced: 'Best overall fit',
+        delight: "Someone's favorite"
+      },
+      blandCaveat: (maxScore) => `Safe, but nobody is genuinely excited yet — the highest score in the group for this option is only ${maxScore}%.`,
       whyTitle: (name) => `🧾 Why "${name}"?`,
       reasonPrefMatch: (count, total) => `${count} of ${total} members' preferences match this place`,
       reasonBudget: (price) => `Price range: ${price}`,
@@ -1045,13 +1063,6 @@ function detectPreferenceConflicts(members, entry, lang) {
   }];
 }
 
-/**
- * Ranks knowledge-entry candidates into up to 3 compromise options. Ranked by each
- * option's WORST member score first (the floor), not the average — directly
- * answers the "averaged plans nobody loves" failure mode: the highest-average
- * option is not picked if it leaves someone far behind.
- */
-
 /** Picks the RAG candidate that best matches the place the user typed in (exact, then substring, then first-available). */
 function pickPrimaryKnowledgeEntry(candidates, place) {
   const named = (candidates || []).filter(c => c && c.name);
@@ -1064,24 +1075,62 @@ function pickPrimaryKnowledgeEntry(candidates, place) {
   return named[0] || { name: place || '' };
 }
 
+// Below this score, no one in the group is genuinely excited about an option — it may still
+// clear the "floor" bar (nobody hates it) without anyone actually loving it either.
+const COMPROMISE_DELIGHT_THRESHOLD = 75;
+
+/**
+ * Ranks knowledge-entry candidates into up to 3 compromise options — but NOT by the same
+ * criterion three times. Sorting all three by "worst member score" (the floor) alone reliably
+ * produces the "averaged plan nobody loves" failure mode from the other direction: three
+ * flavors of the same safe, lukewarm middle, because a candidate that would thrill one person
+ * but only be "fine" for another never wins on floor score alone. Each option here comes from a
+ * different strategy, so a genuinely exciting pick for someone can surface even when it isn't
+ * the safest:
+ *   A = safest (highest floor — "no one is left behind", still the AI's default pick)
+ *   B = best overall fit (highest average across the group)
+ *   C = most delight (highest peak score for whoever likes it most)
+ * If the resulting pool of named candidates is too small for 3 distinct picks, the same venue
+ * can appear more than once under different strategies — genuinely winning on multiple axes is
+ * itself a signal worth showing, not a bug to hide.
+ */
 function generateCompromiseOptions(candidates, members, lang) {
   const named = (candidates || []).filter(c => c && c.name);
+  if (!named.length) return [];
   const scored = named.map(entry => {
     const group = computeGroupSatisfaction(members, entry, lang);
-    const minScore = group.perMember.length ? Math.min(...group.perMember.map(m => m.score)) : group.overall;
-    return { entry, group, minScore };
+    const scores = group.perMember.map(m => m.score);
+    const minScore = scores.length ? Math.min(...scores) : group.overall;
+    const maxScore = scores.length ? Math.max(...scores) : group.overall;
+    return { entry, group, minScore, maxScore };
   });
-  scored.sort((a, b) => (b.minScore - a.minScore) || (b.group.overall - a.group.overall));
+
+  const strategies = [
+    { key: 'safest', sort: (a, b) => (b.minScore - a.minScore) || (b.group.overall - a.group.overall) },
+    { key: 'balanced', sort: (a, b) => (b.group.overall - a.group.overall) || (b.minScore - a.minScore) },
+    { key: 'delight', sort: (a, b) => (b.maxScore - a.maxScore) || (b.group.overall - a.group.overall) }
+  ];
   const labels = ['A', 'B', 'C'];
-  return scored.slice(0, 3).map((s, i) => ({
-    label: labels[i],
-    name: s.entry.name,
-    overall: s.group.overall,
-    minScore: s.minScore,
-    best: s.group.highest,
-    worst: s.group.lowest,
-    picked: i === 0
-  }));
+  const used = new Set();
+
+  const count = Math.min(3, named.length);
+  return strategies.slice(0, count).map((strat, i) => {
+    const ranked = [...scored].sort(strat.sort);
+    const s = ranked.find(c => !used.has(c.entry.name)) || ranked[0];
+    used.add(s.entry.name);
+    return {
+      label: labels[i],
+      strategy: strat.key,
+      name: s.entry.name,
+      overall: s.group.overall,
+      minScore: s.minScore,
+      maxScore: s.maxScore,
+      best: s.group.highest,
+      worst: s.group.lowest,
+      bland: s.maxScore < COMPROMISE_DELIGHT_THRESHOLD,
+      picked: strat.key === 'safest'
+    };
+  });
 }
 
 /** Structured reasoning bullets for Explainable AI (Feature 4) — built from real RAG fields, not the LLM. */
@@ -1137,9 +1186,11 @@ function renderCompromiseOptionsHtml(options, lang) {
     <div class="opt-card${o.picked ? ' picked' : ''}">
       ${o.picked ? `<div class="opt-pick-tag">${escapeHtml(tr(lang, 'group.aiPick'))}</div>` : ''}
       <div class="opt-top"><span class="opt-label">${tr(lang, 'group.optionLabel', o.label)}</span><span class="opt-score">${o.overall}%</span></div>
+      ${o.strategy ? `<div class="opt-strategy">${escapeHtml(tr(lang, 'group.strategy.' + o.strategy))}</div>` : ''}
       <div class="opt-name">${escapeHtml(o.name)}</div>
       ${o.best ? `<div class="opt-pro">+ ${escapeHtml(tr(lang, 'group.optionPro', o.best.name, o.best.score))}</div>` : ''}
       ${o.worst ? `<div class="opt-con">− ${escapeHtml(tr(lang, 'group.optionCon', o.worst.name, o.worst.score))}</div>` : ''}
+      ${o.bland ? `<div class="opt-caveat">⚠️ ${escapeHtml(tr(lang, 'group.blandCaveat', o.maxScore))}</div>` : ''}
       <div class="opt-why">${escapeHtml(o.picked ? tr(lang, 'group.whyPicked') : tr(lang, 'group.whyAlt'))}</div>
     </div>`).join('');
   html += `</div>`;
