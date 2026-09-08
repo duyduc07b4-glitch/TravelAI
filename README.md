@@ -25,7 +25,8 @@ Tóm tắt nhanh:
   - Toàn bộ tính toán trên chạy **cục bộ, tức thời, không qua LLM** — cập nhật ngay khi bạn sửa sở thích thành viên, không cần bấm lại nút. Có thể ưu tiên dùng dữ liệu thật (giờ mở cửa, giá, đánh giá) từ RAG server local nếu đang chạy.
 - 🆚 **Vì sao TravelAI** — màn hình so sánh trực tiếp với AI Travel Planner truyền thống (tối ưu cá nhân) và TravelAI (tối ưu quyết định nhóm)
 - 🎙️ **Trợ lý giọng nói** — hỏi/đáp bằng giọng nói (Web Speech API)
-- 🌧️ **Self-Healing Itinerary** — tự đề xuất thay đổi lịch trình khi có sự cố (thời tiết...)
+- 🌧️ **Self-Healing Itinerary (giải thích được)** — khi có sự cố (thời tiết...), không chỉ đổi hoạt động mà còn cho thấy: **📉 mức độ hài lòng nhóm thay đổi thế nào** (VD: 64% → 63%) và **thay đổi theo từng thành viên** (VD: A -5%) — dựa trên sở thích thành viên đã khai ở tab Quyết định nhóm, tính cục bộ không qua LLM
+- 🚦 **Kiểm tra rủi ro chuyến đi** — quét tự động 4 loại rủi ro (đi bộ quá nhiều, ngân sách, thiếu phương tiện di chuyển, thời tiết xấu) ngay sau khi tạo lịch trình hoặc self-healing, kèm mức độ và gợi ý khắc phục
 - 🌐 **Đa ngôn ngữ Việt/Nhật/Anh** — nút VI/JA/EN ở góc trên bên phải đổi toàn bộ giao diện, nội dung AI trả về (lịch trình, group matching, giọng nói, self-healing, camera), nhận diện/phát giọng nói theo đúng ngôn ngữ đang chọn. Lựa chọn ngôn ngữ được lưu lại cho lần sau.
 - ⚡ **Streaming** — kết quả AI hiện dần theo từng token thay vì đợi cả khối, cảm giác phản hồi nhanh hơn nhiều với lịch trình dài.
 - 📤 **Chia sẻ lịch trình** — nút "Chia sẻ" ở tab Lịch trình mở bảng chia sẻ native trên điện thoại (Messenger, Zalo, email...), hoặc copy văn bản đã format sẵn vào clipboard trên desktop. Có phương án dự phòng để vẫn copy được khi mở app qua địa chỉ IP LAN (http, không phải https).

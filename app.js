@@ -163,6 +163,7 @@ const I18N = {
       planLabel: 'Bám theo plan Tab 1:',
       reasonPrefix: 'Lý do:',
       severityLabel: 'Mức độ:',
+      satisfactionImpact: '📉 Tác động đến mức độ hài lòng nhóm',
       reasonStorm: 'Bão / gió lớn / mưa dông nên ưu tiên hoạt động trong nhà và gần nhau hơn',
       reasonRain: 'Mưa to khiến hoạt động ngoài trời không còn phù hợp',
       reasonHeat: 'Nắng nóng cực đoan, chuyển sang nơi có điều hòa',
@@ -215,6 +216,18 @@ const I18N = {
         'Tự điều chỉnh giữa chuyến đi mà không âm thầm bỏ rơi ai'
       ],
       mission: '"TravelAI không lên lịch trình — nó giúp nhóm du lịch ra quyết định tốt hơn cùng nhau, và cho từng thành viên thấy rõ tiếng nói của họ đã ảnh hưởng tới kết quả thế nào."'
+    },
+    risk: {
+      title: '🚦 Kiểm tra rủi ro chuyến đi',
+      level: { low: 'Thấp', medium: 'Vừa', high: 'Cao' },
+      type: { walking: 'Đi bộ nhiều', budget: 'Rủi ro ngân sách', transport: 'Di chuyển', weather: 'Thời tiết' },
+      walkingHigh: (count) => `${count} hoạt động ngoài trời liên tiếp — nhóm có thể mệt, nên xen kẽ hoạt động trong nhà hoặc thêm thời gian nghỉ.`,
+      walkingMedium: (count) => `${count} hoạt động ngoài trời trong danh sách — cân nhắc xen kẽ nghỉ ngơi.`,
+      budgetHigh: (perDay) => `Ngân sách chỉ khoảng ${perDay} yên/ngày — khá eo hẹp so với chi phí du lịch Nhật Bản, dễ vượt ngân sách.`,
+      budgetMedium: (perDay) => `Ngân sách khoảng ${perDay} yên/ngày — vừa đủ, nên ưu tiên các lựa chọn giá hợp lý.`,
+      transportMedium: 'Nhiều hoạt động nhưng không có phương tiện di chuyển rõ ràng trong lịch trình — cân nhắc thuê xe hoặc đặt taxi trước.',
+      weatherHigh: 'Thời tiết xấu nghiêm trọng — nhiều khả năng phải đổi kế hoạch giữa chừng.',
+      weatherMedium: 'Thời tiết không thuận lợi — nên chuẩn bị phương án dự phòng trong nhà.'
     },
     weatherCodes: {
       0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
@@ -382,6 +395,7 @@ const I18N = {
       planLabel: 'Tab 1 の計画に沿う：',
       reasonPrefix: '理由：',
       severityLabel: '重要度：',
+      satisfactionImpact: '📉 グループ満足度への影響',
       reasonStorm: '大雨・強風・雷雨のため、屋内で近い場所を優先する',
       reasonRain: '雨が強く、屋外アクティビティが適さない',
       reasonHeat: '猛暑のため、冷房のある場所に切り替える',
@@ -434,6 +448,18 @@ const I18N = {
         '旅行中も誰かを置き去りにせず調整し続ける'
       ],
       mission: '「TravelAIは旅程を作るだけのツールではありません。旅行グループがより良い決断を一緒に下せるよう支援し、一人ひとりの声が結果にどう反映されたかを明確に示します。」'
+    },
+    risk: {
+      title: '🚦 旅程のリスクチェック',
+      level: { low: '低い', medium: '中程度', high: '高い' },
+      type: { walking: '徒歩が多い', budget: '予算リスク', transport: '移動手段', weather: '天候' },
+      walkingHigh: (count) => `屋外アクティビティが${count}件連続しています — グループが疲れる可能性があるため、屋内アクティビティや休憩を挟むことをおすすめします。`,
+      walkingMedium: (count) => `旅程に屋外アクティビティが${count}件あります — 休憩を挟むことを検討してください。`,
+      budgetHigh: (perDay) => `予算が1日あたり約${perDay}円と、日本旅行の費用としてはやや厳しめです。予算オーバーに注意してください。`,
+      budgetMedium: (perDay) => `予算は1日あたり約${perDay}円 — ちょうど良い水準です。コストパフォーマンスの良い選択を優先してください。`,
+      transportMedium: 'アクティビティは多いですが、旅程に明確な移動手段がありません — レンタカーやタクシーの事前手配を検討してください。',
+      weatherHigh: '深刻な悪天候です — 旅程の途中変更が必要になる可能性が高いです。',
+      weatherMedium: '天候が良くありません — 屋内の代替プランを準備しておくとよいでしょう。'
     },
     weatherCodes: {
       0: '快晴', 1: 'ほぼ晴れ', 2: '所により曇り', 3: '曇り',
@@ -601,6 +627,7 @@ const I18N = {
       planLabel: 'Based on Tab 1 plan:',
       reasonPrefix: 'Reason:',
       severityLabel: 'Severity:',
+      satisfactionImpact: '📉 Impact on group satisfaction',
       reasonStorm: 'Heavy rain / strong wind / thunderstorm means indoor and compact alternatives are preferred',
       reasonRain: 'Heavy rain makes the outdoor activity unsuitable',
       reasonHeat: 'Extreme heat means moving to air-conditioned places',
@@ -653,6 +680,18 @@ const I18N = {
         "Adapts mid-trip without silently losing anyone's fit"
       ],
       mission: '"TravelAI doesn\'t plan trips — it helps travel groups make better decisions together, and shows every member exactly how their voice shaped the result."'
+    },
+    risk: {
+      title: '🚦 Travel risk check',
+      level: { low: 'Low', medium: 'Medium', high: 'High' },
+      type: { walking: 'Excessive walking', budget: 'Budget risk', transport: 'Transportation', weather: 'Weather' },
+      walkingHigh: (count) => `${count} outdoor activities back to back — the group may get tired, consider mixing in indoor activities or extra rest.`,
+      walkingMedium: (count) => `${count} outdoor activities in this itinerary — consider spacing them with breaks.`,
+      budgetHigh: (perDay) => `Budget is only about ¥${perDay}/day — tight for travel costs in Japan, easy to go over.`,
+      budgetMedium: (perDay) => `Budget is about ¥${perDay}/day — reasonable, prioritize good-value options.`,
+      transportMedium: 'Many activities but no clear transportation in the itinerary — consider arranging a rental car or taxi ahead of time.',
+      weatherHigh: 'Severe bad weather — the plan will likely need a mid-trip change.',
+      weatherMedium: "Weather isn't great — prepare an indoor backup plan."
     },
     weatherCodes: {
       0: 'clear sky', 1: 'mainly clear', 2: 'partly cloudy', 3: 'overcast',
@@ -874,12 +913,12 @@ const PREFERENCE_TAG_KEYWORDS = {
   vegetarian: { vi: ['chay', 'ăn chay'], en: ['vegetarian', 'vegan'], ja: ['ベジタリアン', '菜食', 'ヴィーガン'] },
   budget: { vi: ['tiết kiệm', 'giá rẻ', 'rẻ'], en: ['budget', 'cheap', 'affordable'], ja: ['安い', '格安', '予算重視'] },
   luxury: { vi: ['sang trọng', 'cao cấp'], en: ['luxury', 'fine dining', 'upscale'], ja: ['高級', '贅沢'] },
-  photo: { vi: ['chụp ảnh', 'check-in', 'sống ảo'], en: ['photo', 'instagram', 'check-in', 'checkin'], ja: ['写真', 'インスタ', '映え'] },
+  photo: { vi: ['chụp ảnh', 'check-in', 'sống ảo', 'view đẹp'], en: ['photo', 'instagram', 'check-in', 'checkin', 'rooftop', 'view'], ja: ['写真', 'インスタ', '映え', '絶景'] },
   shopping: { vi: ['mua sắm', 'shopping'], en: ['shopping', 'shop'], ja: ['ショッピング', '買い物'] },
-  kids: { vi: ['trẻ em', 'có con', 'em bé', 'gia đình'], en: ['kid', 'child', 'family'], ja: ['子供', '子連れ', 'ファミリー'] },
-  nightlife: { vi: ['bia', 'nhậu', 'tiệc'], en: ['beer', 'nightlife', 'bar', 'party'], ja: ['ビール', 'ナイトライフ', '飲み'] },
+  kids: { vi: ['trẻ em', 'có con', 'em bé', 'gia đình', 'vòng quay', 'sở thú', 'công viên giải trí', 'khu vui chơi'], en: ['kid', 'child', 'family', 'aquarium', 'zoo', 'ferris wheel', 'playground', 'amusement park'], ja: ['子供', '子連れ', 'ファミリー', '水族館', '動物園', '観覧車', '遊園地'] },
+  nightlife: { vi: ['bia', 'nhậu', 'tiệc'], en: ['beer', 'nightlife', 'bar', 'party', 'pub', 'rooftop bar'], ja: ['ビール', 'ナイトライフ', '飲み'] },
   nature: { vi: ['thiên nhiên', 'biển', 'núi', 'ngoài trời'], en: ['nature', 'beach', 'outdoor', 'hiking'], ja: ['自然', 'ビーチ', 'アウトドア'] },
-  culture: { vi: ['văn hóa', 'lịch sử', 'bảo tàng', 'đền'], en: ['culture', 'history', 'museum', 'temple'], ja: ['文化', '歴史', '博物館'] },
+  culture: { vi: ['văn hóa', 'lịch sử', 'bảo tàng', 'đền', 'lâu đài', 'thành cổ'], en: ['culture', 'history', 'museum', 'temple', 'castle'], ja: ['文化', '歴史', '博物館', '城'] },
   quiet: { vi: ['yên tĩnh', 'thư giãn'], en: ['quiet', 'relax', 'peaceful'], ja: ['静か', 'リラックス'] },
   adventure: { vi: ['mạo hiểm', 'phiêu lưu'], en: ['adventure', 'extreme'], ja: ['冒険', 'アドベンチャー'] }
 };
@@ -1345,6 +1384,7 @@ function renderHealHtml(data, lang) {
   if (data.context_summary) {
     html += `<div class="summary-note"><strong>${tr(lang, 'heal.planLabel')}</strong> ${escapeHtml(data.context_summary)}</div>`;
   }
+  html += renderSatisfactionDeltaHtml(data.satisfactionDelta, lang);
   if ((data.replacements || []).length) {
     html += `<div class="day-block"><h4>${tr(lang, 'common.changesHeader')}</h4><ul>`;
     data.replacements.forEach(r => {
@@ -1368,7 +1408,103 @@ function renderHealHtml(data, lang) {
     html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
   }
   if (data.notes) html += `<div class="summary-note">${escapeHtml(data.notes)}</div>`;
+  html += renderRiskPanelHtml(data.risks, lang);
   return html || tr(lang, 'common.noChange');
+}
+
+// ================================================================
+// Explainable Self-Healing (Feature 5) + Travel Risk Detection (Feature 6).
+// Both reuse the Group Decision scoring primitives — still no LLM call.
+// ================================================================
+
+/** Average group satisfaction across a whole list of activities (not just one venue). */
+function computeItinerarySatisfaction(members, activities, lang) {
+  const list = (activities || []).filter(Boolean);
+  if (!members || !members.length || !list.length) return null;
+  const perMember = members.map(m => {
+    const tags = extractPreferenceTags(m.pref, lang);
+    const total = list.reduce((sum, activityText) => sum + scoreEntryForMember({ name: activityText }, tags, lang).score, 0);
+    return { name: m.name, score: Math.round(total / list.length) };
+  });
+  const overall = Math.round(perMember.reduce((s, m) => s + m.score, 0) / perMember.length);
+  return { overall, perMember };
+}
+
+/** Before/after group satisfaction across a self-healing swap. Returns null when there are no members to score against. */
+function computeSatisfactionDelta(members, beforeActivities, afterActivities, lang) {
+  const before = computeItinerarySatisfaction(members, beforeActivities, lang);
+  const after = computeItinerarySatisfaction(members, afterActivities, lang);
+  if (!before || !after) return null;
+  const perMember = after.perMember.map((m, i) => ({ name: m.name, before: before.perMember[i].score, after: m.score }));
+  return { before: before.overall, after: after.overall, perMember };
+}
+
+/**
+ * Rule-based travel risk scan: excessive walking, budget, transportation, weather.
+ * Entirely deterministic — reuses classifyActivity()/classifyIncident() already
+ * built for self-healing, so no new AI call and no new data source.
+ */
+function detectTravelRisks(activities, context, weatherIncident, lang) {
+  const list = (activities || []).filter(Boolean);
+  const risks = [];
+
+  const outdoorCount = list.filter(a => classifyActivity(a).category === 'outdoor').length;
+  if (outdoorCount >= 4) risks.push({ type: 'walking', level: 'high', detail: tr(lang, 'risk.walkingHigh', outdoorCount) });
+  else if (outdoorCount >= 2) risks.push({ type: 'walking', level: 'medium', detail: tr(lang, 'risk.walkingMedium', outdoorCount) });
+
+  const budgetNum = parseBudgetNumber(context && context.budget);
+  const days = Math.max(1, Number(context && context.days) || 1);
+  if (budgetNum) {
+    const perDay = Math.round(budgetNum / days);
+    if (perDay < 5000) risks.push({ type: 'budget', level: 'high', detail: tr(lang, 'risk.budgetHigh', perDay) });
+    else if (perDay < 8000) risks.push({ type: 'budget', level: 'medium', detail: tr(lang, 'risk.budgetMedium', perDay) });
+  }
+
+  const notes = String((context && (context.notes + ' ' + (context.group || ''))) || '');
+  const hasCarMention = /(thuê xe|rent a car|rental car|có xe|レンタカー|drive)/i.test(notes);
+  const transitCount = list.filter(a => classifyActivity(a).category === 'transit').length;
+  if (!hasCarMention && list.length >= 5 && transitCount === 0) {
+    risks.push({ type: 'transport', level: 'medium', detail: tr(lang, 'risk.transportMedium') });
+  }
+
+  if (weatherIncident) {
+    if (isSevereWeatherIncident(weatherIncident)) {
+      risks.push({ type: 'weather', level: 'high', detail: tr(lang, 'risk.weatherHigh') });
+    } else if (weatherIncident.severity === 'medium') {
+      risks.push({ type: 'weather', level: 'medium', detail: tr(lang, 'risk.weatherMedium') });
+    }
+  }
+
+  return risks;
+}
+
+function deltaClass(before, after) {
+  return after > before ? 'delta-pos' : after < before ? 'delta-neg' : '';
+}
+function formatDelta(before, after) {
+  const diff = after - before;
+  return diff > 0 ? `+${diff}%` : `${diff}%`;
+}
+
+function renderSatisfactionDeltaHtml(delta, lang) {
+  if (!delta) return '';
+  let html = `<div class="sat-delta"><div class="sat-score-label">${escapeHtml(tr(lang, 'heal.satisfactionImpact'))}</div>`;
+  html += `<div class="sat-delta-row overall"><span class="sat-who">${escapeHtml(tr(lang, 'group.overallLabel'))}</span><span class="sat-delta-value">${delta.before}% <span class="delta-arrow">→</span> ${delta.after}% <span class="${deltaClass(delta.before, delta.after)}">(${formatDelta(delta.before, delta.after)})</span></span></div>`;
+  delta.perMember.forEach(m => {
+    html += `<div class="sat-delta-row"><span class="sat-who">${escapeHtml(m.name)}</span><span class="sat-delta-value ${deltaClass(m.before, m.after)}">${formatDelta(m.before, m.after)}</span></div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function renderRiskPanelHtml(risks, lang) {
+  if (!risks || !risks.length) return '';
+  let html = `<div class="risk-panel"><div class="sat-score-label">${escapeHtml(tr(lang, 'risk.title'))}</div>`;
+  risks.forEach(r => {
+    html += `<div class="risk-row"><span class="risk-level ${r.level}">${escapeHtml(tr(lang, 'risk.level.' + r.level))}</span><div class="risk-body"><div class="risk-type">${escapeHtml(tr(lang, 'risk.type.' + r.type))}</div><div class="risk-detail">${escapeHtml(r.detail)}</div></div></div>`;
+  });
+  html += `</div>`;
+  return html;
 }
 
 function buildCameraFallback(mode, caption, model, lang = DEFAULT_LANG) {
@@ -1443,6 +1579,8 @@ const AppCore = {
   classifyIncident, isSevereWeatherIncident, classifyActivity,
   buildCameraFallback,
   parseBudgetNumber, buildPlannerContextSummary, buildSelfHealingPlan,
+  computeItinerarySatisfaction, computeSatisfactionDelta, detectTravelRisks,
+  renderSatisfactionDeltaHtml, renderRiskPanelHtml,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
 };
 
@@ -1842,7 +1980,8 @@ function initApp() {
         group: saved.group || '',
         notes: saved.notes || ''
       });
-      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(saved.data, saved.dest || '', currentLang, saved.days)}</div>`;
+      const savedRisks = detectTravelRisks(flattenActivities(saved.data), { budget: saved.budget, days: saved.days, group: saved.group, notes: saved.notes }, null, currentLang);
+      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(saved.data, saved.dest || '', currentLang, saved.days)}${renderRiskPanelHtml(savedRisks, currentLang)}</div>`;
       updatePlannerShareState(saved.data, saved.dest || '');
     }
   })();
@@ -1862,7 +2001,8 @@ function initApp() {
     try {
       const data = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
-      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}</div>`;
+      const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
+      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
     } catch (err) { showError(pResult, err); pShare.style.display = 'none'; }
@@ -2234,6 +2374,7 @@ function initApp() {
     if (!tripState.plannerContext) tripState.plannerContext = plannerContext;
     setLoading(hResult, true, T('heal.loading'));
 
+    const weatherIncident = classifyIncident(event);
     let data = null;
     try {
       const system = T('heal.systemPrompt');
@@ -2243,7 +2384,7 @@ function initApp() {
         data = {
           ...buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang),
           ...ai,
-          incident_summary: summarizeIncident(event, classifyIncident(event), currentLang),
+          incident_summary: summarizeIncident(event, weatherIncident, currentLang),
           context_summary: buildPlannerContextSummary(plannerContext)
         };
       }
@@ -2252,6 +2393,13 @@ function initApp() {
     }
 
     if (!data) data = buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang);
+
+    // Feature 5 (Explainable Self-Healing) + Feature 6 (Travel Risk Detection) — both
+    // deterministic, reusing the Group Decision tab's members if any were entered there.
+    const members = currentMembers();
+    data.satisfactionDelta = computeSatisfactionDelta(members, itin, data.updated_itinerary || itin, currentLang);
+    data.risks = detectTravelRisks(data.updated_itinerary || itin, plannerContext, weatherIncident, currentLang);
+
     hResult.innerHTML = `<div class="result-box">${renderHealHtml(data, currentLang)}</div>`;
     saveHealState({ data });
   });

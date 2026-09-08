@@ -238,6 +238,26 @@ table.score-table th{background:var(--panel2); color:var(--muted); font-weight:5
 .receipt li{font-size:12.5px; color:var(--muted); padding-left:18px; position:relative;}
 .receipt li::before{content:"✓"; position:absolute; left:0; color:var(--good); font-weight:700;}
 
+/* ---------- Explainable Self-Healing (satisfaction delta) ---------- */
+.sat-delta{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 18px; box-shadow:var(--shadow); margin-bottom:12px;}
+.sat-delta-row{display:flex; justify-content:space-between; align-items:center; padding:5px 0; font-size:13px;}
+.sat-delta-row.overall{font-weight:700; border-bottom:1px dashed var(--border); margin-bottom:4px; padding-bottom:9px;}
+.sat-delta-value{font-weight:600; font-variant-numeric:tabular-nums;}
+.delta-arrow{color:var(--muted); margin:0 2px;}
+.delta-pos{color:var(--good);}
+.delta-neg{color:var(--danger);}
+
+/* ---------- Travel Risk Detection ---------- */
+.risk-panel{background:var(--panel); border:1px solid var(--border); border-radius:14px; padding:14px 18px; box-shadow:var(--shadow); margin-top:12px;}
+.risk-row{display:flex; align-items:flex-start; gap:12px; padding:9px 0; border-bottom:1px solid var(--border);}
+.risk-row:last-child{border-bottom:none;}
+.risk-level{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px; flex-shrink:0; white-space:nowrap; margin-top:1px;}
+.risk-level.low{background:rgba(47,158,110,0.12); color:var(--good);}
+.risk-level.medium{background:rgba(239,155,82,0.14); color:var(--warn);}
+.risk-level.high{background:rgba(223,90,90,0.14); color:var(--danger);}
+.risk-type{font-weight:700; font-size:13px; color:var(--text);}
+.risk-detail{font-size:12.3px; color:var(--muted); margin-top:2px; line-height:1.5;}
+
 /* ---------- Differentiation screen ---------- */
 .diff-cols{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px;}
 .diff-col{border-radius:14px; padding:16px;}

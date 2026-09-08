@@ -8,6 +8,8 @@ const {
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
   detectPreferenceConflicts, generateCompromiseOptions, pickPrimaryKnowledgeEntry, buildReasoningReceipt,
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
+  computeItinerarySatisfaction, computeSatisfactionDelta, detectTravelRisks,
+  renderSatisfactionDeltaHtml, renderRiskPanelHtml,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
 
@@ -545,5 +547,96 @@ describe('Group Decision render functions', () => {
     const options = generateCompromiseOptions(candidates, members, 'vi');
     const html = renderCompromiseOptionsHtml(options, 'vi');
     assert.equal((html.match(/opt-card picked/g) || []).length, 1);
+  });
+});
+
+// ================================================================
+// Explainable Self-Healing (Feature 5) + Travel Risk Detection (Feature 6).
+// ================================================================
+
+describe('computeItinerarySatisfaction', () => {
+  const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+  test('averages each member\'s score across every activity', () => {
+    const g = computeItinerarySatisfaction(members, ['Beach', 'Hải sản restaurant'], 'vi');
+    assert.equal(g.perMember.length, 2);
+    assert.equal(typeof g.overall, 'number');
+  });
+  test('returns null with no members or no activities', () => {
+    assert.equal(computeItinerarySatisfaction([], ['Beach'], 'vi'), null);
+    assert.equal(computeItinerarySatisfaction(members, [], 'vi'), null);
+  });
+});
+
+describe('computeSatisfactionDelta', () => {
+  const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'B', pref: 'Ăn chay' }];
+  test('reports a before/after overall score and a per-member delta', () => {
+    const delta = computeSatisfactionDelta(members, ['Beach'], ['Hải sản restaurant'], 'vi');
+    assert.equal(typeof delta.before, 'number');
+    assert.equal(typeof delta.after, 'number');
+    assert.equal(delta.perMember.length, 2);
+    assert.ok('before' in delta.perMember[0] && 'after' in delta.perMember[0]);
+  });
+  test('returns null when there are no members to score against', () => {
+    assert.equal(computeSatisfactionDelta([], ['Beach'], ['Museum'], 'vi'), null);
+  });
+});
+
+describe('detectTravelRisks', () => {
+  test('flags excessive walking when many outdoor activities are back to back', () => {
+    const risks = detectTravelRisks(['Beach', 'Sunset viewing', 'Hiking trail', 'Outdoor BBQ', 'Snorkel tour'], {}, null, 'vi');
+    const walking = risks.find(r => r.type === 'walking');
+    assert.ok(walking);
+    assert.equal(walking.level, 'high');
+  });
+  test('flags a tight budget for the number of days', () => {
+    const risks = detectTravelRisks(['Museum'], { budget: '10000', days: 4 }, null, 'vi');
+    const budget = risks.find(r => r.type === 'budget');
+    assert.ok(budget);
+    assert.equal(budget.level, 'high');
+  });
+  test('does not flag budget risk when it is comfortable', () => {
+    const risks = detectTravelRisks(['Museum'], { budget: '200000', days: 4 }, null, 'vi');
+    assert.equal(risks.find(r => r.type === 'budget'), undefined);
+  });
+  test('flags missing transportation when there are many activities and no car/transit mention', () => {
+    const risks = detectTravelRisks(['Beach', 'Museum', 'Market', 'Restaurant', 'Park'], { notes: '' }, null, 'vi');
+    assert.ok(risks.find(r => r.type === 'transport'));
+  });
+  test('does not flag transportation when a car rental is mentioned', () => {
+    const risks = detectTravelRisks(['Beach', 'Museum', 'Market', 'Restaurant', 'Park'], { notes: 'Thuê xe' }, null, 'vi');
+    assert.equal(risks.find(r => r.type === 'transport'), undefined);
+  });
+  test('surfaces a high weather risk for a severe incident', () => {
+    const incident = classifyIncident('Bão lớn cả ngày');
+    const risks = detectTravelRisks(['Museum'], {}, incident, 'vi');
+    const weather = risks.find(r => r.type === 'weather');
+    assert.ok(weather);
+    assert.equal(weather.level, 'high');
+  });
+  test('returns an empty array when nothing is risky', () => {
+    assert.deepEqual(detectTravelRisks(['Museum'], { budget: '200000', days: 1, notes: 'Thuê xe' }, null, 'vi'), []);
+  });
+});
+
+describe('Explainable Self-Healing / Risk render functions', () => {
+  test('renderSatisfactionDeltaHtml shows before/after and a per-member delta', () => {
+    const delta = { before: 87, after: 84, perMember: [{ name: 'A', before: 90, after: 80 }, { name: 'B', before: 84, after: 92 }] };
+    const html = renderSatisfactionDeltaHtml(delta, 'vi');
+    assert.match(html, /87%/);
+    assert.match(html, /84%/);
+    assert.match(html, /delta-neg/);
+    assert.match(html, /delta-pos/);
+  });
+  test('renderSatisfactionDeltaHtml returns empty string with no delta', () => {
+    assert.equal(renderSatisfactionDeltaHtml(null, 'vi'), '');
+  });
+  test('renderRiskPanelHtml renders one row per risk with its level', () => {
+    const html = renderRiskPanelHtml([{ type: 'budget', level: 'high', detail: 'test detail' }], 'vi');
+    assert.match(html, /risk-level high/);
+    assert.match(html, /test detail/);
+  });
+  test('renderRiskPanelHtml returns empty string with no risks', () => {
+    assert.equal(renderRiskPanelHtml([], 'vi'), '');
+    assert.equal(renderRiskPanelHtml(null, 'vi'), '');
   });
 });
