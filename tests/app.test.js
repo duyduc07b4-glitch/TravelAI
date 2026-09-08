@@ -10,6 +10,8 @@ const {
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   computeItinerarySatisfaction, computeSatisfactionDelta, detectTravelRisks,
   renderSatisfactionDeltaHtml, renderRiskPanelHtml,
+  buildForecastEventFromDaily, parseSelfHealingInput,
+  canonicalHealedActivities, buildPlannerDataFromHealedData, normalizeSelfHealingAiResult, relocalizeHealedData, normalizeMemberImpactAi,
   buildConversationTranscript, normalizeExtractedSlots, missingTripSlots, buildVoiceFollowUpQuestion, detectItineraryIntent,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
@@ -253,6 +255,13 @@ describe('renderPlannerHtml', () => {
     const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Beach'] }] }, 'Okinawa', 'vi');
     assert.doesNotMatch(html, /error-box/);
   });
+  test('renders object activities safely (Accept flow) without [object Object]', () => {
+    const html = renderPlannerHtml({
+      days: [{ day: 1, activities: [{ text: 'Aquarium', slot: 'morning' }, { text: 'Food Hall' }] }]
+    }, 'Okinawa', 'en');
+    assert.match(html, /Aquarium/);
+    assert.doesNotMatch(html, /\[object Object\]/);
+  });
 });
 
 describe('formatPlannerShareText', () => {
@@ -301,7 +310,7 @@ describe('renderGroupScoreTableHtml', () => {
 });
 
 describe('renderHealHtml', () => {
-  test('renders replacements and updated days with highlights (vi)', () => {
+  test('renders updated days with highlights and no separate changes list (vi)', () => {
     const html = renderHealHtml({
       incident_summary: 'Thời tiết mưa to ở Okinawa',
       severity: 'high',
@@ -317,14 +326,15 @@ describe('renderHealHtml', () => {
     assert.match(html, /mưa to/);
     assert.match(html, /changed-item/);
     assert.match(html, /reason-tag/);
+    assert.doesNotMatch(html, /Thay đổi/);
   });
-  test('renders fallback updated_itinerary in Japanese', () => {
+  test('renders fallback updated_itinerary in Japanese without changes header', () => {
     const html = renderHealHtml({
       replacements: [{ original: 'Beach', replacement: 'Aquarium', reason: '大雨のため' }],
       updated_itinerary: ['Aquarium']
     }, 'ja');
-    assert.match(html, /変更点/);
-    assert.match(html, /大雨のため/);
+    assert.doesNotMatch(html, /変更点/);
+    assert.match(html, /新しい旅程|更新後の旅程/);
   });
   test('falls back to a localized placeholder when nothing changed', () => {
     assert.equal(renderHealHtml({}, 'vi'), 'Không có thay đổi.');
@@ -339,7 +349,54 @@ describe('classifyIncident', () => {
   });
   test('keeps mild weather below high', () => {
     assert.equal(classifyIncident('mưa nhẹ').severity, 'medium');
+    assert.equal(classifyIncident('trời nóng').severity, 'medium');
     assert.equal(classifyIncident('trời nhiều mây').severity, 'low');
+  });
+  test('classifies non-weather operational disruptions', () => {
+    assert.equal(classifyIncident('Nhà hàng bị đóng cửa cả ngày').type, 'closure');
+    assert.equal(classifyIncident('Train strike all lines').type, 'strike');
+    assert.equal(classifyIncident('Severe traffic jam around city center').type, 'traffic');
+    assert.equal(classifyIncident('Restaurant fully booked tonight').type, 'overbook');
+    assert.equal(classifyIncident('One traveler is sick').type, 'health');
+  });
+});
+
+describe('parseSelfHealingInput', () => {
+  test('parses day/slot format and keeps slot metadata', () => {
+    const parsed = parseSelfHealingInput('Day 1 | morning | Beach\nDay 1 | evening | Outdoor BBQ\nDay 2 | afternoon | Museum');
+    assert.equal(parsed.hasStructured, true);
+    assert.equal(parsed.days.length, 2);
+    assert.equal(parsed.days[0].activities[0].slot, 'morning');
+    assert.equal(parsed.days[0].activities[1].slot, 'evening');
+    assert.equal(parsed.days[1].activities[0].slot, 'afternoon');
+  });
+  test('falls back to legacy one-line-per-activity mode', () => {
+    const parsed = parseSelfHealingInput('Beach\nMuseum');
+    assert.equal(parsed.hasStructured, false);
+    assert.equal(parsed.days.length, 1);
+    assert.deepEqual(parsed.flatActivities, ['Beach', 'Museum']);
+  });
+});
+
+describe('buildForecastEventFromDaily', () => {
+  test('picks the worst day inside the trip window', () => {
+    const daily = {
+      time: ['2026-09-10', '2026-09-11', '2026-09-12'],
+      weather_code: [2, 95, 1],
+      temperature_2m_max: [29, 30, 28],
+      precipitation_sum: [0, 22, 0]
+    };
+    const event = buildForecastEventFromDaily(daily, '2026-09-10', 3, 'en');
+    assert.ok(event);
+    assert.equal(event.severity, 'high');
+    assert.equal(event.type, 'storm');
+    assert.equal(event.date, '2026-09-11');
+    assert.match(event.text, /^Forecast:/);
+    assert.doesNotMatch(event.text, /2026-09-11/);
+  });
+  test('returns null when start date or daily data is missing', () => {
+    assert.equal(buildForecastEventFromDaily(null, '2026-09-10', 2, 'en'), null);
+    assert.equal(buildForecastEventFromDaily({ time: [] }, '', 2, 'en'), null);
   });
 });
 
@@ -372,9 +429,158 @@ describe('buildSelfHealingPlan', () => {
       'mưa nhẹ',
       { days: 2, budget: '90000', group: '2 người', notes: '' }
     );
+    assert.ok(plan.replacements.length >= 1);
+    assert.equal(plan.updated_days[0].activities[1].changed, false);
+    assert.equal(plan.updated_days[0].activities[1].text, 'Museum');
+  });
+
+  test('keeps plan unchanged for low-severity incidents', () => {
+    const plan = buildSelfHealingPlan(
+      { days: [{ day: 1, activities: ['Sunset Beach', 'Museum'] }] },
+      ['Sunset Beach', 'Museum'],
+      'trời nhiều mây',
+      { days: 2, budget: '90000', group: '2 người', notes: '' }
+    );
     assert.equal(plan.replacements.length, 0);
     assert.equal(plan.updated_days[0].activities[0].changed, false);
     assert.equal(plan.updated_days[0].activities[0].text, 'Sunset Beach');
+  });
+});
+
+describe('normalizeSelfHealingAiResult', () => {
+  test('falls back to deterministic plan when AI payload is malformed', () => {
+    const base = buildSelfHealingPlan(
+      { days: [{ day: 1, activities: ['Sunset Beach', 'Museum'] }] },
+      ['Sunset Beach', 'Museum'],
+      'Bão lớn kèm gió mạnh',
+      { days: 2, budget: '90000', group: '2 người', notes: '' }
+    );
+    const normalized = normalizeSelfHealingAiResult(base, { replacements: 'not-an-array', updated_itinerary: '' });
+    assert.deepEqual(normalized.updated_itinerary, canonicalHealedActivities(base));
+    assert.deepEqual(normalized.replacements, base.replacements);
+  });
+
+  test('rebuilds day-structure from AI flat itinerary and keeps canonical consistency', () => {
+    const base = buildSelfHealingPlan(
+      {
+        days: [
+          { day: 1, activities: ['Beach', 'Lunch'] },
+          { day: 2, activities: ['Museum', 'Dinner'] }
+        ]
+      },
+      ['Beach', 'Lunch', 'Museum', 'Dinner'],
+      'Mưa to kèm gió mạnh',
+      { days: 2, budget: '120000', group: 'gia đình', notes: '' }
+    );
+    const normalized = normalizeSelfHealingAiResult(base, {
+      updated_itinerary: ['Aquarium', 'Food Hall', 'Museum', 'Dinner']
+    });
+
+    assert.equal(normalized.updated_days.length, 2);
+    assert.deepEqual(canonicalHealedActivities(normalized), normalized.updated_itinerary);
+    assert.ok(normalized.replacements.length >= 1);
+  });
+
+  test('keeps day mapping stable when AI flat itinerary has extra noisy entries', () => {
+    const base = buildSelfHealingPlan(
+      {
+        days: [
+          { day: 1, activities: ['Naha Airport', 'Kyara'] },
+          { day: 2, activities: ['Churaumi Aquarium', 'Cape Manzamo'] }
+        ]
+      },
+      ['Naha Airport', 'Kyara', 'Churaumi Aquarium', 'Cape Manzamo'],
+      'Mưa to kèm gió mạnh',
+      { days: 2, budget: '120000', group: 'gia đình', notes: '' }
+    );
+    const normalized = normalizeSelfHealingAiResult(base, {
+      updated_itinerary: [
+        '2026-09-10 | Naha Airport',
+        '2026-09-10 | Kyara',
+        '2026-09-11 | Churaumi Aquarium',
+        '2026-09-11 | Cape Manzamo',
+        '2026-09-11 | Extra item that should invalidate positional remap'
+      ]
+    });
+    assert.equal(normalized.updated_days.length, 2);
+    assert.equal(normalized.updated_days[0].activities.length, 2);
+    assert.equal(normalized.updated_days[1].activities.length, 2);
+  });
+});
+
+describe('buildPlannerDataFromHealedData', () => {
+  test('maps updated_days into planner day/activity objects', () => {
+    const planner = buildPlannerDataFromHealedData({
+      updated_days: [
+        { day: 1, activities: [{ text: 'Aquarium', slot: 'morning' }, { text: 'Food Hall', slot: 'afternoon' }] },
+        { day: 2, activities: [{ text: 'Museum', slot: 'evening' }] }
+      ]
+    }, { summary: 'original summary' });
+
+    assert.equal(planner.summary, 'original summary');
+    assert.equal(planner.days.length, 2);
+    assert.equal(planner.days[0].activities[0].text, 'Aquarium');
+    assert.equal(planner.days[0].activities[0].slot, 'morning');
+    assert.equal(planner.days[1].day, 2);
+  });
+
+  test('falls back to a one-day plan when only updated_itinerary exists', () => {
+    const planner = buildPlannerDataFromHealedData({
+      updated_itinerary: ['Aquarium', 'Market']
+    }, {});
+
+    assert.equal(planner.days.length, 1);
+    assert.equal(planner.days[0].day, 1);
+    assert.deepEqual(planner.days[0].activities.map(a => a.text), ['Aquarium', 'Market']);
+  });
+});
+
+describe('relocalizeHealedData', () => {
+  test('rebuilds forecast-based incident summary in target language', () => {
+    const source = {
+      incident_summary: 'Dự báo: giông bão, nhiệt độ cao nhất 30°C, lượng mưa 20mm.',
+      severity: 'high',
+      context_summary: '3 ngày • ngân sách 100000 yên',
+      updated_days: [{ day: 1, activities: [{ original: 'Beach', text: 'Museum', changed: true, reason: 'x', slot: 'morning' }] }],
+      updated_itinerary: ['Museum'],
+      satisfactionDelta: { before: 60, after: 58, perMember: [{ name: 'A', before: 70, after: 60 }] },
+      meta: {
+        rawIncidentText: 'Forecast: thunderstorm, max 30°C, precipitation 20mm.',
+        plannerContext: { days: 3, budget: '100000', group: 'family', notes: 'car rental' },
+        forecastEvent: { date: '2026-09-11', weatherCode: 95, tempMax: 30, precip: 20, severity: 'high', type: 'storm' }
+      }
+    };
+    const ja = relocalizeHealedData(source, 'ja');
+    assert.match(ja.incident_summary, /重大な状況|雷雨/);
+    assert.match(ja.context_summary, /日間/);
+    assert.match(ja.meta.forecastEvent.text, /予報|雷雨/);
+  });
+});
+
+describe('normalizeMemberImpactAi', () => {
+  test('keeps only valid members and enforces impact labels', () => {
+    const delta = {
+      before: 66,
+      after: 63,
+      perMember: [
+        { name: 'A', before: 70, after: 60 },
+        { name: 'B', before: 62, after: 66 }
+      ]
+    };
+    const normalized = normalizeMemberImpactAi({
+      summary: 'custom',
+      members: [
+        { name: 'A', impact: 'negative', reason: 'r1', advice: 'a1' },
+        { name: 'X', impact: 'positive', reason: 'ignored', advice: 'ignored' },
+        { name: 'B', impact: 'weird-value', reason: 'r2', advice: '' }
+      ]
+    }, delta, 'en');
+
+    assert.equal(normalized.members.length, 2);
+    assert.equal(normalized.members[0].name, 'A');
+    assert.equal(normalized.members[0].impact, 'negative');
+    assert.equal(normalized.members[1].name, 'B');
+    assert.equal(normalized.members[1].impact, 'positive');
   });
 });
 

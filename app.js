@@ -175,11 +175,18 @@ const I18N = {
     heal: {
       title: 'Lịch trình tự thay đổi',
       itinLabel: 'Lịch trình hiện tại (mỗi dòng 1 hoạt động)',
+      itinPlaceholder: 'Day 1 | sáng | Beach\nDay 1 | tối | Outdoor BBQ\nDay 2 | chiều | Museum',
+      itinFormatHint: 'Có thể nhập dạng nâng cao: Day/Ngày + buổi + hoạt động (VD: "Day 2 | chiều | Museum"). Nếu không nhập Day/buổi, app vẫn hiểu theo dạng mỗi dòng 1 hoạt động như cũ.',
       destLabel: 'Điểm đến (để lấy thời tiết thật)',
       eventLabel: 'Tình huống bất ngờ',
       eventPlaceholder: 'Buổi sáng mưa lớn',
       weatherBtn: '🌦️ Lấy thời tiết thật',
       runBtn: 'Cập nhật lịch trình',
+      acceptBtn: 'Accept Plan vào Tab 1',
+      acceptDisabledNoUpdate: 'Chưa có kế hoạch cập nhật để áp dụng. Hãy bấm "Cập nhật lịch trình" trước.',
+      acceptDisabledAccepted: 'Kế hoạch này đã được áp dụng vào Tab 1.',
+      acceptReady: 'Có kế hoạch cập nhật mới. Bấm Accept để ghi đè lịch trình Tab 1.',
+      acceptDone: '✅ Đã áp dụng kế hoạch mới vào lịch trình Tab 1.',
       loading: 'Đang cập nhật lịch trình...',
       defaultItinerary: 'Beach\nSunset viewing\nOutdoor BBQ\nDinner ngoài trời',
       defaultEvent: 'Buổi sáng mưa lớn',
@@ -187,7 +194,10 @@ const I18N = {
       lookingUp: 'Đang tra vị trí và thời tiết thật...',
       notFound: (dest) => `⚠️ Không tìm thấy vị trí "${dest}".`,
       weatherText: (place, country, desc, temp, precip) => `Tại ${place}${country ? ', ' + country : ''} hiện đang ${desc}, ${temp}°C${precip > 0 ? `, lượng mưa ${precip}mm` : ''}.`,
+      weatherForecastText: (date, desc, tempMax, precip) => `Dự báo: ${desc}, nhiệt độ cao nhất ${tempMax}°C${precip > 0 ? `, lượng mưa ${precip}mm` : ''}.`,
       weatherReady: (time) => `✅ Dữ liệu thật từ Open-Meteo, cập nhật lúc ${time}.`,
+      weatherReadyForecast: (startDate, days) => `✅ Đã lấy dự báo theo chuyến đi từ ngày ${startDate} trong ${days} ngày.`,
+      weatherFallbackCurrent: 'ℹ️ Chưa đủ dữ liệu ngày khởi hành/số ngày, nên đang dùng thời tiết hiện tại.',
       weatherError: (msg) => `⚠️ Không lấy được thời tiết: ${msg}`,
       incidentLabel: 'Tình huống:',
       planLabel: 'Bám theo plan Tab 1:',
@@ -198,14 +208,30 @@ const I18N = {
       reasonRain: 'Mưa to khiến hoạt động ngoài trời không còn phù hợp',
       reasonHeat: 'Nắng nóng cực đoan, chuyển sang nơi có điều hòa',
       reasonWind: 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế',
+      reasonClosure: 'Điểm đến bị đóng cửa nên cần thay bằng phương án tương tự đang mở',
+      reasonStrike: 'Sự cố đình công làm gián đoạn kế hoạch nên cần đổi hoạt động ít phụ thuộc vào tuyến bị ảnh hưởng',
+      reasonTraffic: 'Kẹt xe/tắc đường nghiêm trọng nên ưu tiên hoạt động gần và dễ di chuyển hơn',
+      reasonOverbook: 'Địa điểm hết chỗ nên cần thay bằng phương án tương đương còn chỗ',
+      reasonHealth: 'Tình trạng sức khỏe không phù hợp hoạt động cường độ cao nên chuyển sang phương án nhẹ nhàng hơn',
       reasonDefault: 'Thời tiết xấu khiến hoạt động ngoài trời nên được thay thế',
       summaryDefault: 'Không có mô tả tình huống cụ thể.',
       summaryStorm: (text) => `Sự cố nghiêm trọng: ${text}`,
       summaryRain: (text) => `Thời tiết mưa: ${text}`,
       summaryHeat: (text) => `Thời tiết nóng / nắng: ${text}`,
       summaryWind: (text) => `Thời tiết gió mạnh: ${text}`,
-      systemPrompt: 'Bạn là AI Self-Healing Itinerary Engine. Khi có tình huống bất ngờ, tự động thay thế các hoạt động không còn phù hợp bằng lựa chọn thay thế hợp lý, giữ nguyên các hoạt động không bị ảnh hưởng. Trả lời DUY NHẤT bằng JSON (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
-      userPrompt: (itin, event) => `Lịch trình hiện tại:\n${itin.map(i => '- ' + i).join('\n')}\n\nTình huống: ${event}`
+      summaryClosure: (text) => `Địa điểm tạm ngừng hoạt động: ${text}`,
+      summaryStrike: (text) => `Gián đoạn do đình công: ${text}`,
+      summaryTraffic: (text) => `Kẹt xe / tắc đường: ${text}`,
+      summaryOverbook: (text) => `Địa điểm đã kín chỗ: ${text}`,
+      summaryHealth: (text) => `Vấn đề sức khỏe trong chuyến đi: ${text}`,
+      impactAiTitle: '🧠 AI phân tích mức ảnh hưởng theo thành viên',
+      impactAiSummary: 'Đánh giá tổng quan:',
+      impactAiReason: 'Lý do:',
+      impactAiAdvice: 'Gợi ý điều chỉnh:',
+      impactAiChange: (before, after, diff) => `${before}% → ${after}% (${diff > 0 ? '+' : ''}${diff}%)`,
+      impactAiTag: { positive: 'Tích cực', neutral: 'Trung tính', negative: 'Tiêu cực' },
+      systemPrompt: 'Bạn là AI Self-Healing Itinerary Engine. Trả lời CHỈ JSON hợp lệ, không thêm văn bản. Viết nội dung tiếng Việt, giữ nguyên tên field tiếng Anh. Schema: {"updated_itinerary":["..."],"replacements":[{"original":"...","replacement":"...","reason":"..."}]}. Quy tắc: chỉ thay hoạt động bị ảnh hưởng; giữ nguyên hoạt động còn phù hợp; không thêm ngày/thời gian vào tên hoạt động.',
+      userPrompt: (itin, event) => `Itinerary:\n${itin.map(i => '- ' + i).join('\n')}\nSituation: ${event}`
     },
     camera: {
       title: 'AI hiểu qua camera',
@@ -442,11 +468,18 @@ const I18N = {
     heal: {
       title: '旅程の自動リカバリー',
       itinLabel: '現在の旅程（1行に1つのアクティビティ）',
+      itinPlaceholder: 'Day 1 | 朝 | Beach\nDay 1 | 夜 | Outdoor BBQ\nDay 2 | 午後 | Museum',
+      itinFormatHint: '詳細入力にも対応: Day/日 + 時間帯 + アクティビティ（例: "Day 2 | 午後 | Museum"）。未指定の場合は従来通り1行1アクティビティとして扱います。',
       destLabel: '目的地（実際の天気を取得するため）',
       eventLabel: '突発的な状況',
       eventPlaceholder: '朝から大雨',
       weatherBtn: '🌦️ 実際の天気を取得',
       runBtn: '旅程を更新',
+      acceptBtn: 'この計画をTab 1へ反映',
+      acceptDisabledNoUpdate: '反映できる更新済みプランがありません。先に「旅程を更新」を実行してください。',
+      acceptDisabledAccepted: 'このプランはすでにTab 1へ反映済みです。',
+      acceptReady: '更新済みプランがあります。AcceptでTab 1の旅程を上書きします。',
+      acceptDone: '✅ 新しいプランをTab 1の旅程に反映しました。',
       loading: '旅程を更新中...',
       defaultItinerary: 'ビーチ\n夕日鑑賞\n屋外バーベキュー\n屋外ディナー',
       defaultEvent: '朝から大雨',
@@ -454,7 +487,10 @@ const I18N = {
       lookingUp: '位置情報と実際の天気を取得中...',
       notFound: (dest) => `⚠️ 「${dest}」の位置が見つかりません。`,
       weatherText: (place, country, desc, temp, precip) => `${place}${country ? '、' + country : ''}は現在${desc}、${temp}°C${precip > 0 ? `、降水量${precip}mm` : ''}です。`,
+      weatherForecastText: (date, desc, tempMax, precip) => `予報: ${desc}、最高気温${tempMax}°C${precip > 0 ? `、降水量${precip}mm` : ''}。`,
       weatherReady: (time) => `✅ Open-Meteoの実データ、${time}時点。`,
+      weatherReadyForecast: (startDate, days) => `✅ ${startDate}開始の${days}日間の予報を取得しました。`,
+      weatherFallbackCurrent: 'ℹ️ 開始日または日数が不足しているため、現在の天気を使用しています。',
       weatherError: (msg) => `⚠️ 天気を取得できませんでした：${msg}`,
       incidentLabel: '状況：',
       planLabel: 'Tab 1 の計画に沿う：',
@@ -465,14 +501,30 @@ const I18N = {
       reasonRain: '雨が強く、屋外アクティビティが適さない',
       reasonHeat: '猛暑のため、冷房のある場所に切り替える',
       reasonWind: '風が強く、屋外の予定を変更する必要がある',
+      reasonClosure: '施設の休業により、営業中の近い代替案に置き換える必要がある',
+      reasonStrike: 'ストライキで計画が不安定なため、影響を受けにくい活動へ変更する',
+      reasonTraffic: '深刻な渋滞のため、近距離で移動しやすい活動を優先する',
+      reasonOverbook: '満席・予約不可のため、同等の代替先に変更する',
+      reasonHealth: '体調を考慮し、負荷の低い活動へ切り替える',
       reasonDefault: '悪天候のため、屋外の予定を変更する必要がある',
       summaryDefault: '具体的な状況の説明はありません。',
       summaryStorm: (text) => `重大な状況: ${text}`,
       summaryRain: (text) => `雨天: ${text}`,
       summaryHeat: (text) => `猛暑: ${text}`,
       summaryWind: (text) => `強風: ${text}`,
-      systemPrompt: 'あなたはAI Self-Healing Itinerary Engineです。突発的な状況が発生した場合、もう適さなくなったアクティビティを合理的な代替案に自動的に置き換え、影響を受けないアクティビティはそのまま維持してください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
-      userPrompt: (itin, event) => `現在の旅程：\n${itin.map(i => '- ' + i).join('\n')}\n\n状況：${event}`
+      summaryClosure: (text) => `施設クローズ: ${text}`,
+      summaryStrike: (text) => `ストライキによる影響: ${text}`,
+      summaryTraffic: (text) => `渋滞・交通障害: ${text}`,
+      summaryOverbook: (text) => `満席・予約不可: ${text}`,
+      summaryHealth: (text) => `体調トラブル: ${text}`,
+      impactAiTitle: '🧠 メンバー別の影響をAI分析',
+      impactAiSummary: '総合評価:',
+      impactAiReason: '理由:',
+      impactAiAdvice: '調整提案:',
+      impactAiChange: (before, after, diff) => `${before}% → ${after}% (${diff > 0 ? '+' : ''}${diff}%)`,
+      impactAiTag: { positive: 'プラス', neutral: '中立', negative: 'マイナス' },
+      systemPrompt: 'あなたはAI Self-Healing Itinerary Engineです。必ず有効なJSONのみを返してください（説明文禁止）。内容は日本語、フィールド名は英語のまま。Schema: {"updated_itinerary":["..."],"replacements":[{"original":"...","replacement":"...","reason":"..."}]}. ルール: 影響を受ける活動だけ置換し、問題ない活動は維持。活動名に日付や時刻を付けない。',
+      userPrompt: (itin, event) => `Itinerary:\n${itin.map(i => '- ' + i).join('\n')}\nSituation: ${event}`
     },
     camera: {
       title: 'カメラでAI認識',
@@ -709,11 +761,18 @@ const I18N = {
     heal: {
       title: 'Self-healing itinerary',
       itinLabel: 'Current itinerary (one activity per line)',
+      itinPlaceholder: 'Day 1 | morning | Beach\nDay 1 | evening | Outdoor BBQ\nDay 2 | afternoon | Museum',
+      itinFormatHint: 'Advanced format is supported: Day + time slot + activity (e.g. "Day 2 | afternoon | Museum"). If omitted, each line is still treated as one activity as before.',
       destLabel: 'Destination (to fetch real weather)',
       eventLabel: 'Unexpected situation',
       eventPlaceholder: 'Heavy rain in the morning',
       weatherBtn: '🌦️ Fetch real weather',
       runBtn: 'Update itinerary',
+      acceptBtn: 'Accept Plan to Tab 1',
+      acceptDisabledNoUpdate: 'No updated plan is available to apply. Run "Update itinerary" first.',
+      acceptDisabledAccepted: 'This plan has already been applied to Tab 1.',
+      acceptReady: 'An updated plan is ready. Click Accept to overwrite Tab 1 itinerary.',
+      acceptDone: '✅ Updated plan applied to Tab 1 itinerary.',
       loading: 'Updating itinerary...',
       defaultItinerary: 'Beach\nSunset viewing\nOutdoor BBQ\nOutdoor dinner',
       defaultEvent: 'Heavy rain in the morning',
@@ -721,7 +780,10 @@ const I18N = {
       lookingUp: 'Looking up location and real weather...',
       notFound: (dest) => `⚠️ Couldn't find a location for "${dest}".`,
       weatherText: (place, country, desc, temp, precip) => `${place}${country ? ', ' + country : ''} currently has ${desc}, ${temp}°C${precip > 0 ? `, ${precip}mm of precipitation` : ''}.`,
+      weatherForecastText: (date, desc, tempMax, precip) => `Forecast: ${desc}, max ${tempMax}°C${precip > 0 ? `, precipitation ${precip}mm` : ''}.`,
       weatherReady: (time) => `✅ Real data from Open-Meteo, updated at ${time}.`,
+      weatherReadyForecast: (startDate, days) => `✅ Pulled forecast for the trip window starting ${startDate} (${days} days).`,
+      weatherFallbackCurrent: 'ℹ️ Missing trip start date/day count, so current weather is used instead.',
       weatherError: (msg) => `⚠️ Couldn't fetch weather: ${msg}`,
       incidentLabel: 'Situation:',
       planLabel: 'Based on Tab 1 plan:',
@@ -732,14 +794,30 @@ const I18N = {
       reasonRain: 'Heavy rain makes the outdoor activity unsuitable',
       reasonHeat: 'Extreme heat means moving to air-conditioned places',
       reasonWind: 'Strong wind makes the outdoor activity unsuitable',
+      reasonClosure: 'The venue is closed, so it should be swapped for a similar open option',
+      reasonStrike: 'A strike disruption makes this plan unreliable, so switch to less-affected options',
+      reasonTraffic: 'Severe traffic disruption means preferring closer and easier-to-reach activities',
+      reasonOverbook: 'The venue is fully booked, so replace it with an equivalent available option',
+      reasonHealth: 'The health condition makes high-intensity activities unsuitable, so use gentler options',
       reasonDefault: 'Bad weather means the outdoor activity should be replaced',
       summaryDefault: 'There is no specific incident description.',
       summaryStorm: (text) => `Severe incident: ${text}`,
       summaryRain: (text) => `Rainy conditions: ${text}`,
       summaryHeat: (text) => `Heatwave: ${text}`,
       summaryWind: (text) => `Strong wind: ${text}`,
-      systemPrompt: 'You are the AI Self-Healing Itinerary Engine. When an unexpected situation comes up, automatically replace activities that no longer fit with reasonable alternatives, keeping unaffected activities unchanged. Reply with ONLY JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"replacements":[{"original":"Beach","replacement":"Aquarium","reason":"..."}],"updated_itinerary":["Aquarium","Sunset viewing", "..."]}',
-      userPrompt: (itin, event) => `Current itinerary:\n${itin.map(i => '- ' + i).join('\n')}\n\nSituation: ${event}`
+      summaryClosure: (text) => `Venue closure: ${text}`,
+      summaryStrike: (text) => `Strike disruption: ${text}`,
+      summaryTraffic: (text) => `Traffic disruption: ${text}`,
+      summaryOverbook: (text) => `Venue overbooked: ${text}`,
+      summaryHealth: (text) => `Health issue during the trip: ${text}`,
+      impactAiTitle: '🧠 AI impact analysis by member',
+      impactAiSummary: 'Overall assessment:',
+      impactAiReason: 'Reason:',
+      impactAiAdvice: 'Adjustment advice:',
+      impactAiChange: (before, after, diff) => `${before}% → ${after}% (${diff > 0 ? '+' : ''}${diff}%)`,
+      impactAiTag: { positive: 'Positive', neutral: 'Neutral', negative: 'Negative' },
+      systemPrompt: 'You are the AI Self-Healing Itinerary Engine. Return valid JSON only, no prose. Keep English field names. Schema: {"updated_itinerary":["..."],"replacements":[{"original":"...","replacement":"...","reason":"..."}]}. Rules: replace only affected activities, keep unaffected ones unchanged, and do not prepend dates/times to activity text.',
+      userPrompt: (itin, event) => `Itinerary:\n${itin.map(i => '- ' + i).join('\n')}\nSituation: ${event}`
     },
     camera: {
       title: 'AI understands via camera',
@@ -906,6 +984,233 @@ function buildGeoLookupCandidates(dest) {
   return candidates.slice(0, 8);
 }
 
+function toIsoDateOnly(value) {
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString().slice(0, 10);
+}
+
+function addDaysIso(isoDate, offset) {
+  const d = new Date(`${isoDate}T00:00:00`);
+  if (Number.isNaN(d.getTime())) return '';
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().slice(0, 10);
+}
+
+function classifyForecastSeverity(code, precip, tMax) {
+  const c = Number(code);
+  const p = Number(precip) || 0;
+  const t = Number(tMax);
+  const stormCodes = [65, 75, 82, 95, 96, 99];
+  const rainCodes = [51, 53, 55, 61, 63, 80, 81];
+  const high = stormCodes.includes(c) || p >= 15 || (!Number.isNaN(t) && t >= 35);
+  const medium = rainCodes.includes(c) || p >= 3 || (!Number.isNaN(t) && t >= 31) || c === 45 || c === 48;
+  if (high) {
+    const type = !Number.isNaN(t) && t >= 35 ? 'heat' : (stormCodes.includes(c) || p >= 15 ? 'storm' : 'rain');
+    return { type, severity: 'high' };
+  }
+  if (medium) {
+    const type = !Number.isNaN(t) && t >= 31 ? 'heat' : (c === 45 || c === 48 ? 'wind' : 'rain');
+    return { type, severity: 'medium' };
+  }
+  return { type: 'default', severity: 'low' };
+}
+
+function buildForecastEventFromDaily(daily, startDate, days, lang = DEFAULT_LANG) {
+  const startIso = toIsoDateOnly(startDate);
+  const totalDays = Math.max(1, Number(days) || 0);
+  if (!startIso || !totalDays) return null;
+  if (!daily || !Array.isArray(daily.time) || !daily.time.length) return null;
+
+  const endIso = addDaysIso(startIso, totalDays - 1);
+  if (!endIso) return null;
+  const bucket = [];
+  daily.time.forEach((date, i) => {
+    if (date < startIso || date > endIso) return;
+    const weatherCode = Array.isArray(daily.weather_code) ? daily.weather_code[i] : null;
+    const precip = Array.isArray(daily.precipitation_sum) ? daily.precipitation_sum[i] : 0;
+    const tMax = Array.isArray(daily.temperature_2m_max) ? daily.temperature_2m_max[i] : null;
+    const info = classifyForecastSeverity(weatherCode, precip, tMax);
+    bucket.push({ date, weatherCode, precip, tMax, type: info.type, severity: info.severity });
+  });
+  if (!bucket.length) return null;
+
+  const rank = { low: 1, medium: 2, high: 3 };
+  bucket.sort((a, b) => (rank[b.severity] - rank[a.severity]) || ((Number(b.precip) || 0) - (Number(a.precip) || 0)));
+  const worst = bucket[0];
+  const desc = weatherDescription(worst.weatherCode, lang);
+  const tempMax = Number.isFinite(Number(worst.tMax)) ? Math.round(Number(worst.tMax)) : 0;
+  const precip = Math.round(Number(worst.precip) || 0);
+  const text = tr(lang, 'heal.weatherForecastText', worst.date, desc, tempMax, precip);
+  return {
+    text,
+    severity: worst.severity,
+    type: worst.type,
+    startDate: startIso,
+    days: totalDays,
+    date: worst.date,
+    weatherCode: Number(worst.weatherCode),
+    tempMax,
+    precip
+  };
+}
+
+function relocalizeWeatherIncidentText(data, lang = DEFAULT_LANG) {
+  if (!data || !data.meta || !data.meta.forecastEvent) return data;
+  const forecast = data.meta.forecastEvent;
+  if (!forecast || !forecast.date) return data;
+  const desc = weatherDescription(forecast.weatherCode, lang);
+  const rebuilt = tr(lang, 'heal.weatherForecastText', forecast.date, desc, forecast.tempMax, forecast.precip);
+  return {
+    ...data,
+    incident_summary: summarizeIncident(rebuilt, { type: forecast.type || 'default', severity: forecast.severity || 'low', text: rebuilt }, lang),
+    meta: {
+      ...data.meta,
+      forecastEvent: {
+        ...forecast,
+        text: rebuilt
+      }
+    }
+  };
+}
+
+function rebuildLocalizedPlannerContextSummary(context, lang = DEFAULT_LANG) {
+  const ctx = context || {};
+  const parts = [];
+  if (ctx.days) parts.push(`${ctx.days} ${lang === 'ja' ? '日間' : lang === 'en' ? 'days' : 'ngày'}`);
+  if (ctx.budget) {
+    if (lang === 'ja') parts.push(`予算 ${ctx.budget} 円`);
+    else if (lang === 'en') parts.push(`budget ${ctx.budget} yen`);
+    else parts.push(`ngân sách ${ctx.budget} yên`);
+  }
+  if (ctx.group) {
+    if (lang === 'ja') parts.push(`グループ: ${ctx.group}`);
+    else if (lang === 'en') parts.push(`group: ${ctx.group}`);
+    else parts.push(`nhóm: ${ctx.group}`);
+  }
+  if (ctx.notes) {
+    if (lang === 'ja') parts.push(`メモ: ${ctx.notes}`);
+    else if (lang === 'en') parts.push(`notes: ${ctx.notes}`);
+    else parts.push(`ghi chú: ${ctx.notes}`);
+  }
+  return parts.join(' • ');
+}
+
+function relocalizeHealedData(data, lang = DEFAULT_LANG) {
+  if (!data || typeof data !== 'object') return data;
+  const next = { ...data };
+  if (next.meta && next.meta.plannerContext) {
+    next.context_summary = rebuildLocalizedPlannerContextSummary(next.meta.plannerContext, lang);
+  }
+  if (next.meta && next.meta.rawIncidentText) {
+    const incident = classifyIncident(next.meta.rawIncidentText);
+    next.incident_summary = summarizeIncident(next.meta.rawIncidentText, incident, lang);
+    next.severity = incident.severity;
+    next.notes = incidentReasonText(incident, lang);
+  }
+  if (next.satisfactionDelta) {
+    const rawImpact = next.meta && next.meta.impactAiRaw;
+    const rawLang = next.meta && next.meta.impactAiLang;
+    next.impactAi = rawImpact && rawLang === lang
+      ? normalizeMemberImpactAi(rawImpact, next.satisfactionDelta, lang)
+      : buildMemberImpactFallback(next.satisfactionDelta, lang);
+  }
+  const weatherRelocalized = relocalizeWeatherIncidentText(next, lang);
+  return weatherRelocalized;
+}
+
+function buildMemberImpactFallback(delta, lang = DEFAULT_LANG) {
+  if (!delta || !Array.isArray(delta.perMember)) return null;
+  const rows = delta.perMember.map(m => {
+    const diff = (m.after || 0) - (m.before || 0);
+    const impact = diff >= 3 ? 'positive' : diff <= -3 ? 'negative' : 'neutral';
+    return {
+      name: m.name,
+      before: m.before,
+      after: m.after,
+      diff,
+      impact,
+      reason: impact === 'positive'
+        ? (lang === 'ja' ? '置換後の活動がこのメンバーの好みにより近くなりました。' : lang === 'en' ? 'The replacement activities align better with this member\'s preferences.' : 'Các hoạt động thay thế phù hợp sở thích của thành viên này hơn.')
+        : impact === 'negative'
+          ? (lang === 'ja' ? '一部の置換により、このメンバーの好みとの一致が下がりました。' : lang === 'en' ? 'Some replacements reduced alignment with this member\'s preferences.' : 'Một số thay thế làm giảm độ phù hợp với sở thích của thành viên này.')
+          : (lang === 'ja' ? '変更前後で満足度はほぼ同等です。' : lang === 'en' ? 'Satisfaction is largely unchanged after the swap.' : 'Mức độ hài lòng gần như không đổi sau khi thay đổi.'),
+      advice: impact === 'negative'
+        ? (lang === 'ja' ? '次の置換ではこのメンバーの優先項目を1つ追加してください。' : lang === 'en' ? 'For the next swap, add one activity tailored to this member.' : 'Ở lượt điều chỉnh tiếp theo, nên thêm 1 hoạt động ưu tiên cho thành viên này.')
+        : ''
+    };
+  });
+  const overallDiff = (delta.after || 0) - (delta.before || 0);
+  const summary = overallDiff >= 3
+    ? (lang === 'ja' ? 'グループ全体の満足度は改善しました。' : lang === 'en' ? 'Overall group satisfaction improved.' : 'Mức hài lòng chung của nhóm đã tăng.')
+    : overallDiff <= -3
+      ? (lang === 'ja' ? 'グループ全体の満足度は低下しました。' : lang === 'en' ? 'Overall group satisfaction dropped.' : 'Mức hài lòng chung của nhóm đã giảm.')
+      : (lang === 'ja' ? 'グループ全体の満足度は概ね維持されています。' : lang === 'en' ? 'Overall group satisfaction is mostly preserved.' : 'Mức hài lòng chung của nhóm nhìn chung được giữ ổn định.');
+  return { summary, members: rows };
+}
+
+function normalizeMemberImpactAi(raw, delta, lang = DEFAULT_LANG) {
+  const fallback = buildMemberImpactFallback(delta, lang);
+  if (!raw || typeof raw !== 'object' || !Array.isArray(raw.members)) return fallback;
+
+  const byName = new Map((delta && Array.isArray(delta.perMember) ? delta.perMember : []).map(m => [String(m.name || ''), m]));
+  const members = [];
+
+  raw.members.forEach(row => {
+    const name = String(row && row.name || '').trim();
+    if (!name || !byName.has(name)) return;
+    const original = byName.get(name);
+    const before = Number(original.before) || 0;
+    const after = Number(original.after) || 0;
+    const diff = after - before;
+    let impact = String(row && row.impact || '').trim().toLowerCase();
+    if (!['positive', 'neutral', 'negative'].includes(impact)) {
+      impact = diff >= 3 ? 'positive' : diff <= -3 ? 'negative' : 'neutral';
+    }
+    members.push({
+      name,
+      before,
+      after,
+      diff,
+      impact,
+      reason: String(row && row.reason || '').trim() || (fallback && fallback.members.find(m => m.name === name)?.reason) || '',
+      advice: String(row && row.advice || '').trim() || ''
+    });
+  });
+
+  if (!members.length) return fallback;
+  return {
+    summary: String(raw.summary || '').trim() || (fallback && fallback.summary) || '',
+    members
+  };
+}
+
+function renderImpactAiHtml(impactAi, lang = DEFAULT_LANG) {
+  if (!impactAi || !Array.isArray(impactAi.members) || !impactAi.members.length) return '';
+  let html = `<div class="impact-ai"><div class="sat-score-label">${escapeHtml(tr(lang, 'heal.impactAiTitle'))}</div>`;
+  if (impactAi.summary) {
+    html += `<div class="impact-summary"><strong>${escapeHtml(tr(lang, 'heal.impactAiSummary'))}</strong> ${escapeHtml(impactAi.summary)}</div>`;
+  }
+  impactAi.members.forEach(row => {
+    const tag = tr(lang, `heal.impactAiTag.${row.impact}`);
+    const diff = Number(row.diff) || 0;
+    const tone = diff > 0 ? 'pos' : diff < 0 ? 'neg' : 'neu';
+    html += `<div class="impact-row ${tone}"><div class="impact-top"><span class="impact-name">${escapeHtml(row.name)}</span><span class="impact-tag ${tone}">${escapeHtml(tag)}</span></div>`;
+    html += `<div class="impact-score">${escapeHtml(tr(lang, 'heal.impactAiChange', row.before, row.after, diff))}</div>`;
+    if (row.reason) html += `<div class="impact-reason"><strong>${escapeHtml(tr(lang, 'heal.impactAiReason'))}</strong> ${escapeHtml(row.reason)}</div>`;
+    if (row.advice) html += `<div class="impact-advice"><strong>${escapeHtml(tr(lang, 'heal.impactAiAdvice'))}</strong> ${escapeHtml(row.advice)}</div>`;
+    html += `</div>`;
+  });
+  html += `</div>`;
+  return html;
+}
+
+function impactOutputLanguageName(lang = DEFAULT_LANG) {
+  if (lang === 'ja') return 'Japanese';
+  if (lang === 'en') return 'English';
+  return 'Vietnamese';
+}
+
 /**
  * Finds the first balanced {...} object in text, respecting strings/escapes,
  * instead of a greedy "first { to last }" regex — more robust when the model
@@ -964,13 +1269,32 @@ function extractJson(text, lang) {
 
 // ---------- Render helpers (return HTML strings; pure given data) ----------
 
+function plannerActivityText(activity) {
+  if (typeof activity === 'string') return activity.trim();
+  if (activity && typeof activity === 'object') return String(activity.text || '').trim();
+  return String(activity || '').trim();
+}
+
+function plannerActivitySlot(activity) {
+  if (!activity || typeof activity !== 'object') return '';
+  return normalizeTimeSlot(activity.slot);
+}
+
 function renderPlannerHtml(data, dest, lang, requestedDays) {
   let dayHtml = '';
   let renderedDays = 0;
   (data.days || []).forEach((d, i) => {
     if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
+    const entries = d.activities.map(activity => {
+      const text = plannerActivityText(activity);
+      if (!text) return '';
+      const slot = plannerActivitySlot(activity);
+      const slotHtml = slot ? `<span class="slot-badge">${escapeHtml(formatSlotLabel(slot, lang))}</span>` : '';
+      return `<li>${slotHtml}${escapeHtml(text)} ${mapLink(text, dest, lang)}${venueWarning(text, lang)}</li>`;
+    }).filter(Boolean);
+    if (!entries.length) return;
     renderedDays++;
-    const items = d.activities.map(a => `<li>${escapeHtml(a)} ${mapLink(a, dest, lang)}${venueWarning(a, lang)}</li>`).join('');
+    const items = entries.join('');
     dayHtml += `<div class="day-block"><h4>${tr(lang, 'common.dayLabel', d.day || (i + 1))}</h4><ul>${items}</ul></div>`;
   });
   if (!dayHtml) return tr(lang, 'common.noResult');
@@ -991,7 +1315,13 @@ function formatPlannerShareText(data, dest, lang) {
     if (!d || !Array.isArray(d.activities) || d.activities.length === 0) return;
     lines.push('');
     lines.push(String(tr(lang, 'common.dayLabel', d.day || (i + 1))));
-    d.activities.forEach(a => lines.push(`- ${a}`));
+    d.activities.forEach(activity => {
+      const text = plannerActivityText(activity);
+      if (!text) return;
+      const slot = plannerActivitySlot(activity);
+      const slotLabel = slot ? `[${formatSlotLabel(slot, lang)}] ` : '';
+      lines.push(`- ${slotLabel}${text}`);
+    });
   });
   if (data.summary) {
     lines.push('');
@@ -1350,10 +1680,116 @@ function flattenActivities(planData) {
   planData.days.forEach(day => {
     if (!day || !Array.isArray(day.activities)) return;
     day.activities.forEach(activity => {
-      if (typeof activity === 'string' && activity.trim()) flat.push(activity.trim());
+      if (typeof activity === 'string' && activity.trim()) {
+        flat.push(activity.trim());
+        return;
+      }
+      const text = String(activity && activity.text || '').trim();
+      if (text) flat.push(text);
     });
   });
   return dedupePlanItems(flat);
+}
+
+function normalizeTimeSlot(slotRaw) {
+  const slot = normalizeHealedText(slotRaw).replace(/\./g, '').trim();
+  if (!slot) return '';
+  if (/^(morning|am|sáng|sang|朝)$/.test(slot)) return 'morning';
+  if (/^(midday|noon|trưa|trua|昼)$/.test(slot)) return 'midday';
+  if (/^(afternoon|chiều|chieu|午後)$/.test(slot)) return 'afternoon';
+  if (/^(evening|tối|toi|夕方)$/.test(slot)) return 'evening';
+  if (/^(night|đêm|dem|夜|pm)$/.test(slot)) return 'night';
+  return slot;
+}
+
+function formatSlotLabel(slot, lang = DEFAULT_LANG) {
+  const key = normalizeTimeSlot(slot);
+  if (!key) return '';
+  const map = {
+    vi: { morning: 'SANG', midday: 'TRUA', afternoon: 'CHIEU', evening: 'TOI', night: 'DEM' },
+    ja: { morning: 'ASA', midday: 'HIRU', afternoon: 'GOGO', evening: 'YUGATA', night: 'YORU' },
+    en: { morning: 'MORNING', midday: 'MIDDAY', afternoon: 'AFTERNOON', evening: 'EVENING', night: 'NIGHT' }
+  };
+  return (map[lang] && map[lang][key]) || key.toUpperCase();
+}
+
+function parseSelfHealingLine(line) {
+  const raw = String(line || '').trim();
+  if (!raw) return null;
+
+  const full = raw.match(/^(?:day|d|ngay|ngày|第)?\s*(\d{1,2})(?:\s*日)?\s*(?:[|,:\-]\s*)?(morning|midday|afternoon|evening|night|am|pm|sáng|trưa|chiều|tối|đêm|朝|昼|午後|夕方|夜)\s*[|:\-]\s*(.+)$/i);
+  if (full) {
+    return {
+      day: parseInt(full[1], 10),
+      slot: normalizeTimeSlot(full[2]),
+      text: String(full[3] || '').trim(),
+      structured: true
+    };
+  }
+
+  const dayOnly = raw.match(/^(?:day|d|ngay|ngày|第)?\s*(\d{1,2})(?:\s*日)?\s*[|:\-]\s*(.+)$/i);
+  if (dayOnly) {
+    return {
+      day: parseInt(dayOnly[1], 10),
+      slot: '',
+      text: String(dayOnly[2] || '').trim(),
+      structured: true
+    };
+  }
+
+  return { day: null, slot: '', text: raw, structured: false };
+}
+
+function parseSelfHealingInput(text) {
+  const lines = String(text || '').split('\n').map(s => s.trim()).filter(Boolean);
+  const parsed = lines.map(parseSelfHealingLine).filter(Boolean);
+  const hasStructured = parsed.some(p => p.structured);
+  const grouped = new Map();
+  let currentDay = 1;
+
+  parsed.forEach(row => {
+    const day = hasStructured ? (row.day || currentDay || 1) : 1;
+    currentDay = day;
+    if (!grouped.has(day)) grouped.set(day, []);
+    grouped.get(day).push({
+      original: row.text,
+      text: row.text,
+      changed: false,
+      reason: '',
+      slot: normalizeTimeSlot(row.slot)
+    });
+  });
+
+  const days = [...grouped.keys()].sort((a, b) => a - b).map(day => ({ day, activities: grouped.get(day) }));
+  const flatActivities = dedupePlanItems(days.flatMap(d => d.activities.map(a => a.text)));
+  return {
+    hasStructured,
+    days: days.length ? days : [{ day: 1, activities: flatActivities.map(item => ({ original: item, text: item, changed: false, reason: '', slot: '' })) }],
+    flatActivities
+  };
+}
+
+function cleanSelfHealingActivityText(value) {
+  let text = String(value || '').trim();
+  if (!text) return '';
+  text = text
+    .replace(/^\d{4}-\d{2}-\d{2}\s*[|｜]\s*/i, '')
+    .replace(/^(?:day|d|ngay|ngày|第)\s*\d{1,2}(?:\s*日)?\s*[|｜:]\s*/i, '')
+    .replace(/^(?:morning|midday|afternoon|evening|night|am|pm|sáng|trưa|chiều|tối|đêm|朝|昼|午後|夕方|夜)\s*[|｜:]\s*/i, '');
+  return text.trim();
+}
+
+function buildSelfHealingPromptLines(days, lang = DEFAULT_LANG) {
+  const lines = [];
+  cloneSelfHealingDays(days).forEach((day, idx) => {
+    day.activities.forEach(activity => {
+      const slot = formatSlotLabel(activity.slot, lang);
+      const dayLabel = tr(lang, 'common.dayLabel', day.day || (idx + 1));
+      const prefix = slot ? `${dayLabel} | ${slot}` : `${dayLabel}`;
+      lines.push(`${prefix} | ${activity.text}`);
+    });
+  });
+  return lines.length ? lines : [];
 }
 
 function normalizeHealedText(text) {
@@ -1365,10 +1801,30 @@ function classifyIncident(eventText) {
   const rainy = /mưa|rain|drizzle|bão|giông|typhoon|lụt|flood|雨|嵐|台風/.test(text);
   const hot = /nắng|nóng|heat|heatwave|extreme heat|猛暑|酷暑|暑/.test(text);
   const windy = /gió|wind|gust|強風|風が強/.test(text);
+  const closure = /đóng cửa|closed|closure|休業|臨時休業|closed today/.test(text);
+  const strike = /đình công|strike|ストライキ|walkout/.test(text);
+  const traffic = /kẹt xe|tắc đường|traffic jam|road block|road closed|渋滞|通行止め/.test(text);
+  const overbook = /hết chỗ|full booked|fully booked|overbook|sold out|満席|予約不可/.test(text);
+  const health = /ốm|mệt|say nắng|injury|sick|ill|food poisoning|体調不良|発熱/.test(text);
   let type = 'default';
   let severity = 'low';
 
-  if (/bão|giông|typhoon|lụt|flood|hurricane|台風|暴風雨|雷雨/.test(text) || (rainy && windy && /(mưa to|mưa lớn|heavy rain|rainstorm|torrential|豪雨|大雨|gió lớn|gió mạnh|strong wind|暴風|強風)/.test(text))) {
+  if (closure) {
+    type = 'closure';
+    severity = /(cả ngày|all day|entire day|終日)/.test(text) ? 'high' : 'medium';
+  } else if (strike) {
+    type = 'strike';
+    severity = /(toàn tuyến|all lines|citywide|全面|全線)/.test(text) ? 'high' : 'medium';
+  } else if (traffic) {
+    type = 'traffic';
+    severity = /(severe|nghiêm trọng|rất nặng|全域|major)/.test(text) ? 'high' : 'medium';
+  } else if (overbook) {
+    type = 'overbook';
+    severity = /(all|mọi|all day|hết toàn bộ|full day)/.test(text) ? 'high' : 'medium';
+  } else if (health) {
+    type = 'health';
+    severity = /(sốt|fever|hospital|nhập viện|救急)/.test(text) ? 'high' : 'medium';
+  } else if (/bão|giông|typhoon|lụt|flood|hurricane|台風|暴風雨|雷雨/.test(text) || (rainy && windy && /(mưa to|mưa lớn|heavy rain|rainstorm|torrential|豪雨|大雨|gió lớn|gió mạnh|strong wind|暴風|強風)/.test(text))) {
     type = 'storm';
     severity = 'high';
   } else if (rainy && /(mưa rất to|mưa to|mưa lớn|heavy rain|rainstorm|torrential|mưa dông|豪雨|大雨)/.test(text)) {
@@ -1383,6 +1839,9 @@ function classifyIncident(eventText) {
   } else if (rainy) {
     type = 'rain';
     severity = 'medium';
+  } else if (hot) {
+    type = 'heat';
+    severity = 'medium';
   } else if (windy) {
     type = 'wind';
     severity = 'medium';
@@ -1392,6 +1851,20 @@ function classifyIncident(eventText) {
 
 function isSevereWeatherIncident(incident) {
   return !!incident && incident.severity === 'high';
+}
+
+function incidentReasonText(incident, lang = DEFAULT_LANG) {
+  if (!incident) return tr(lang, 'heal.reasonDefault');
+  if (incident.type === 'storm') return tr(lang, 'heal.reasonStorm');
+  if (incident.type === 'heat') return tr(lang, 'heal.reasonHeat');
+  if (incident.type === 'rain') return tr(lang, 'heal.reasonRain');
+  if (incident.type === 'wind') return tr(lang, 'heal.reasonWind');
+  if (incident.type === 'closure') return tr(lang, 'heal.reasonClosure');
+  if (incident.type === 'strike') return tr(lang, 'heal.reasonStrike');
+  if (incident.type === 'traffic') return tr(lang, 'heal.reasonTraffic');
+  if (incident.type === 'overbook') return tr(lang, 'heal.reasonOverbook');
+  if (incident.type === 'health') return tr(lang, 'heal.reasonHealth');
+  return tr(lang, 'heal.reasonDefault');
 }
 
 function classifyActivity(item) {
@@ -1423,11 +1896,41 @@ function buildPlannerContextSummary(context) {
 }
 
 function shouldReplaceActivity(item, info, incident) {
-  if (!isSevereWeatherIncident(incident)) return false;
+  if (!incident || incident.severity === 'low') return false;
   const text = normalizeHealedText(item);
+  const incidentText = normalizeHealedText(incident.text);
   const seaTransit = /boat|cruise|ferry|港|船/.test(text);
   const hasIndoorFoodCue = /nhà hàng|quán|restaurant|café|cafe|izakaya|food hall|indoor/.test(text);
   const outdoorFood = /bbq|barbecue|picnic|outdoor dining|grill/.test(text) && !hasIndoorFoodCue;
+  const exposedOutdoor = /beach|sunset|outdoor|park|hike|trail|garden|boat|cruise|snorkel|surf|bbq|barbecue|bay|picnic|viewpoint|biển|bãi biển|ngắm hoàng hôn|海|ビーチ|公園|散策|ハイキング/.test(text);
+  const strenuous = /hike|trail|trek|climb|surf|snorkel|run|adventure|ハイキング|登山|トレッキング|leo núi/.test(text);
+  const nightlife = /bar|beer|pub|club|izakaya|karaoke|nhậu|bia|バー|居酒屋/.test(text);
+  const incidentMentionsThis = text.length >= 4 && incidentText.includes(text);
+
+  if (incident.type === 'closure') {
+    if (incidentMentionsThis) return true;
+    return incident.severity === 'high' ? (info.category !== 'transit') : (info.category === 'food' || info.category === 'indoor' || info.category === 'outdoor');
+  }
+  if (incident.type === 'strike') {
+    return info.category === 'transit' || seaTransit;
+  }
+  if (incident.type === 'traffic') {
+    return info.category === 'transit' || /airport|station|transfer|drive|bus|train|taxi|空港|駅|移動/.test(text);
+  }
+  if (incident.type === 'overbook') {
+    if (incidentMentionsThis) return true;
+    return info.category === 'food' || /booking|reservation|tour|ticket|予約|book/.test(text);
+  }
+  if (incident.type === 'health') {
+    return strenuous || exposedOutdoor || nightlife;
+  }
+
+  if (incident.severity === 'medium') {
+    if (info.category === 'transit') return seaTransit;
+    if (info.category === 'food') return outdoorFood;
+    return exposedOutdoor || seaTransit || outdoorFood;
+  }
+
   if (info.category === 'transit' && !seaTransit) return false;
   if (info.category === 'food' && !outdoorFood) return false;
   return info.category === 'outdoor' || seaTransit || outdoorFood;
@@ -1462,6 +1965,12 @@ function rankReplacementCandidates(candidates, original, context, incidentType) 
       if (/food hall|restaurant|café|cafe|indoor market/.test(key)) score += 3;
     }
     if (incidentType === 'storm') score += /indoor|museum|aquarium|cinema|food hall|market|café|cafe/.test(key) ? 2 : 0;
+    if (incidentType === 'traffic' || incidentType === 'strike') score += /food hall|café|cafe|indoor market|museum/.test(key) ? 2 : 0;
+    if (incidentType === 'overbook') score += /food hall|restaurant|café|cafe|indoor market/.test(key) ? 2 : 0;
+    if (incidentType === 'health') {
+      if (/spa|café|cafe|museum|aquarium|cinema/.test(key)) score += 3;
+      if (/arcade/.test(key)) score -= 1;
+    }
     scored.push({ candidate, score });
   });
   scored.sort((a, b) => b.score - a.score);
@@ -1508,6 +2017,11 @@ function formatReplacementActivity(original, replacement, lang = DEFAULT_LANG) {
 function summarizeIncident(eventText, incident, lang = DEFAULT_LANG) {
   const text = String(eventText || '').trim();
   if (!text) return tr(lang, 'heal.summaryDefault');
+  if (incident.type === 'closure') return tr(lang, 'heal.summaryClosure', text);
+  if (incident.type === 'strike') return tr(lang, 'heal.summaryStrike', text);
+  if (incident.type === 'traffic') return tr(lang, 'heal.summaryTraffic', text);
+  if (incident.type === 'overbook') return tr(lang, 'heal.summaryOverbook', text);
+  if (incident.type === 'health') return tr(lang, 'heal.summaryHealth', text);
   if (incident.type === 'storm') return tr(lang, 'heal.summaryStorm', text);
   if (incident.type === 'rain') return tr(lang, 'heal.summaryRain', text);
   if (incident.type === 'heat') return tr(lang, 'heal.summaryHeat', text);
@@ -1515,11 +2029,222 @@ function summarizeIncident(eventText, incident, lang = DEFAULT_LANG) {
   return text;
 }
 
+function normalizeSelfHealingActivity(activity) {
+  const fromString = typeof activity === 'string' ? activity : '';
+  const original = cleanSelfHealingActivityText((activity && activity.original) || fromString || '');
+  const text = cleanSelfHealingActivityText((activity && activity.text) || original);
+  if (!text) return null;
+  const changed = !!(activity && activity.changed) || normalizeHealedText(original) !== normalizeHealedText(text);
+  const reason = changed ? String((activity && activity.reason) || '').trim() : '';
+  const slot = normalizeTimeSlot(activity && activity.slot);
+  return { original: original || text, text, changed, reason, slot };
+}
+
+function cloneSelfHealingDays(days) {
+  return (Array.isArray(days) ? days : []).map((day, idx) => ({
+    day: Number(day && day.day) || (idx + 1),
+    activities: (Array.isArray(day && day.activities) ? day.activities : [])
+      .map(normalizeSelfHealingActivity)
+      .filter(Boolean)
+  }));
+}
+
+function flattenSelfHealingActivitiesFromDays(days) {
+  const flat = [];
+  cloneSelfHealingDays(days).forEach(day => {
+    day.activities.forEach(activity => {
+      if (activity && activity.text) flat.push(activity.text);
+    });
+  });
+  return dedupePlanItems(flat);
+}
+
+function buildDaysFromActivityList(templateDays, activityList) {
+  const list = dedupePlanItems(Array.isArray(activityList) ? activityList : []);
+  if (!list.length) return [];
+
+  const template = cloneSelfHealingDays(templateDays);
+  if (!template.length) {
+    return [{
+      day: 1,
+      activities: list.map(item => ({ original: item, text: item, changed: false, reason: '', slot: '' }))
+    }];
+  }
+
+  const flatOriginals = [];
+  template.forEach(day => day.activities.forEach(activity => flatOriginals.push(activity.original || activity.text)));
+  let cursor = 0;
+  const rebuilt = template.map(day => {
+    const activities = day.activities.map(activity => {
+      const next = list[cursor] || activity.text || activity.original;
+      cursor += 1;
+      const normalized = normalizeSelfHealingActivity({
+        original: activity.original || activity.text,
+        text: next,
+        changed: normalizeHealedText(next) !== normalizeHealedText(activity.original || activity.text),
+        reason: activity.reason || '',
+        slot: activity.slot || ''
+      });
+      return normalized;
+    }).filter(Boolean);
+    return { day: day.day, activities };
+  });
+
+  if (cursor < list.length) {
+    const tail = list.slice(cursor).map(item => ({ original: item, text: item, changed: false, reason: '', slot: '' }));
+    const last = rebuilt[rebuilt.length - 1];
+    last.activities = last.activities.concat(tail);
+  }
+
+  // Keep this deterministic: if the template has no usable activities, fall back to a flat one-day list.
+  if (!flatOriginals.length) {
+    return [{
+      day: 1,
+      activities: list.map(item => ({ original: item, text: item, changed: false, reason: '', slot: '' }))
+    }];
+  }
+  return rebuilt;
+}
+
+function normalizeAiReplacementHints(replacements) {
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(replacements) ? replacements : []).forEach(row => {
+    const original = String(row && row.original || '').trim();
+    const replacement = String(row && row.replacement || '').trim();
+    if (!original || !replacement) return;
+    const key = `${normalizeHealedText(original)}=>${normalizeHealedText(replacement)}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push({ original, replacement, reason: String(row && row.reason || '').trim() });
+  });
+  return out;
+}
+
+function applyReplacementHintsToDays(days, replacementHints) {
+  const hints = normalizeAiReplacementHints(replacementHints);
+  if (!hints.length) return cloneSelfHealingDays(days);
+
+  const used = new Set();
+  const normalizedDays = cloneSelfHealingDays(days).map(day => ({
+    day: day.day,
+    activities: day.activities.map(activity => ({ ...activity }))
+  }));
+
+  hints.forEach(hint => {
+    const sourceKey = normalizeHealedText(hint.original);
+    const hintKey = `${sourceKey}=>${normalizeHealedText(hint.replacement)}`;
+    if (used.has(hintKey)) return;
+    let applied = false;
+
+    normalizedDays.forEach(day => {
+      if (applied) return;
+      day.activities.forEach(activity => {
+        if (applied) return;
+        if (normalizeHealedText(activity.original) !== sourceKey) return;
+        activity.text = hint.replacement;
+        activity.changed = normalizeHealedText(activity.text) !== normalizeHealedText(activity.original);
+        activity.reason = hint.reason || activity.reason || '';
+        applied = true;
+      });
+    });
+
+    if (applied) used.add(hintKey);
+  });
+
+  return normalizedDays;
+}
+
+function deriveReplacementsFromDays(days) {
+  const out = [];
+  cloneSelfHealingDays(days).forEach(day => {
+    day.activities.forEach(activity => {
+      if (!activity.changed) return;
+      out.push({ original: activity.original, replacement: activity.text, reason: activity.reason || '' });
+    });
+  });
+  return out;
+}
+
+function canonicalHealedActivities(data) {
+  if (Array.isArray(data && data.updated_days) && data.updated_days.length) {
+    const fromDays = flattenSelfHealingActivitiesFromDays(data.updated_days);
+    if (fromDays.length) return fromDays;
+  }
+  return dedupePlanItems(Array.isArray(data && data.updated_itinerary) ? data.updated_itinerary : []);
+}
+
+function buildPlannerDataFromHealedData(healedData, plannerData) {
+  const normalizedDays = cloneSelfHealingDays(healedData && healedData.updated_days);
+  let days = normalizedDays.map((day, idx) => ({
+    day: Number(day && day.day) || (idx + 1),
+    activities: (Array.isArray(day && day.activities) ? day.activities : [])
+      .map(activity => ({
+        text: String(activity && activity.text || '').trim(),
+        slot: normalizeTimeSlot(activity && activity.slot)
+      }))
+      .filter(activity => activity.text)
+  })).filter(day => day.activities.length);
+
+  if (!days.length) {
+    const flat = canonicalHealedActivities(healedData);
+    if (flat.length) {
+      days = [{
+        day: 1,
+        activities: flat.map(text => ({ text, slot: '' }))
+      }];
+    }
+  }
+
+  return {
+    ...(plannerData && typeof plannerData === 'object' ? plannerData : {}),
+    days
+  };
+}
+
+function normalizeSelfHealingAiResult(baseData, aiData) {
+  const fallback = {
+    ...baseData,
+    updated_days: cloneSelfHealingDays(baseData && baseData.updated_days),
+    updated_itinerary: canonicalHealedActivities(baseData),
+    replacements: deriveReplacementsFromDays(baseData && baseData.updated_days)
+  };
+
+  if (!aiData || typeof aiData !== 'object') return fallback;
+
+  let updatedDays = [];
+  const baselineCount = flattenSelfHealingActivitiesFromDays(fallback.updated_days).length;
+  if (Array.isArray(aiData.updated_days) && aiData.updated_days.length) {
+    updatedDays = cloneSelfHealingDays(aiData.updated_days);
+  } else if (Array.isArray(aiData.replacements) && aiData.replacements.length) {
+    updatedDays = applyReplacementHintsToDays(fallback.updated_days, aiData.replacements);
+  } else if (Array.isArray(aiData.updated_itinerary) && aiData.updated_itinerary.length) {
+    const normalizedList = dedupePlanItems(aiData.updated_itinerary.map(cleanSelfHealingActivityText).filter(Boolean));
+    // Keep day mapping stable: only map by position when the LLM keeps the exact activity count.
+    if (baselineCount > 0 && normalizedList.length === baselineCount) {
+      updatedDays = buildDaysFromActivityList(fallback.updated_days, normalizedList);
+    }
+  }
+
+  if (!updatedDays.length) return fallback;
+
+  const replacements = deriveReplacementsFromDays(updatedDays);
+  const updatedItinerary = flattenSelfHealingActivitiesFromDays(updatedDays);
+  if (!updatedItinerary.length) return fallback;
+
+  return {
+    ...fallback,
+    updated_days: updatedDays,
+    updated_itinerary: updatedItinerary,
+    replacements
+  };
+}
+
 function buildSelfHealingPlan(planData, itin, eventText, context, lang = DEFAULT_LANG) {
   const incident = classifyIncident(eventText);
   const sourceDays = Array.isArray(planData && planData.days) && planData.days.length
     ? planData.days
-    : [{ day: 1, activities: dedupePlanItems(itin) }];
+    : [{ day: 1, activities: dedupePlanItems(itin).map(item => ({ text: item, slot: '' })) }];
 
   const updatedDays = [];
   const replacements = [];
@@ -1527,14 +2252,29 @@ function buildSelfHealingPlan(planData, itin, eventText, context, lang = DEFAULT
 
   sourceDays.forEach((day, index) => {
     const activities = [];
-    const originalItems = dedupePlanItems(Array.isArray(day && day.activities) ? day.activities : []);
-    originalItems.forEach(item => {
+    const rawActivities = Array.isArray(day && day.activities) ? day.activities : [];
+    const normalizedItems = dedupePlanItems(rawActivities.map(activity => {
+      if (typeof activity === 'string') return activity;
+      return String(activity && activity.text || '').trim();
+    })).map(itemText => {
+      const source = rawActivities.find(activity => {
+        const text = typeof activity === 'string' ? activity : String(activity && activity.text || '');
+        return normalizeHealedText(text) === normalizeHealedText(itemText);
+      });
+      return {
+        text: itemText,
+        slot: normalizeTimeSlot(source && source.slot)
+      };
+    });
+
+    normalizedItems.forEach(itemObj => {
+      const item = itemObj.text;
       const info = classifyActivity(item);
       const key = normalizeHealedText(item);
       used.add(key);
 
       if (!shouldReplaceActivity(item, info, incident)) {
-        activities.push({ original: item, text: item, changed: false, reason: '' });
+        activities.push({ original: item, text: item, changed: false, reason: '', slot: itemObj.slot || '' });
         return;
       }
 
@@ -1542,36 +2282,30 @@ function buildSelfHealingPlan(planData, itin, eventText, context, lang = DEFAULT
         .find(candidate => !used.has(normalizeHealedText(candidate)) && normalizeHealedText(candidate) !== key);
 
       if (!replacement) {
-        activities.push({ original: item, text: item, changed: false, reason: '' });
+        activities.push({ original: item, text: item, changed: false, reason: '', slot: itemObj.slot || '' });
         return;
       }
 
       used.add(normalizeHealedText(replacement));
-      const reason = incident.type === 'storm'
-        ? tr(lang, 'heal.reasonStorm')
-        : incident.type === 'heat'
-          ? tr(lang, 'heal.reasonHeat')
-          : incident.type === 'rain'
-            ? tr(lang, 'heal.reasonRain')
-            : tr(lang, 'heal.reasonDefault');
+      const reason = incidentReasonText(incident, lang);
 
       const replacementText = formatReplacementActivity(item, replacement, lang);
-      activities.push({ original: item, text: replacementText, changed: true, reason });
+      activities.push({ original: item, text: replacementText, changed: true, reason, slot: itemObj.slot || '' });
       replacements.push({ original: item, replacement: replacementText, reason });
     });
     updatedDays.push({ day: day.day || (index + 1), activities });
   });
 
-  if (!isSevereWeatherIncident(incident)) {
+  if (incident.severity === 'low') {
     return {
       incident_summary: summarizeIncident(eventText, incident, lang),
       severity: incident.severity,
       replacements: [],
       updated_days: updatedDays.map(day => ({
         day: day.day,
-        activities: day.activities.map(a => ({ original: a.original, text: a.original, changed: false, reason: '' }))
+        activities: day.activities.map(a => ({ original: a.original, text: a.original, changed: false, reason: '', slot: a.slot || '' }))
       })),
-      updated_itinerary: dedupePlanItems(sourceDays.flatMap(d => Array.isArray(d.activities) ? d.activities : [])),
+      updated_itinerary: dedupePlanItems(sourceDays.flatMap(d => (Array.isArray(d.activities) ? d.activities : []).map(a => typeof a === 'string' ? a : String(a && a.text || '').trim()))),
       context_summary: buildPlannerContextSummary(context || {}),
       notes: tr(lang, 'heal.reasonDefault')
     };
@@ -1584,13 +2318,7 @@ function buildSelfHealingPlan(planData, itin, eventText, context, lang = DEFAULT
     updated_days: updatedDays,
     updated_itinerary: updatedDays.flatMap(day => day.activities.map(a => a.text)),
     context_summary: buildPlannerContextSummary(context || {}),
-    notes: incident.type === 'storm'
-      ? tr(lang, 'heal.reasonStorm')
-      : incident.type === 'heat'
-        ? tr(lang, 'heal.reasonHeat')
-        : incident.type === 'rain'
-          ? tr(lang, 'heal.reasonRain')
-          : tr(lang, 'heal.reasonDefault')
+    notes: incidentReasonText(incident, lang)
   };
 }
 
@@ -1602,14 +2330,6 @@ function renderHealHtml(data, lang) {
   if (data.context_summary) {
     html += `<div class="summary-note"><strong>${tr(lang, 'heal.planLabel')}</strong> ${escapeHtml(data.context_summary)}</div>`;
   }
-  html += renderSatisfactionDeltaHtml(data.satisfactionDelta, lang);
-  if ((data.replacements || []).length) {
-    html += `<div class="day-block"><h4>${tr(lang, 'common.changesHeader')}</h4><ul>`;
-    data.replacements.forEach(r => {
-      html += `<li><strong>${escapeHtml(r.original)}</strong> → <strong>${escapeHtml(r.replacement)}</strong> — ${escapeHtml(r.reason || '')}</li>`;
-    });
-    html += `</ul></div>`;
-  }
   if (Array.isArray(data.updated_days) && data.updated_days.length) {
     html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4>${data.updated_days.map((day, idx) => {
       const activities = Array.isArray(day.activities) ? day.activities : [];
@@ -1617,15 +2337,18 @@ function renderHealHtml(data, lang) {
         const changed = !!activity.changed;
         const original = String(activity.original || '');
         const text = String(activity.text || original);
+        const slot = formatSlotLabel(activity.slot, lang);
         const reason = changed && activity.reason ? `<span class="reason-tag">${tr(lang, 'heal.reasonPrefix')} ${escapeHtml(activity.reason)}</span>` : '';
         const before = changed && original && original !== text ? `<del>${escapeHtml(original)}</del> → ` : '';
-        return `<li class="${changed ? 'changed-item' : ''}">${before}<strong>${escapeHtml(text)}</strong>${reason} ${mapLink(text, undefined, lang)}${venueWarning(text, lang)}</li>`;
+        const slotHtml = slot ? `<span class="slot-badge">${escapeHtml(slot)}</span>` : '';
+        return `<li class="${changed ? 'changed-item' : ''}">${slotHtml}${before}<strong>${escapeHtml(text)}</strong>${reason} ${mapLink(text, undefined, lang)}${venueWarning(text, lang)}</li>`;
       }).join('')}</ul></div>`;
     }).join('')}</div>`;
   } else if ((data.updated_itinerary || []).length) {
     html += `<div class="day-block"><h4>${tr(lang, 'common.newItineraryHeader')}</h4><ul>${data.updated_itinerary.map(a => `<li>${escapeHtml(a)} ${mapLink(a, undefined, lang)}${venueWarning(a, lang)}</li>`).join('')}</ul></div>`;
   }
   if (data.notes) html += `<div class="summary-note">${escapeHtml(data.notes)}</div>`;
+  html += renderImpactAiHtml(data.impactAi, lang);
   html += renderRiskPanelHtml(data.risks, lang);
   return html || tr(lang, 'common.noChange');
 }
@@ -1788,16 +2511,20 @@ const AppCore = {
   DEFAULT_LANG, SUPPORTED_LANGS, I18N, tr, normalizeLang,
   escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity,
   weatherDescription,
+  buildForecastEventFromDaily,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
   detectPreferenceConflicts, generateCompromiseOptions, buildReasoningReceipt, pickPrimaryKnowledgeEntry,
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   dedupePlanItems, flattenActivities, normalizeHealedText,
+  normalizeTimeSlot, formatSlotLabel, parseSelfHealingInput, buildSelfHealingPromptLines,
   buildConversationTranscript, normalizeExtractedSlots, missingTripSlots, buildVoiceFollowUpQuestion, detectItineraryIntent,
   classifyIncident, isSevereWeatherIncident, classifyActivity,
   buildCameraFallback,
   parseBudgetNumber, buildPlannerContextSummary, buildSelfHealingPlan,
+  canonicalHealedActivities, buildPlannerDataFromHealedData, normalizeSelfHealingAiResult,
+  relocalizeHealedData, normalizeMemberImpactAi, renderImpactAiHtml,
   computeItinerarySatisfaction, computeSatisfactionDelta, detectTravelRisks,
   renderSatisfactionDeltaHtml, renderRiskPanelHtml,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
@@ -1860,6 +2587,21 @@ function initApp() {
     }
     populateGroupPlaceOptions();
     renderDiffLists();
+    const savedHeal = safeLoad(STORAGE_KEYS.heal);
+    const weatherStatusEl = document.getElementById('h-weatherStatus');
+    if (savedHeal && savedHeal.forecastEvent && savedHeal.forecastEvent.date) {
+      const desc = weatherDescription(savedHeal.forecastEvent.weatherCode, currentLang);
+      hEvent.value = tr(currentLang, 'heal.weatherForecastText', savedHeal.forecastEvent.date, desc, savedHeal.forecastEvent.tempMax, savedHeal.forecastEvent.precip);
+      if (weatherStatusEl) weatherStatusEl.textContent = T('heal.weatherReadyForecast', savedHeal.forecastEvent.startDate, savedHeal.forecastEvent.days);
+    } else if (weatherStatusEl) {
+      weatherStatusEl.textContent = '';
+    }
+    if (savedHeal && savedHeal.data) {
+      const localized = relocalizeHealedData(savedHeal.data, currentLang);
+      hResult.innerHTML = `<div class="result-box">${renderHealHtml(localized, currentLang)}</div>`;
+      safeSave(STORAGE_KEYS.heal, { ...savedHeal, data: localized, event: hEvent.value });
+    }
+    updateHealAcceptState();
   }
 
   /** Fills the Differentiation screen's two comparison lists — arrays can't be set via a plain [data-i18n] text swap. */
@@ -1969,6 +2711,7 @@ function initApp() {
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+      if (btn.dataset.tab === 'heal') syncPlannerToSelfHealing(true);
     });
   });
 
@@ -2177,11 +2920,36 @@ function initApp() {
     };
   }
 
-  function syncPlannerToSelfHealing() {
+  function plannerToHealText(plannerData) {
+    const days = Array.isArray(plannerData && plannerData.days) ? plannerData.days : [];
+    const lines = [];
+    days.forEach((day, idx) => {
+      const dayNumber = Number(day && day.day) || (idx + 1);
+      const activities = Array.isArray(day && day.activities) ? day.activities : [];
+      activities.forEach(activity => {
+        const text = typeof activity === 'string' ? activity.trim() : String(activity && activity.text || '').trim();
+        if (!text) return;
+        lines.push(`Day ${dayNumber} | ${text}`);
+      });
+    });
+    return lines.join('\n');
+  }
+
+  function syncPlannerToSelfHealing(forceRefresh = false) {
     const hDestEl = document.getElementById('h-dest');
     const hItinEl = document.getElementById('h-itin');
-    if (hDestEl) hDestEl.value = tripState.destination || '';
-    if (hItinEl) hItinEl.value = Array.isArray(tripState.itinerary) ? tripState.itinerary.join('\n') : '';
+    if (hDestEl) hDestEl.value = tripState.destination || hDestEl.value || '';
+    if (!hItinEl) return;
+
+    const fromPlanner = plannerToHealText(tripState.plannerData);
+    if (fromPlanner && (forceRefresh || !hItinEl.value.trim() || healUsesDefaultItin)) {
+      hItinEl.value = fromPlanner;
+      healUsesDefaultItin = false;
+      return;
+    }
+    if (!fromPlanner) {
+      hItinEl.value = Array.isArray(tripState.itinerary) ? tripState.itinerary.join('\n') : '';
+    }
   }
 
   /**
@@ -2884,21 +3652,65 @@ function initApp() {
   const hDest = document.getElementById('h-dest');
   const hEvent = document.getElementById('h-event');
   const hResult = document.getElementById('h-result');
+  const hAccept = document.getElementById('h-accept');
+  const hAcceptStatus = document.getElementById('h-acceptStatus');
+
+  function healedPlanSignature(data) {
+    const activities = canonicalHealedActivities(data);
+    return activities.length ? JSON.stringify(activities) : '';
+  }
+
+  function updateHealAcceptState() {
+    if (!hAccept || !hAcceptStatus) return;
+    const saved = safeLoad(STORAGE_KEYS.heal) || {};
+    const signature = healedPlanSignature(saved.data);
+
+    if (!signature) {
+      hAccept.disabled = true;
+      hAcceptStatus.textContent = T('heal.acceptDisabledNoUpdate');
+      return;
+    }
+    if (saved.acceptedSignature && saved.acceptedSignature === signature) {
+      hAccept.disabled = true;
+      hAcceptStatus.textContent = T('heal.acceptDisabledAccepted');
+      return;
+    }
+
+    hAccept.disabled = false;
+    hAcceptStatus.textContent = T('heal.acceptReady');
+  }
 
   function saveHealState(extra) {
-    safeSave(STORAGE_KEYS.heal, Object.assign({ itin: hItin.value, dest: hDest.value, event: hEvent.value }, extra));
+    const prev = safeLoad(STORAGE_KEYS.heal) || {};
+    safeSave(STORAGE_KEYS.heal, Object.assign({}, prev, { itin: hItin.value, dest: hDest.value, event: hEvent.value }, extra));
   }
-  hItin.addEventListener('input', () => { healUsesDefaultItin = false; saveHealState({}); });
-  [hDest, hEvent].forEach(el => el.addEventListener('input', () => saveHealState({})));
+  hItin.addEventListener('input', () => {
+    healUsesDefaultItin = false;
+    saveHealState({});
+    updateHealAcceptState();
+  });
+  [hDest, hEvent].forEach(el => el.addEventListener('input', () => {
+    saveHealState({});
+    updateHealAcceptState();
+  }));
 
   (function restoreHeal() {
+    const statusEl = document.getElementById('h-weatherStatus');
     const saved = safeLoad(STORAGE_KEYS.heal);
     if (saved) {
       if (saved.itin) hItin.value = saved.itin;
       if (saved.dest) hDest.value = saved.dest;
-      if (saved.event) hEvent.value = saved.event;
+      if (saved.forecastEvent && saved.forecastEvent.date) {
+        const desc = weatherDescription(saved.forecastEvent.weatherCode, currentLang);
+        hEvent.value = tr(currentLang, 'heal.weatherForecastText', saved.forecastEvent.date, desc, saved.forecastEvent.tempMax, saved.forecastEvent.precip);
+        if (statusEl) statusEl.textContent = T('heal.weatherReadyForecast', saved.forecastEvent.startDate, saved.forecastEvent.days);
+      } else if (saved.event) {
+        hEvent.value = saved.event;
+        if (statusEl) statusEl.textContent = '';
+      }
       if (saved.data) {
-        hResult.innerHTML = `<div class="result-box">${renderHealHtml(saved.data, currentLang)}</div>`;
+        const localized = relocalizeHealedData(saved.data, currentLang);
+        hResult.innerHTML = `<div class="result-box">${renderHealHtml(localized, currentLang)}</div>`;
       }
     } else {
       healUsesDefaultItin = true;
@@ -2909,11 +3721,13 @@ function initApp() {
       hItin.value = tripState.itinerary.join('\n');
       healUsesDefaultItin = false;
     }
+    updateHealAcceptState();
   })();
 
   document.getElementById('h-weather').addEventListener('click', async () => {
     const dest = hDest.value.trim();
     const statusEl = document.getElementById('h-weatherStatus');
+    const plannerContext = getPlannerContext();
     if (!dest) { statusEl.textContent = T('heal.needDest'); return; }
     statusEl.textContent = T('heal.lookingUp');
     try {
@@ -2928,25 +3742,116 @@ function initApp() {
       }
       if (!place) { statusEl.textContent = T('heal.notFound', dest); return; }
 
-      const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation&timezone=auto`);
+      const wRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${place.latitude}&longitude=${place.longitude}&current=temperature_2m,weather_code,precipitation&daily=weather_code,temperature_2m_max,precipitation_sum&timezone=auto&forecast_days=16`);
       const w = await wRes.json();
-      const c = w.current;
-      const desc = weatherDescription(c.weather_code, currentLang);
-      hEvent.value = tr(currentLang, 'heal.weatherText', place.name, place.country, desc, c.temperature_2m, c.precipitation);
-      const timeText = String(c.time || '').slice(11, 16);
-      statusEl.textContent = T('heal.weatherReady', timeText);
-      saveHealState({});
+
+      const forecast = buildForecastEventFromDaily(w.daily, plannerContext.startDate, plannerContext.days, currentLang);
+      if (forecast) {
+        hEvent.value = forecast.text;
+        statusEl.textContent = T('heal.weatherReadyForecast', forecast.startDate, forecast.days);
+        saveHealState({ forecastEvent: forecast });
+        updateHealAcceptState();
+      } else {
+        const c = w.current;
+        const desc = weatherDescription(c.weather_code, currentLang);
+        hEvent.value = tr(currentLang, 'heal.weatherText', place.name, place.country, desc, c.temperature_2m, c.precipitation);
+        const timeText = String(c.time || '').slice(11, 16);
+        statusEl.textContent = `${T('heal.weatherReady', timeText)} ${T('heal.weatherFallbackCurrent')}`;
+        saveHealState({ forecastEvent: null });
+        updateHealAcceptState();
+      }
     } catch (err) {
       statusEl.textContent = T('heal.weatherError', err.message);
     }
   });
 
+  hAccept.addEventListener('click', () => {
+    const saved = safeLoad(STORAGE_KEYS.heal) || {};
+    const data = saved.data;
+    const signature = healedPlanSignature(data);
+    if (!data || !signature || (saved.acceptedSignature && saved.acceptedSignature === signature)) {
+      updateHealAcceptState();
+      return;
+    }
+
+    const plannerContext = getPlannerContext();
+    const nextPlannerData = buildPlannerDataFromHealedData(data, tripState.plannerData);
+    if (!Array.isArray(nextPlannerData.days) || !nextPlannerData.days.length) {
+      updateHealAcceptState();
+      return;
+    }
+
+    const destination = hDest.value.trim() || plannerContext.destination || tripState.destination || 'Okinawa';
+    const days = plannerContext.days || String(nextPlannerData.days.length);
+    const startDate = plannerContext.startDate || '';
+    const budget = plannerContext.budget || T('common.unlimitedBudget');
+    const group = plannerContext.group || T('common.soloTraveler');
+    const notes = plannerContext.notes || '';
+
+    pDest.value = destination;
+    pDays.value = days;
+    pStart.value = startDate;
+    pBudget.value = budget;
+    pGroup.value = group;
+    pNotes.value = notes;
+
+    updateTripStateFromPlannerData(nextPlannerData, { destination, days, startDate, budget, group, notes });
+
+    const weatherIncident = classifyIncident((data.meta && data.meta.rawIncidentText) || hEvent.value.trim());
+    const risks = detectTravelRisks(flattenActivities(nextPlannerData), { budget, days, group, notes }, weatherIncident, currentLang);
+    pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(nextPlannerData, destination, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+    updatePlannerShareState(nextPlannerData, destination);
+    savePlannerState({ data: nextPlannerData });
+    saveHealState({ acceptedSignature: signature });
+
+    hAccept.disabled = true;
+    hAcceptStatus.textContent = T('heal.acceptDone');
+    syncPlannerToSelfHealing(true);
+  });
+
+  async function analyzeMemberImpactWithAi(members, beforeActivities, afterActivities, eventText, delta, lang = DEFAULT_LANG) {
+    if (!delta || !Array.isArray(delta.perMember) || !delta.perMember.length) return null;
+    const before = Array.isArray(beforeActivities) ? beforeActivities : [];
+    const after = Array.isArray(afterActivities) ? afterActivities : [];
+    const maxPreviewItems = 10;
+    const payload = {
+      language: impactOutputLanguageName(lang),
+      incident: String(eventText || '').slice(0, 180),
+      changedCount: Math.max(before.length, after.length),
+      beforePreview: before.slice(0, maxPreviewItems),
+      afterPreview: after.slice(0, maxPreviewItems),
+      members: (members || []).map(m => ({ name: m.name, preference: m.pref || '' })),
+      numericDelta: delta
+    };
+    const systemPrompt = `Analyze member impact for a self-healing itinerary. Return valid JSON only: {"summary":"","members":[{"name":"","impact":"positive|neutral|negative","reason":"","advice":""}]}. Keep names exact. Base judgments on numericDelta. Write in ${impactOutputLanguageName(lang)}. Keep each reason/advice short.`;
+    const userPrompt = `Impact payload: ${JSON.stringify(payload)}`;
+    try {
+      const raw = await callClaude(systemPrompt, userPrompt, { json: true });
+      return {
+        normalized: normalizeMemberImpactAi(raw, delta, lang),
+        raw
+      };
+    } catch (err) {
+      return {
+        normalized: buildMemberImpactFallback(delta, lang),
+        raw: null
+      };
+    }
+  }
+
   document.getElementById('h-run').addEventListener('click', async () => {
-    const itin = hItin.value.split('\n').map(s => s.trim()).filter(Boolean);
+    syncPlannerToSelfHealing(true);
+    const parsedInput = parseSelfHealingInput(hItin.value);
+    const itin = parsedInput.flatActivities;
     const event = hEvent.value.trim() || T('heal.defaultEvent');
     const plannerContext = getPlannerContext();
-    const plannerData = tripState.plannerData || {
-      days: [{ day: 1, activities: dedupePlanItems(itin) }],
+    const plannerData = {
+      ...(tripState.plannerData || {}),
+      days: parsedInput.days,
+      summary: (tripState.plannerData && tripState.plannerData.summary) || ''
+    };
+    const fallbackPlannerData = {
+      days: [{ day: 1, activities: dedupePlanItems(itin).map(item => ({ text: item, slot: '' })) }],
       summary: ''
     };
 
@@ -2961,33 +3866,76 @@ function initApp() {
     setLoading(hResult, true, T('heal.loading'));
 
     const weatherIncident = classifyIncident(event);
-    let data = null;
+    const effectivePlannerData = plannerData.days && plannerData.days.length ? plannerData : fallbackPlannerData;
+    const baseData = buildSelfHealingPlan(effectivePlannerData, itin, event, plannerContext, currentLang);
+    let data = baseData;
     try {
       const system = T('heal.systemPrompt');
-      const user = tr(currentLang, 'heal.userPrompt', itin, event);
+      const promptLines = buildSelfHealingPromptLines(parsedInput.days, currentLang);
+      const promptInput = promptLines.length ? promptLines : itin;
+      const user = tr(currentLang, 'heal.userPrompt', promptInput, event);
       const ai = await callClaude(system, user, { json: true, onChunk: streamPreview(hResult, T('heal.loading')) });
-      if (ai && Array.isArray(ai.replacements)) {
-        data = {
-          ...buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang),
-          ...ai,
-          incident_summary: summarizeIncident(event, weatherIncident, currentLang),
-          context_summary: buildPlannerContextSummary(plannerContext)
-        };
-      }
+      data = normalizeSelfHealingAiResult(baseData, ai);
     } catch (err) {
-      data = buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang);
+      data = baseData;
     }
 
-    if (!data) data = buildSelfHealingPlan(plannerData, itin, event, plannerContext, currentLang);
+    if (!data) data = baseData;
 
     // Feature 5 (Explainable Self-Healing) + Feature 6 (Travel Risk Detection) — both
     // deterministic, reusing the Group Decision tab's members if any were entered there.
     const members = currentMembers();
-    data.satisfactionDelta = computeSatisfactionDelta(members, itin, data.updated_itinerary || itin, currentLang);
-    data.risks = detectTravelRisks(data.updated_itinerary || itin, plannerContext, weatherIncident, currentLang);
+    const healedActivities = canonicalHealedActivities(data);
+    const scoredActivities = healedActivities.length ? healedActivities : itin;
+    data.satisfactionDelta = computeSatisfactionDelta(members, itin, scoredActivities, currentLang);
+    data.risks = detectTravelRisks(scoredActivities, plannerContext, weatherIncident, currentLang);
+
+    if (members.length && data.satisfactionDelta) {
+      data.impactAi = buildMemberImpactFallback(data.satisfactionDelta, currentLang);
+    }
+
+    data.meta = {
+      ...(data.meta || {}),
+      rawIncidentText: event,
+      plannerContext,
+      forecastEvent: (safeLoad(STORAGE_KEYS.heal) || {}).forecastEvent || null
+    };
 
     hResult.innerHTML = `<div class="result-box">${renderHealHtml(data, currentLang)}</div>`;
-    saveHealState({ data });
+    const savedHeal = safeLoad(STORAGE_KEYS.heal) || {};
+    const signature = healedPlanSignature(data);
+    const keepAccepted = savedHeal.acceptedSignature && savedHeal.acceptedSignature === signature;
+    saveHealState({ data, acceptedSignature: keepAccepted ? savedHeal.acceptedSignature : null });
+    updateHealAcceptState();
+
+    if (members.length && data.satisfactionDelta) {
+      const signatureAtRequest = signature;
+      const langAtRequest = currentLang;
+      analyzeMemberImpactWithAi(members, itin, scoredActivities, event, data.satisfactionDelta, langAtRequest)
+        .then(aiImpact => {
+          if (!aiImpact || !aiImpact.normalized) return;
+          const latest = safeLoad(STORAGE_KEYS.heal) || {};
+          if (!latest.data) return;
+          if (healedPlanSignature(latest.data) !== signatureAtRequest) return;
+
+          const enriched = {
+            ...latest.data,
+            impactAi: aiImpact.normalized,
+            meta: {
+              ...(latest.data.meta || {}),
+              impactAiRaw: aiImpact.raw,
+              impactAiLang: langAtRequest
+            }
+          };
+          const localized = relocalizeHealedData(enriched, currentLang);
+          hResult.innerHTML = `<div class="result-box">${renderHealHtml(localized, currentLang)}</div>`;
+          saveHealState({ data: localized });
+          updateHealAcceptState();
+        })
+        .catch(() => {
+          // Keep deterministic fallback already rendered.
+        });
+    }
   });
 
   // ---------- TAB 5: Camera AI ----------

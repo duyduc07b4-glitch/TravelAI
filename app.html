@@ -142,7 +142,8 @@
     <div class="card">
       <h3 data-i18n="heal.title"></h3>
       <div class="field"><label data-i18n="heal.itinLabel"></label>
-        <textarea id="h-itin"></textarea>
+        <textarea id="h-itin" data-i18n="heal.itinPlaceholder" data-i18n-attr="placeholder"></textarea>
+        <div class="hint" id="h-itinHint" data-i18n="heal.itinFormatHint"></div>
       </div>
       <div class="row2">
         <div class="field"><label data-i18n="heal.destLabel"></label><input type="text" id="h-dest" placeholder="Okinawa"></div>
@@ -152,6 +153,8 @@
       <div class="hint" id="h-weatherStatus"></div>
       <div style="height:10px;"></div>
       <button id="h-run" data-i18n="heal.runBtn"></button>
+      <button type="button" class="secondary" id="h-accept" data-i18n="heal.acceptBtn" disabled></button>
+      <div class="hint" id="h-acceptStatus"></div>
       <div class="result" id="h-result"></div>
     </div>
   </section>
