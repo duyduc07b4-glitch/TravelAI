@@ -80,6 +80,15 @@ describe('tr', () => {
     // 'xx' is not a supported language, so normalizeLang() coerces it to 'vi'.
     assert.equal(tr('xx', 'planner.runBtn'), 'Tạo lịch trình');
   });
+  test('planner.userPrompt includes a per-member preferences block only when members are given', () => {
+    const withMembers = tr('vi', 'planner.userPrompt', 'Đà Nẵng', 3, '', '', 'Gia đình', '', [{ name: 'A', pref: 'thích biển' }, { name: 'B', pref: 'mua sắm' }]);
+    assert.match(withMembers, /A: thích biển/);
+    assert.match(withMembers, /B: mua sắm/);
+    const withoutMembers = tr('vi', 'planner.userPrompt', 'Đà Nẵng', 3, '', '', 'Gia đình', '', []);
+    assert.doesNotMatch(withoutMembers, /thích biển/);
+    const noArgAtAll = tr('vi', 'planner.userPrompt', 'Đà Nẵng', 3, '', '', 'Gia đình', '');
+    assert.equal(noArgAtAll, withoutMembers);
+  });
 });
 
 describe('mapLink', () => {
