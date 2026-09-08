@@ -1,7 +1,7 @@
 const { test, describe } = require('node:test');
 const assert = require('node:assert/strict');
 const {
-  escapeHtml, mapLink, venueWarning, weatherDescription,
+  escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity, weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   classifyIncident, buildSelfHealingPlan,
@@ -110,6 +110,29 @@ describe('venueWarning', () => {
   test('returns empty string for non-venue activities', () => {
     assert.equal(venueWarning('Sunset Beach', 'vi'), '');
     assert.equal(venueWarning('サンセットビーチ', 'ja'), '');
+  });
+});
+
+describe('isGenericPlaceholderActivity', () => {
+  test('flags a bare meal placeholder with no venue name', () => {
+    assert.equal(isGenericPlaceholderActivity('昼食'), true);
+    assert.equal(isGenericPlaceholderActivity('Lunch'), true);
+    assert.equal(isGenericPlaceholderActivity('ăn trưa'), true);
+  });
+  test('flags a bare meal placeholder even behind a time-range prefix', () => {
+    assert.equal(isGenericPlaceholderActivity('午後4:00-6:00、夕食'), true);
+  });
+  test('keeps an activity that names an actual place', () => {
+    assert.equal(isGenericPlaceholderActivity('American Village'), false);
+    assert.equal(isGenericPlaceholderActivity('Yunangi Okinawan Cuisineで昼食'), false);
+  });
+  test('strips a leading time-range prefix before checking the place name', () => {
+    assert.equal(isGenericPlaceholderActivity('早 morning 8:00-9:00、那覇空港'), false);
+    assert.equal(isGenericPlaceholderActivity('9:00-12:00、美ら海水族館'), false);
+  });
+  test('treats blank input as a placeholder', () => {
+    assert.equal(isGenericPlaceholderActivity(''), true);
+    assert.equal(isGenericPlaceholderActivity(null), true);
   });
 });
 

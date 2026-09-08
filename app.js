@@ -72,6 +72,15 @@ const I18N = {
     group: {
       title: 'Chấm điểm địa điểm cho cả nhóm',
       placeLabel: 'Địa điểm cần đánh giá',
+      placeEmptyOption: '-- Chọn địa điểm từ lịch trình --',
+      placeNoItinerary: '-- Chưa có lịch trình, hãy tạo ở tab Lịch trình trước --',
+      placeRequiredError: 'Vui lòng chọn địa điểm cần chấm điểm trước khi bấm "Chấm điểm phù hợp".',
+      scoreHint: '👆 Bấm "Chấm điểm phù hợp" để xem nhận xét AI cho địa điểm này.',
+      swapBtn: '🔄 Đổi địa điểm',
+      swapLoading: 'Đang tìm địa điểm thay thế & chấm điểm lại...',
+      swapNoCandidates: 'Hãy bấm "Chấm điểm phù hợp" trước để có dữ liệu tham khảo, rồi mới đổi địa điểm.',
+      swapNoAlternative: 'Không tìm thấy địa điểm thay thế phù hợp trong dữ liệu tham khảo hiện có.',
+      swapSuccess: (oldPlace, newPlace) => `✅ Đã đổi "${oldPlace}" thành "${newPlace}" và cập nhật lịch trình.`,
       membersLabel: 'Thành viên & sở thích',
       addMemberBtn: '+ Thêm thành viên',
       runBtn: 'Chấm điểm phù hợp',
@@ -316,6 +325,15 @@ const I18N = {
     group: {
       title: 'グループ全員向けにスポットを採点',
       placeLabel: '評価するスポット',
+      placeEmptyOption: '-- 旅程からスポットを選択 --',
+      placeNoItinerary: '-- 旅程がまだありません。先に旅程タブで作成してください --',
+      placeRequiredError: '「適合度を採点」を押す前に、採点するスポットを選択してください。',
+      scoreHint: '👆「適合度を採点」を押すと、このスポットについてのAIコメントが見られます。',
+      swapBtn: '🔄 スポットを変更',
+      swapLoading: '代わりのスポットを探して再採点中...',
+      swapNoCandidates: '先に「適合度を採点」を押して参考データを取得してから、スポットを変更してください。',
+      swapNoAlternative: '現在の参考データの中に、代わりになりそうなスポットが見つかりませんでした。',
+      swapSuccess: (oldPlace, newPlace) => `✅「${oldPlace}」を「${newPlace}」に変更し、旅程を更新しました。`,
       membersLabel: 'メンバーと好み',
       addMemberBtn: '+ メンバーを追加',
       runBtn: '適合度を採点',
@@ -560,6 +578,15 @@ const I18N = {
     group: {
       title: 'Score a place for the whole group',
       placeLabel: 'Place to evaluate',
+      placeEmptyOption: '-- Select a place from the itinerary --',
+      placeNoItinerary: '-- No itinerary yet, create one in the Itinerary tab first --',
+      placeRequiredError: 'Please select a place to score before clicking "Score fit".',
+      scoreHint: '👆 Click "Score fit" to see the AI\'s take on this place.',
+      swapBtn: '🔄 Swap place',
+      swapLoading: 'Finding a replacement place & re-scoring...',
+      swapNoCandidates: 'Click "Score fit" first to load reference data, then swap the place.',
+      swapNoAlternative: 'No suitable replacement place found in the current reference data.',
+      swapSuccess: (oldPlace, newPlace) => `✅ Swapped "${oldPlace}" for "${newPlace}" and updated the itinerary.`,
       membersLabel: 'Members & preferences',
       addMemberBtn: '+ Add member',
       runBtn: 'Score fit',
@@ -781,6 +808,25 @@ function venueWarning(text, lang) {
     return ` <span class="warn-badge" title="${escapeHtml(tr(lang, 'common.venueWarning'))}">${tr(lang, 'common.venueWarning')}</span>`;
   }
   return '';
+}
+
+// Leading "8:00-9:00、" / "午後4:00-6:00、" / "早 morning 8:00-9:00、"-style time-range prefixes some
+// itineraries embed directly in the activity string, ahead of the actual place/venue name.
+const TIME_RANGE_PREFIX_RE = /^.*?\d{1,2}:\d{2}\s*[-~〜]\s*\d{1,2}:\d{2}[、,，]?\s*/;
+
+// Bare meal/generic placeholders with no actual venue name attached (e.g. just "昼食" / "lunch") —
+// as opposed to "Yunangi Okinawan Cuisineで昼食", which names a real place and should stay listed.
+const GENERIC_PLACEHOLDER_WORDS = [
+  'ăn trưa', 'ăn tối', 'ăn sáng', 'bữa trưa', 'bữa tối', 'bữa sáng', 'bữa ăn',
+  '昼食', '夕食', '朝食', 'ランチ', '夕飯', '朝ご飯', '昼ご飯', '食事',
+  'lunch', 'dinner', 'breakfast', 'meal'
+];
+
+/** True when an itinerary activity is just a generic meal/placeholder mention with no actual place name to look up. */
+function isGenericPlaceholderActivity(text) {
+  const stripped = String(text || '').replace(TIME_RANGE_PREFIX_RE, '').trim().toLowerCase();
+  if (!stripped) return true;
+  return GENERIC_PLACEHOLDER_WORDS.some(w => stripped === w.toLowerCase());
 }
 
 function weatherDescription(code, lang) {
@@ -1654,7 +1700,7 @@ function safeLoadString(key) {
 
 const AppCore = {
   DEFAULT_LANG, SUPPORTED_LANGS, I18N, tr, normalizeLang,
-  escapeHtml, mapLink, venueWarning,
+  escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity,
   weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
@@ -1693,6 +1739,11 @@ function initApp() {
   // so switching language can re-translate them instead of leaving stale text behind.
   let healUsesDefaultItin = false;
   let groupUsesDefaultMembers = false;
+  // RAG candidates for the currently selected Group Decision place. Declared this early (rather than
+  // next to the rest of the Group Decision tab code) so populateGroupPlaceOptions() can safely reset
+  // it — that function can run during the Itinerary tab's own restore-from-storage, before the Group
+  // Decision tab's script section has executed, which would otherwise be a TDZ error.
+  let lastRagCandidates = [];
 
   // ---------- Static text translation ----------
   function applyStaticTranslations() {
@@ -1716,6 +1767,7 @@ function initApp() {
       membersDiv.innerHTML = '';
       T('group.defaultMembers').forEach(([n, p]) => addMemberRow(n, p));
     }
+    populateGroupPlaceOptions();
     renderDiffLists();
   }
 
@@ -2025,6 +2077,73 @@ function initApp() {
     if (hItinEl) hItinEl.value = Array.isArray(tripState.itinerary) ? tripState.itinerary.join('\n') : '';
   }
 
+  /**
+   * Fills the Group Decision "評価するスポット" dropdown with the activities from the current
+   * itinerary, each labeled with its day (e.g. "1日目 - American Village") — looked up fresh via
+   * getElementById (not a closed-over const) because this can run before the Group Decision tab's
+   * own script section has executed (e.g. while restoring saved planner state on page load).
+   */
+  function populateGroupPlaceOptions() {
+    const select = document.getElementById('g-place');
+    if (!select) return;
+    const days = (tripState.plannerData && Array.isArray(tripState.plannerData.days)) ? tripState.plannerData.days : [];
+    const previous = select.value;
+    const hadSelection = !!previous;
+    const seen = new Set();
+    const rows = [];
+    days.forEach((day, idx) => {
+      if (!day || !Array.isArray(day.activities)) return;
+      const dayNumber = Number(day.day) || (idx + 1); // Number(...) first: the AI-generated JSON sometimes has "day" as a numeric string, which would break the strict-equality day match in replacePlaceInItinerary otherwise.
+      day.activities.forEach(activity => {
+        const text = String(activity || '').trim();
+        if (!text || isGenericPlaceholderActivity(text)) return;
+        const key = `${dayNumber}::${text.toLowerCase()}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        rows.push({ dayNumber, text });
+      });
+    });
+    select.innerHTML = '';
+    if (!rows.length) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = T('group.placeNoItinerary');
+      select.appendChild(opt);
+      if (hadSelection) clearStaleGroupDecisionDisplay();
+      return;
+    }
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = T('group.placeEmptyOption');
+    select.appendChild(placeholder);
+    rows.forEach(({ dayNumber, text }) => {
+      const opt = document.createElement('option');
+      opt.value = text;
+      opt.dataset.day = String(dayNumber);
+      opt.textContent = `${T('common.dayLabel', dayNumber)} - ${text}`;
+      select.appendChild(opt);
+    });
+    if (previous && rows.some(r => r.text === previous)) select.value = previous;
+    // The itinerary changed (new plan, or an activity was renamed/removed) and the previously
+    // selected place fell out of the list — its cached score/debate is for a place that's no longer
+    // an option, so clear it instead of leaving mismatched results on screen.
+    if (hadSelection && select.value !== previous) clearStaleGroupDecisionDisplay();
+  }
+
+  /** Clears Group Decision result panels tied to a place selection that no longer exists (itinerary changed underneath it). Looked up fresh via getElementById for the same reason as populateGroupPlaceOptions. */
+  function clearStaleGroupDecisionDisplay() {
+    const result = document.getElementById('g-result');
+    const decision = document.getElementById('g-decision');
+    const debate = document.getElementById('g-debate');
+    const ragHint = document.getElementById('g-ragHint');
+    if (result) result.innerHTML = '';
+    if (decision) decision.innerHTML = '';
+    if (debate) debate.innerHTML = '';
+    if (ragHint) ragHint.textContent = '';
+    lastRagCandidates = [];
+    saveGroupState({ data: null, ragSources: [], candidates: [] });
+  }
+
   function updateTripStateFromPlannerData(data, context) {
     const itinerary = flattenActivities(data);
     tripState.destination = context.destination || tripState.destination || '';
@@ -2039,6 +2158,37 @@ function initApp() {
       notes: context.notes || ''
     };
     syncPlannerToSelfHealing();
+    populateGroupPlaceOptions();
+  }
+
+  /** Re-renders the Itinerary tab (Tab 1) from tripState.plannerData — used after Group Decision swaps an activity in place, so the itinerary display stays in sync without a new AI call. */
+  function refreshPlannerDisplay() {
+    const data = tripState.plannerData;
+    if (!data) return;
+    const dest = pDest.value.trim() || 'Okinawa';
+    const days = pDays.value || 4;
+    const budget = pBudget.value || T('common.unlimitedBudget');
+    const group = pGroup.value.trim() || T('common.soloTraveler');
+    const notes = pNotes.value.trim();
+    const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
+    pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+    updatePlannerShareState(data, dest);
+    savePlannerState({ data });
+  }
+
+  /** Replaces one activity's text in tripState.plannerData in place (matched by day number when known, else by exact text) and keeps tripState.itinerary in sync. Returns false if no match was found. */
+  function replacePlaceInItinerary(oldText, newText, dayNumber) {
+    const data = tripState.plannerData;
+    if (!data || !Array.isArray(data.days)) return false;
+    const day = dayNumber != null
+      ? data.days.find((d, idx) => d && (Number(d.day) || (idx + 1)) === Number(dayNumber))
+      : data.days.find(d => d && Array.isArray(d.activities) && d.activities.includes(oldText));
+    if (!day || !Array.isArray(day.activities)) return false;
+    const idx = day.activities.indexOf(oldText);
+    if (idx === -1) return false;
+    day.activities[idx] = newText;
+    tripState.itinerary = flattenActivities(data);
+    return true;
   }
 
   function plannerInputs() {
@@ -2116,8 +2266,6 @@ function initApp() {
     return { entry, candidates };
   }
 
-  let lastRagCandidates = [];
-
   /** Re-runs the deterministic Group Decision engine against the last RAG candidates — no LLM call, so this is instant. Lets a member's preference change re-score live without re-fetching anything. */
   function refreshGroupDecisionLive() {
     if (!lastRagCandidates.length) return;
@@ -2142,9 +2290,15 @@ function initApp() {
       pref: row.querySelector('.g-pref').value.trim()
     })).filter(m => m.name);
   }
+  // Merges onto whatever is already saved (rather than replacing it outright) so a bare
+  // saveGroupState({}) — e.g. from a member-preference edit — doesn't wipe out the last scored
+  // data/ragSources/candidates, which are still valid for the same place.
   function saveGroupState(extra) {
-    safeSave(STORAGE_KEYS.group, Object.assign({ place: gPlace.value, members: currentMembers() }, extra));
+    const prev = safeLoad(STORAGE_KEYS.group) || {};
+    safeSave(STORAGE_KEYS.group, Object.assign({}, prev, { place: gPlace.value, members: currentMembers() }, extra));
   }
+
+  populateGroupPlaceOptions();
 
   const savedGroup = safeLoad(STORAGE_KEYS.group);
   if (savedGroup && Array.isArray(savedGroup.members) && savedGroup.members.length) {
@@ -2165,7 +2319,16 @@ function initApp() {
     lastRagCandidates = savedGroup.candidates;
     renderGroupDecision(savedGroup.candidates, savedGroup.place || '', currentMembers());
   }
-  gPlace.addEventListener('input', () => { saveGroupState({}); refreshGroupDecisionLive(); });
+  // A place change needs fresh reference data (a different venue has different attributes to score
+  // against) — unlike a member-preference edit, which can cheaply rescore the same lastRagCandidates
+  // via refreshGroupDecisionLive() below.
+  gPlace.addEventListener('change', () => {
+    saveGroupState({});
+    const place = gPlace.value.trim();
+    gResult.innerHTML = place ? `<div class="hint">${escapeHtml(T('group.scoreHint'))}</div>` : '';
+    gDebate.innerHTML = '';
+    refreshGroupDecisionForPlace(place, currentMembers());
+  });
 
   document.getElementById('g-addMember').addEventListener('click', () => { groupUsesDefaultMembers = false; addMemberRow(); saveGroupState({}); refreshGroupDecisionLive(); });
 
@@ -2185,34 +2348,103 @@ function initApp() {
     }
   }
 
-  document.getElementById('g-run').addEventListener('click', async () => {
-    const place = gPlace.value.trim() || 'American Village';
-    const members = currentMembers();
-    setLoading(gResult, true, T('group.loading'));
-    gRagHint.textContent = '';
-    gDebate.innerHTML = '';
-    gDecision.innerHTML = '';
-
+  /**
+   * Fresh RAG lookup + deterministic Group Decision engine (satisfaction score, conflicts, compromise
+   * options, reasoning) for one place — no LLM call, so it's fast. This is the piece that MUST re-run
+   * whenever the selected place itself changes (a different place needs different reference data);
+   * member-preference edits alone can skip it and just rescore lastRagCandidates via refreshGroupDecisionLive.
+   */
+  async function refreshGroupDecisionForPlace(place, members) {
+    if (!place) {
+      gDecision.innerHTML = '';
+      gRagHint.textContent = '';
+      lastRagCandidates = [];
+      saveGroupState({ data: null, ragSources: [], candidates: [] });
+      return { candidates: [], sources: [], context: '' };
+    }
+    setLoading(gDecision, true, T('group.loading'));
     const rawResults = await ragSearchRaw(`${place}. ${members.map(m => m.pref).join(', ')}`);
     const sources = rawResults.map(r => r.source);
     const context = rawResults.length ? rawResults.map(r => `[${r.source}]\n${r.text}`).join('\n\n') : '';
     gRagHint.textContent = sources.length > 0 ? T('group.ragUsed', sources.join(', ')) : T('group.ragNone');
-
-    // Deterministic Group Decision engine (score, conflicts, compromise options, reasoning) needs
-    // no LLM call, so it renders immediately — the AI debate/recommendation streams in underneath.
     const candidates = rawResults.map(r => parseKnowledgeChunk(r.text));
     lastRagCandidates = candidates;
     if (members.length) renderGroupDecision(candidates, place, members);
+    else gDecision.innerHTML = '';
+    // Persisted right away (with data:null, since no fresh AI debate has run yet for this place) so
+    // that reloading the page — or an AI call below failing — never leaves storage holding this
+    // place's name next to a stale data/candidates pair scored for whatever place came before it.
+    saveGroupState({ data: null, ragSources: sources, candidates });
+    return { candidates, sources, context };
+  }
+
+  /** Runs the deterministic Group Decision engine + AI debate for one place. Shared by the "Score fit" button and the "Swap place" flow (which re-scores the newly picked place the same way). */
+  async function runGroupScoring(place, members, loadingLabel) {
+    setLoading(gResult, true, loadingLabel || T('group.loading'));
+    gDebate.innerHTML = '';
+
+    const { candidates, sources, context } = await refreshGroupDecisionForPlace(place, members);
 
     const system = T('group.systemPrompt');
     const user = tr(currentLang, 'group.userPrompt', place, members, context);
 
     try {
-      const data = await callClaude(system, user, { json: true, onChunk: streamPreview(gResult, T('group.loading')) });
+      const data = await callClaude(system, user, { json: true });
       gResult.innerHTML = `<div class="result-box">${renderGroupScoreTableHtml(data, currentLang)}</div>`;
       renderDebate(data);
       saveGroupState({ data, ragSources: sources, candidates });
     } catch (err) { showError(gResult, err); }
+  }
+
+  document.getElementById('g-run').addEventListener('click', () => {
+    const place = gPlace.value.trim();
+    if (!place) {
+      showError(gResult, new Error(T('group.placeRequiredError')));
+      return;
+    }
+    runGroupScoring(place, currentMembers());
+  });
+
+  /**
+   * "Đổi địa điểm" — swaps the currently selected place for a better (or at least equally good)
+   * alternative, picked from the same RAG candidates already used for scoring (ranked by worst-member
+   * satisfaction via generateCompromiseOptions, no extra LLM call needed for the pick itself), writes
+   * it back into tripState.plannerData at the exact day it came from, refreshes the Itinerary tab
+   * display, and re-scores the new place the same way "Score fit" would.
+   */
+  document.getElementById('g-swap').addEventListener('click', async () => {
+    const place = gPlace.value.trim();
+    if (!place) {
+      showError(gResult, new Error(T('group.placeRequiredError')));
+      return;
+    }
+    if (!lastRagCandidates.length) {
+      showError(gResult, new Error(T('group.swapNoCandidates')));
+      return;
+    }
+    const members = currentMembers();
+    const entry = pickPrimaryKnowledgeEntry(lastRagCandidates, place);
+    const currentName = String((entry && entry.name) || place).trim().toLowerCase();
+    const options = generateCompromiseOptions(lastRagCandidates, members, currentLang);
+    const alternative = options.find(o => o.name && o.name.trim().toLowerCase() !== currentName);
+    if (!alternative) {
+      showError(gResult, new Error(T('group.swapNoAlternative')));
+      return;
+    }
+
+    const selectedOpt = gPlace.selectedOptions && gPlace.selectedOptions[0];
+    const dayNumber = selectedOpt && selectedOpt.dataset.day ? parseInt(selectedOpt.dataset.day, 10) : null;
+    if (!replacePlaceInItinerary(place, alternative.name, dayNumber)) {
+      showError(gResult, new Error(T('group.swapNoAlternative')));
+      return;
+    }
+
+    refreshPlannerDisplay();
+    populateGroupPlaceOptions();
+    gPlace.value = alternative.name;
+    saveGroupState({});
+    await runGroupScoring(alternative.name, members, T('group.swapLoading'));
+    gRagHint.textContent = `${tr(currentLang, 'group.swapSuccess', place, alternative.name)} ${gRagHint.textContent}`;
   });
 
   // ---------- TAB 3: Voice Assistant ----------
