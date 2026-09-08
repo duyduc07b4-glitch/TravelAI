@@ -10,6 +10,7 @@ const {
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   computeItinerarySatisfaction, computeSatisfactionDelta, detectTravelRisks,
   renderSatisfactionDeltaHtml, renderRiskPanelHtml,
+  buildConversationTranscript, normalizeExtractedSlots, missingTripSlots, buildVoiceFollowUpQuestion, detectItineraryIntent,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
 
@@ -638,5 +639,78 @@ describe('Explainable Self-Healing / Risk render functions', () => {
   test('renderRiskPanelHtml returns empty string with no risks', () => {
     assert.equal(renderRiskPanelHtml([], 'vi'), '');
     assert.equal(renderRiskPanelHtml(null, 'vi'), '');
+  });
+});
+
+describe('buildConversationTranscript', () => {
+  test('joins messages with English role labels', () => {
+    const text = buildConversationTranscript([
+      { role: 'user', text: 'Tôi muốn đi Đà Nẵng' },
+      { role: 'ai', text: 'Bạn muốn đi mấy ngày?' }
+    ]);
+    assert.equal(text, 'User: Tôi muốn đi Đà Nẵng\nAssistant: Bạn muốn đi mấy ngày?');
+  });
+  test('skips empty/missing entries and handles no messages', () => {
+    assert.equal(buildConversationTranscript([{ role: 'user', text: '' }, null]), '');
+    assert.equal(buildConversationTranscript([]), '');
+    assert.equal(buildConversationTranscript(undefined), '');
+  });
+});
+
+describe('normalizeExtractedSlots', () => {
+  test('trims strings and parses a valid day count', () => {
+    const slots = normalizeExtractedSlots({ destination: ' Đà Nẵng ', days: '3', startDate: '2026-10-01', budget: '5000000', group: 'gia đình', notes: 'thích biển' });
+    assert.deepEqual(slots, { destination: 'Đà Nẵng', days: 3, startDate: '2026-10-01', budget: '5000000', group: 'gia đình', notes: 'thích biển' });
+  });
+  test('treats missing/zero/invalid day counts as null, not 0 or NaN', () => {
+    assert.equal(normalizeExtractedSlots({ days: null }).days, null);
+    assert.equal(normalizeExtractedSlots({ days: 0 }).days, null);
+    assert.equal(normalizeExtractedSlots({ days: 'chưa biết' }).days, null);
+    assert.equal(normalizeExtractedSlots({}).days, null);
+  });
+  test('handles a non-object input without throwing', () => {
+    assert.deepEqual(normalizeExtractedSlots(null), { destination: '', days: null, startDate: '', budget: '', group: '', notes: '' });
+  });
+});
+
+describe('missingTripSlots', () => {
+  test('flags destination and days as missing when blank', () => {
+    assert.deepEqual(missingTripSlots({ destination: '', days: null }), ['destination', 'days']);
+  });
+  test('flags only the one field that is missing', () => {
+    assert.deepEqual(missingTripSlots({ destination: 'Okinawa', days: null }), ['days']);
+    assert.deepEqual(missingTripSlots({ destination: '', days: 3 }), ['destination']);
+  });
+  test('returns an empty array once both are known', () => {
+    assert.deepEqual(missingTripSlots({ destination: 'Okinawa', days: 3 }), []);
+  });
+});
+
+describe('buildVoiceFollowUpQuestion', () => {
+  test('asks for both when both are missing', () => {
+    assert.equal(buildVoiceFollowUpQuestion(['destination', 'days'], 'vi'), tr('vi', 'voice.askBoth'));
+  });
+  test('asks only about the destination when only that is missing', () => {
+    assert.equal(buildVoiceFollowUpQuestion(['destination'], 'en'), tr('en', 'voice.askDestination'));
+  });
+  test('asks only about day count when only that is missing', () => {
+    assert.equal(buildVoiceFollowUpQuestion(['days'], 'ja'), tr('ja', 'voice.askDays'));
+  });
+  test('returns an empty string when nothing is missing', () => {
+    assert.equal(buildVoiceFollowUpQuestion([], 'vi'), '');
+  });
+});
+
+describe('detectItineraryIntent', () => {
+  test('matches a trigger phrase case-insensitively', () => {
+    assert.equal(detectItineraryIntent('Bạn TẠO LỊCH TRÌNH cho tôi nhé', ['tạo lịch trình']), true);
+  });
+  test('returns false when no trigger phrase is present', () => {
+    assert.equal(detectItineraryIntent('Gợi ý cho tôi quán ăn gần đây', ['tạo lịch trình', 'lên lịch trình']), false);
+  });
+  test('returns false for empty text or no triggers', () => {
+    assert.equal(detectItineraryIntent('', ['tạo lịch trình']), false);
+    assert.equal(detectItineraryIntent('tạo lịch trình đi', []), false);
+    assert.equal(detectItineraryIntent('tạo lịch trình đi', undefined), false);
   });
 });

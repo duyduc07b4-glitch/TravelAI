@@ -140,7 +140,19 @@ const I18N = {
         'aborted': 'Đã dừng nghe.'
       },
       micErrorPrefix: 'Lỗi mic: ',
-      systemPrompt: 'Bạn là trợ lý du lịch AI bằng giọng nói, thân thiện, trả lời ngắn gọn (2-4 câu), thực tế, như đang đề xuất trực tiếp cho người dùng đang ở gần đó (nhà hàng, địa điểm ngắm cảnh...). Trả lời bằng tiếng Việt, không dùng markdown.'
+      systemPrompt: 'Bạn là trợ lý du lịch AI bằng giọng nói, thân thiện, trả lời ngắn gọn (2-4 câu), thực tế, như đang đề xuất trực tiếp cho người dùng đang ở gần đó (nhà hàng, địa điểm ngắm cảnh...). Trả lời bằng tiếng Việt, không dùng markdown.',
+      buildBtn: '📅 Tạo lịch trình từ cuộc trò chuyện',
+      buildHint: 'Trợ lý sẽ tự hỏi lại nếu cuộc trò chuyện còn thiếu thông tin (điểm đến, số ngày...) trước khi tạo lịch trình.',
+      needConversation: 'Hãy kể cho mình nghe một chút về chuyến đi trước đã (muốn đi đâu, mấy ngày...), rồi bấm nút này để mình tạo lịch trình nhé.',
+      extracting: 'Đang tổng hợp thông tin chuyến đi từ cuộc trò chuyện...',
+      buildingItinerary: 'Đã đủ thông tin — đang tạo lịch trình...',
+      itineraryReady: (dest, days) => `✅ Xong rồi! Lịch trình ${dest} (${days} ngày) đã sẵn sàng bên dưới, và cũng đã được đưa sang tab "Lịch trình".`,
+      askDestination: 'Bạn muốn đi đâu để mình lên lịch trình giúp bạn nhé?',
+      askDays: 'Chuyến đi này bạn định đi mấy ngày?',
+      askBoth: 'Để lên được lịch trình, bạn cho mình biết thêm: bạn muốn đi đâu và đi mấy ngày nhé?',
+      extractSystemPrompt: 'Bạn là bộ trích xuất thông tin lên kế hoạch du lịch từ hội thoại. Đọc đoạn hội thoại bên dưới (User = người dùng, Assistant = trợ lý), rồi trích xuất thông tin cần để tạo lịch trình. CHỈ điền giá trị khi người dùng đã nói rõ ràng, KHÔNG suy đoán hay bịa thêm — nếu chưa nhắc tới thì để chuỗi rỗng "" (hoặc null với "days"). Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh) theo đúng schema:\n{"destination":"","days":null,"startDate":"","budget":"","group":"","notes":""}',
+      extractUserPrompt: (transcript) => `Hội thoại:\n${transcript}\n\nHãy trích xuất thông tin theo đúng schema JSON.`,
+      buildTriggers: ['tạo lịch trình', 'lên lịch trình', 'lập lịch trình', 'chốt lịch trình', 'xây lịch trình', 'làm lịch trình', 'plan giúp tôi']
     },
     heal: {
       title: 'Lịch trình tự thay đổi',
@@ -372,7 +384,19 @@ const I18N = {
         'aborted': '聞き取りを停止しました。'
       },
       micErrorPrefix: 'マイクエラー：',
-      systemPrompt: 'あなたはフレンドリーな音声旅行アシスタントです。簡潔（2〜4文）かつ実用的に、近くにいるユーザーに直接おすすめするように答えてください（レストラン、景勝地など）。日本語で、Markdownを使わずに答えてください。'
+      systemPrompt: 'あなたはフレンドリーな音声旅行アシスタントです。簡潔（2〜4文）かつ実用的に、近くにいるユーザーに直接おすすめするように答えてください（レストラン、景勝地など）。日本語で、Markdownを使わずに答えてください。',
+      buildBtn: '📅 会話から旅程を作成',
+      buildHint: '旅程を作る前に、目的地や日数など情報が足りなければアシスタントが聞き返します。',
+      needConversation: 'まずは旅行について少し話してください（どこに行きたいか、何日間かなど）。その後このボタンを押すと旅程を作成します。',
+      extracting: '会話から旅行情報をまとめています...',
+      buildingItinerary: '情報が揃いました — 旅程を作成中...',
+      itineraryReady: (dest, days) => `✅ 完成しました！${dest}（${days}日間）の旅程が下に表示されています。「旅程」タブにも反映しました。`,
+      askDestination: 'どこに行きたいか教えてもらえますか？旅程を作りますね。',
+      askDays: 'この旅行は何日間の予定ですか？',
+      askBoth: '旅程を作るために、行き先と日数を教えてください。',
+      extractSystemPrompt: 'あなたは会話から旅行計画に必要な情報を抽出するツールです。以下の会話（User=ユーザー、Assistant=アシスタント）を読み、旅程作成に必要な情報を抽出してください。ユーザーが明確に述べた内容のみを埋め、推測や創作はしないでください — まだ触れられていない項目は空文字""（"days"はnull）にしてください。必ずJSONのみで回答してください（フィールド名は英語のまま）。スキーマ：\n{"destination":"","days":null,"startDate":"","budget":"","group":"","notes":""}',
+      extractUserPrompt: (transcript) => `会話：\n${transcript}\n\n上記のスキーマ通りにJSONで情報を抽出してください。`,
+      buildTriggers: ['旅程を作って', 'スケジュールを作って', 'プランを作って', '旅程作成', '旅程を作成']
     },
     heal: {
       title: '旅程の自動リカバリー',
@@ -604,7 +628,19 @@ const I18N = {
         'aborted': 'Stopped listening.'
       },
       micErrorPrefix: 'Mic error: ',
-      systemPrompt: 'You are a friendly AI voice travel assistant. Answer briefly (2-4 sentences) and practically, as if recommending something directly to a user nearby (a restaurant, a scenic spot...). Reply in English, without markdown.'
+      systemPrompt: 'You are a friendly AI voice travel assistant. Answer briefly (2-4 sentences) and practically, as if recommending something directly to a user nearby (a restaurant, a scenic spot...). Reply in English, without markdown.',
+      buildBtn: '📅 Build itinerary from this conversation',
+      buildHint: 'The assistant will ask follow-up questions first if the conversation is missing details (destination, number of days...) before building the itinerary.',
+      needConversation: "Tell me a bit about the trip first (where you want to go, how many days...), then tap this button and I'll build the itinerary.",
+      extracting: 'Gathering trip details from the conversation...',
+      buildingItinerary: 'Got everything needed — building the itinerary...',
+      itineraryReady: (dest, days) => `✅ Done! The ${dest} itinerary (${days} days) is ready below, and has also been added to the "Itinerary" tab.`,
+      askDestination: 'Where would you like to go? I can put together an itinerary for you.',
+      askDays: 'How many days is this trip?',
+      askBoth: 'To build an itinerary, tell me: where do you want to go, and for how many days?',
+      extractSystemPrompt: 'You extract trip-planning details from a conversation. Read the conversation below (User = the traveler, Assistant = the assistant), then extract the information needed to build an itinerary. ONLY fill in a value when the user has clearly stated it — do NOT guess or invent anything; leave unmentioned fields as an empty string "" (or null for "days"). Reply with ONLY valid JSON (keep the English field names) matching this schema:\n{"destination":"","days":null,"startDate":"","budget":"","group":"","notes":""}',
+      extractUserPrompt: (transcript) => `Conversation:\n${transcript}\n\nExtract the information as JSON matching the schema.`,
+      buildTriggers: ['build the itinerary', 'create the itinerary', 'make an itinerary', 'plan my trip', 'generate itinerary', 'build my itinerary']
     },
     heal: {
       title: 'Self-healing itinerary',
@@ -1126,6 +1162,56 @@ function dedupePlanItems(items) {
   });
 }
 
+// ---------- Voice Assistant: build itinerary from conversation ----------
+
+/** Joins the Voice Assistant chat log into one transcript for the slot-extraction prompt. Role labels stay in English — they're structural markers for the LLM, not user-facing text. */
+function buildConversationTranscript(messages) {
+  return (Array.isArray(messages) ? messages : [])
+    .filter(m => m && m.text)
+    .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.text}`)
+    .join('\n');
+}
+
+/** Coerces the LLM's raw slot-extraction JSON into a clean, typed shape. Never guesses a value the LLM left blank. */
+function normalizeExtractedSlots(raw) {
+  const obj = raw && typeof raw === 'object' ? raw : {};
+  const days = parseInt(obj.days, 10);
+  return {
+    destination: String(obj.destination || '').trim(),
+    days: Number.isFinite(days) && days > 0 ? days : null,
+    startDate: String(obj.startDate || '').trim(),
+    budget: String(obj.budget || '').trim(),
+    group: String(obj.group || '').trim(),
+    notes: String(obj.notes || '').trim()
+  };
+}
+
+/** Destination and day count are the only fields an itinerary truly can't be built without — everything else (budget, group, notes) already has a sensible default. */
+function missingTripSlots(slots) {
+  const missing = [];
+  if (!slots || !slots.destination) missing.push('destination');
+  if (!slots || !slots.days) missing.push('days');
+  return missing;
+}
+
+/** Picks the right proactive follow-up question so the assistant asks for exactly what's missing, instead of silently failing to build an itinerary. */
+function buildVoiceFollowUpQuestion(missing, lang) {
+  const list = Array.isArray(missing) ? missing : [];
+  const needsDest = list.includes('destination');
+  const needsDays = list.includes('days');
+  if (needsDest && needsDays) return tr(lang, 'voice.askBoth');
+  if (needsDest) return tr(lang, 'voice.askDestination');
+  if (needsDays) return tr(lang, 'voice.askDays');
+  return '';
+}
+
+/** True if the user's message asks the assistant to build/finalize an itinerary now (so it can happen from voice alone, without a button press). */
+function detectItineraryIntent(text, triggers) {
+  if (!text) return false;
+  const lower = String(text).toLowerCase();
+  return (Array.isArray(triggers) ? triggers : []).some(t => t && lower.includes(String(t).toLowerCase()));
+}
+
 function flattenActivities(planData) {
   if (!planData || !Array.isArray(planData.days)) return [];
   const flat = [];
@@ -1576,6 +1662,7 @@ const AppCore = {
   detectPreferenceConflicts, generateCompromiseOptions, buildReasoningReceipt, pickPrimaryKnowledgeEntry,
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   dedupePlanItems, flattenActivities, normalizeHealedText,
+  buildConversationTranscript, normalizeExtractedSlots, missingTripSlots, buildVoiceFollowUpQuestion, detectItineraryIntent,
   classifyIncident, isSevereWeatherIncident, classifyActivity,
   buildCameraFallback,
   parseBudgetNumber, buildPlannerContextSummary, buildSelfHealingPlan,
@@ -2248,6 +2335,7 @@ function initApp() {
   })();
 
   async function sendVoiceQuery(text) {
+    const wantsItinerary = detectItineraryIntent(text, T('voice.buildTriggers'));
     addMsg('user', text);
     document.getElementById('v-text').value = '';
     const thinking = addMsg('ai', T('voice.thinking'));
@@ -2264,12 +2352,98 @@ function initApp() {
       thinking.textContent = reply;
       speak(reply);
       saveVoiceLog();
+      // If the user's own words asked for the itinerary ("tạo lịch trình cho tôi"...), build it
+      // right after the normal reply — no need to also hunt down the button.
+      if (wantsItinerary) await buildItineraryFromConversation();
     } catch (err) {
       clearInterval(tickId);
       thinking.textContent = '⚠️ ' + err.message;
       saveVoiceLog();
     }
   }
+
+  // ---------- Voice Assistant: "Build itinerary from this conversation" ----------
+  const vBuildBtn = document.getElementById('v-build');
+  const vItinResult = document.getElementById('v-itinResult');
+
+  function collectVoiceMessages() {
+    return [...vLog.querySelectorAll('.msg')].map(el => ({
+      role: el.classList.contains('user') ? 'user' : 'ai',
+      text: el.textContent
+    }));
+  }
+
+  /** Asks the LLM to read the conversation so far and pull out trip-planning slots (destination, days, budget...) as JSON — a dedicated extraction call, kept separate from the normal chat reply so casual Q&A never has to be forced into JSON. */
+  async function extractTripSlotsFromConversation() {
+    const transcript = buildConversationTranscript(collectVoiceMessages());
+    const raw = await callClaude(T('voice.extractSystemPrompt'), tr(currentLang, 'voice.extractUserPrompt', transcript), { json: true });
+    return normalizeExtractedSlots(raw);
+  }
+
+  /**
+   * Turns the Voice Assistant conversation into an actual itinerary: extracts what's been said
+   * so far, and if destination/day-count are still missing, asks exactly for that instead of
+   * failing silently — then re-runs once the user answers. Once complete, it calls the same
+   * planner prompt as TAB 1 and mirrors the result into the Itinerary tab too.
+   */
+  async function buildItineraryFromConversation() {
+    if (!collectVoiceMessages().some(m => m.role === 'user')) {
+      const msg = T('voice.needConversation');
+      addMsg('ai', msg);
+      speak(msg);
+      return;
+    }
+    vBuildBtn.disabled = true;
+    const thinking = addMsg('ai', T('voice.extracting'));
+    try {
+      const slots = await extractTripSlotsFromConversation();
+      const missing = missingTripSlots(slots);
+      if (missing.length) {
+        const question = buildVoiceFollowUpQuestion(missing, currentLang);
+        thinking.textContent = question;
+        speak(question);
+        saveVoiceLog();
+        return;
+      }
+
+      thinking.textContent = T('voice.buildingItinerary');
+      const dest = slots.destination;
+      const days = slots.days;
+      const startDate = slots.startDate || '';
+      const budget = slots.budget || T('common.unlimitedBudget');
+      const group = slots.group || T('common.soloTraveler');
+      const notes = slots.notes || '';
+
+      const system = T('planner.systemPrompt');
+      const user = tr(currentLang, 'planner.userPrompt', dest, days, startDate, budget, group, notes);
+      const data = await callClaude(system, user, { json: true });
+
+      updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
+      const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
+      const html = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+      vItinResult.innerHTML = html;
+
+      // Mirror into the Itinerary tab too, so it's there to review/edit/share, not stranded in the chat log.
+      // Fields the user never actually mentioned stay blank here (matching how an untouched Itinerary
+      // field behaves) — `budget`/`group` above already carry the applied default for the prompt/context.
+      pDest.value = dest; pDays.value = days; pStart.value = slots.startDate; pBudget.value = slots.budget; pGroup.value = slots.group; pNotes.value = slots.notes;
+      pResult.innerHTML = html;
+      updatePlannerShareState(data, dest);
+      savePlannerState({ data });
+
+      const readyMsg = tr(currentLang, 'voice.itineraryReady', dest, days);
+      thinking.textContent = readyMsg;
+      speak(readyMsg);
+      saveVoiceLog();
+    } catch (err) {
+      thinking.textContent = '⚠️ ' + err.message;
+      saveVoiceLog();
+    } finally {
+      vBuildBtn.disabled = false;
+    }
+  }
+
+  vBuildBtn.addEventListener('click', buildItineraryFromConversation);
 
   function addMsg(role, text, persist = true) {
     const div = document.createElement('div');
