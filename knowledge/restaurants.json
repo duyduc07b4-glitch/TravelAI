@@ -7,7 +7,9 @@
     "address": "Naha, Okinawa",
     "kidFriendly": true,
     "rating": 4.8,
-    "notes": "Có menu tiếng Anh, phù hợp nhóm 4-6 người, cách American Village khoảng 350m."
+    "notes": "Có menu tiếng Anh, phù hợp nhóm 4-6 người, cách American Village khoảng 350m.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "American Village Seafood House",
@@ -17,7 +19,9 @@
     "address": "Chatan, Okinawa",
     "kidFriendly": true,
     "rating": 4.5,
-    "notes": "View biển, đông khách vào buổi tối cuối tuần."
+    "notes": "View biển, đông khách vào buổi tối cuối tuần.",
+    "lat": 26.3200991,
+    "lon": 127.7636827
   },
   {
     "name": "Kokusai Dori Ramen",
@@ -27,7 +31,9 @@
     "address": "Kokusai Street, Naha",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Giá rẻ, phục vụ nhanh, phù hợp bữa trưa."
+    "notes": "Giá rẻ, phục vụ nhanh, phù hợp bữa trưa.",
+    "lat": 26.2185154,
+    "lon": 127.6937121
   },
   {
     "name": "Churaumi Cafe & Grill",
@@ -37,7 +43,9 @@
     "address": "Motobu, gần Churaumi Aquarium",
     "kidFriendly": true,
     "rating": 4.4,
-    "notes": "Gần Churaumi Aquarium, thích hợp ăn trưa sau khi tham quan."
+    "notes": "Gần Churaumi Aquarium, thích hợp ăn trưa sau khi tham quan.",
+    "lat": 26.6579272,
+    "lon": 127.8980117
   },
   {
     "name": "Sunset Beach Bar",
@@ -47,7 +55,9 @@
     "address": "Sunset Beach, Chatan",
     "kidFriendly": false,
     "rating": 4.6,
-    "notes": "Có Orion Beer, view hoàng hôn đẹp, không gian dành cho người lớn."
+    "notes": "Có Orion Beer, view hoàng hôn đẹp, không gian dành cho người lớn.",
+    "lat": 26.3131692,
+    "lon": 127.7550968
   },
   {
     "name": "A&W (Okinawa, chuỗi drive-in Mỹ)",
@@ -57,7 +67,9 @@
     "address": "Nhiều chi nhánh: Chatan, Okinawa City, Naha",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Thương hiệu Mỹ duy nhất chỉ còn tồn tại ở Okinawa tại Nhật, đặc sản root beer float, phong cách drive-in đặc trưng thời Mỹ đóng quân. Giờ thực tế khác nhau theo chi nhánh, nên kiểm tra lại từng cửa hàng."
+    "notes": "Thương hiệu Mỹ duy nhất chỉ còn tồn tại ở Okinawa tại Nhật, đặc sản root beer float, phong cách drive-in đặc trưng thời Mỹ đóng quân. Giờ thực tế khác nhau theo chi nhánh, nên kiểm tra lại từng cửa hàng.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Yunangi (ゆうなんぎい)",
@@ -67,7 +79,9 @@
     "address": "Kumoji, gần Kokusai Street, Naha",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Nhà hàng lâu năm nổi tiếng ở Naha, món đặc trưng: mimigaa (tai heo), rafute (thịt kho Okinawa), soki soba. Nên đặt trước vào giờ cao điểm."
+    "notes": "Nhà hàng lâu năm nổi tiếng ở Naha, món đặc trưng: mimigaa (tai heo), rafute (thịt kho Okinawa), soki soba. Nên đặt trước vào giờ cao điểm.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Steak House 88 (Kokusai Dori)",
@@ -77,7 +91,9 @@
     "address": "Kokusai Street, Naha",
     "kidFriendly": true,
     "rating": 4.1,
-    "notes": "Chuỗi steak house lâu đời ở Okinawa, nhiều chi nhánh trên đảo, phù hợp cả gia đình."
+    "notes": "Chuỗi steak house lâu đời ở Okinawa, nhiều chi nhánh trên đảo, phù hợp cả gia đình.",
+    "lat": 26.2185154,
+    "lon": 127.6937121
   },
   {
     "name": "Blue Seal Ice Park",
@@ -87,7 +103,9 @@
     "address": "Okinawa City (Koza)",
     "kidFriendly": true,
     "rating": 4.4,
-    "notes": "Thương hiệu kem lâu đời của Okinawa, có khu trải nghiệm/lịch sử thương hiệu, rất hợp với trẻ em."
+    "notes": "Thương hiệu kem lâu đời của Okinawa, có khu trải nghiệm/lịch sử thương hiệu, rất hợp với trẻ em.",
+    "lat": 26.3324313,
+    "lon": 127.7903201
   },
   {
     "name": "Naha Soba Dokoro",
@@ -97,7 +115,9 @@
     "address": "Naha, gần Kokusai Street",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Quán soba truyền thống, nước dùng xương heo, phù hợp bữa trưa nhanh."
+    "notes": "Quán soba truyền thống, nước dùng xương heo, phù hợp bữa trưa nhanh.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Makishi Public Market Food Court",
@@ -107,7 +127,9 @@
     "address": "Makishi, Naha",
     "kidFriendly": true,
     "rating": 4.5,
-    "notes": "Mua hải sản tầng 1, mang lên tầng 2 chế biến tại chỗ; trải nghiệm ẩm thực đặc trưng Naha."
+    "notes": "Mua hải sản tầng 1, mang lên tầng 2 chế biến tại chỗ; trải nghiệm ẩm thực đặc trưng Naha.",
+    "lat": 26.2171925,
+    "lon": 127.6925906
   },
   {
     "name": "Chanpuru Shokudo",
@@ -117,7 +139,9 @@
     "address": "Naha",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Món goya chanpuru, tofu chanpuru, quán gia đình bình dân."
+    "notes": "Món goya chanpuru, tofu chanpuru, quán gia đình bình dân.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Taco Rice House",
@@ -127,7 +151,9 @@
     "address": "Kin Town, gần căn cứ quân sự Mỹ",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Nơi khai sinh món taco rice, quán lâu năm được nhiều khách quốc tế ghé."
+    "notes": "Nơi khai sinh món taco rice, quán lâu năm được nhiều khách quốc tế ghé.",
+    "lat": 26.4560814,
+    "lon": 127.9260347
   },
   {
     "name": "Ryukyu Awamori Bar Kumesen",
@@ -137,7 +163,9 @@
     "address": "Matsuyama, Naha",
     "kidFriendly": false,
     "rating": 4.4,
-    "notes": "Chuyên rượu awamori lâu năm, không gian dành cho người lớn, phù hợp buổi tối."
+    "notes": "Chuyên rượu awamori lâu năm, không gian dành cho người lớn, phù hợp buổi tối.",
+    "lat": 26.2203357,
+    "lon": 127.6797154
   },
   {
     "name": "Depot Island Grill",
@@ -147,7 +175,9 @@
     "address": "Depot Island, Chatan (gần American Village)",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Không gian ngoài trời, gần bến du thuyền, đông khách buổi tối cuối tuần."
+    "notes": "Không gian ngoài trời, gần bến du thuyền, đông khách buổi tối cuối tuần.",
+    "lat": 26.3200991,
+    "lon": 127.7636827
   },
   {
     "name": "Mihama Burger Terrace",
@@ -157,7 +187,9 @@
     "address": "Mihama, Chatan",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "View ra vòng quay Ferris wheel American Village, phù hợp gia đình có trẻ nhỏ."
+    "notes": "View ra vòng quay Ferris wheel American Village, phù hợp gia đình có trẻ nhỏ.",
+    "lat": 26.3163319,
+    "lon": 127.756303
   },
   {
     "name": "Zanpa Misaki Seafood",
@@ -167,7 +199,9 @@
     "address": "Gần Cape Zanpa, Yomitan",
     "kidFriendly": true,
     "rating": 4.5,
-    "notes": "Gần hải đăng Cape Zanpa, view biển đẹp, nên đi sớm để tránh đông."
+    "notes": "Gần hải đăng Cape Zanpa, view biển đẹp, nên đi sớm để tránh đông.",
+    "lat": 26.3961234,
+    "lon": 127.7449497
   },
   {
     "name": "Motobu Umi Cafe",
@@ -177,7 +211,9 @@
     "address": "Motobu, gần Ocean Expo Park",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Phù hợp nghỉ chân trước/sau khi thăm Churaumi Aquarium."
+    "notes": "Phù hợp nghỉ chân trước/sau khi thăm Churaumi Aquarium.",
+    "lat": 26.6579272,
+    "lon": 127.8980117
   },
   {
     "name": "Nago Pineapple Garden Cafe",
@@ -187,7 +223,9 @@
     "address": "Nago",
     "kidFriendly": true,
     "rating": 4.1,
-    "notes": "Đặc sản kem/bánh dứa, kết hợp tham quan vườn dứa."
+    "notes": "Đặc sản kem/bánh dứa, kết hợp tham quan vườn dứa.",
+    "lat": 26.5919599,
+    "lon": 127.9774759
   },
   {
     "name": "Onna Sunset Terrace",
@@ -197,7 +235,9 @@
     "address": "Onna Village",
     "kidFriendly": false,
     "rating": 4.6,
-    "notes": "Nhà hàng resort view biển, phù hợp bữa tối lãng mạn, nên đặt trước."
+    "notes": "Nhà hàng resort view biển, phù hợp bữa tối lãng mạn, nên đặt trước.",
+    "lat": 26.4648225,
+    "lon": 127.8303136
   },
   {
     "name": "Manza Beach Grill",
@@ -207,7 +247,9 @@
     "address": "Manza Beach, Onna",
     "kidFriendly": true,
     "rating": 4.4,
-    "notes": "Gần bãi biển Manza, phù hợp nhóm đông người, có khu vực ngoài trời."
+    "notes": "Gần bãi biển Manza, phù hợp nhóm đông người, có khu vực ngoài trời.",
+    "lat": 26.5062117,
+    "lon": 127.8591639
   },
   {
     "name": "Ginowan Curry House",
@@ -217,7 +259,9 @@
     "address": "Ginowan",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Cà ri cay vừa phải, phần ăn lớn, giá bình dân."
+    "notes": "Cà ri cay vừa phải, phần ăn lớn, giá bình dân.",
+    "lat": 26.2814968,
+    "lon": 127.7784916
   },
   {
     "name": "Urasoe Ramen Ichiba",
@@ -227,7 +271,9 @@
     "address": "Urasoe",
     "kidFriendly": true,
     "rating": 4.1,
-    "notes": "Nước dùng tonkotsu đậm đà, phù hợp bữa tối nhanh gọn."
+    "notes": "Nước dùng tonkotsu đậm đà, phù hợp bữa tối nhanh gọn.",
+    "lat": 26.2459242,
+    "lon": 127.7219769
   },
   {
     "name": "Itoman Fish Market Grill",
@@ -237,7 +283,9 @@
     "address": "Itoman",
     "kidFriendly": true,
     "rating": 4.4,
-    "notes": "Gần cảng cá Itoman, hải sản tươi trong ngày, giá tốt hơn khu du lịch chính."
+    "notes": "Gần cảng cá Itoman, hải sản tươi trong ngày, giá tốt hơn khu du lịch chính.",
+    "lat": 26.1234201,
+    "lon": 127.666046
   },
   {
     "name": "Nanjo Ocean View Cafe",
@@ -247,7 +295,9 @@
     "address": "Nanjo, gần Cape Chinen",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "View biển đẹp, phù hợp nghỉ chân buổi chiều, chụp ảnh."
+    "notes": "View biển đẹp, phù hợp nghỉ chân buổi chiều, chụp ảnh.",
+    "lat": 26.1632092,
+    "lon": 127.7705563
   },
   {
     "name": "Uruma Soki Soba",
@@ -257,7 +307,9 @@
     "address": "Uruma",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Quán địa phương ít khách du lịch, giá rẻ, sườn heo mềm."
+    "notes": "Quán địa phương ít khách du lịch, giá rẻ, sườn heo mềm.",
+    "lat": 26.3791496,
+    "lon": 127.8573107
   },
   {
     "name": "Kadena Steak & Grill",
@@ -267,7 +319,9 @@
     "address": "Kadena, gần căn cứ không quân",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Phong cách quán ăn Mỹ lâu đời, phần ăn lớn, không khí hoài cổ."
+    "notes": "Phong cách quán ăn Mỹ lâu đời, phần ăn lớn, không khí hoài cổ.",
+    "lat": 26.3617602,
+    "lon": 127.7554216
   },
   {
     "name": "Yomitan Pottery Village Cafe",
@@ -277,7 +331,9 @@
     "address": "Yomitan, gần làng gốm Yachimun no Sato",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Kết hợp tham quan làng gốm truyền thống, không gian yên tĩnh."
+    "notes": "Kết hợp tham quan làng gốm truyền thống, không gian yên tĩnh.",
+    "lat": 26.3961234,
+    "lon": 127.7449497
   },
   {
     "name": "Chatan Fisherman's Wharf",
@@ -287,7 +343,9 @@
     "address": "Chatan, gần cảng cá",
     "kidFriendly": true,
     "rating": 4.4,
-    "notes": "Hải sản đánh bắt trong ngày, view cảng cá, phù hợp bữa tối."
+    "notes": "Hải sản đánh bắt trong ngày, view cảng cá, phù hợp bữa tối.",
+    "lat": 26.3200991,
+    "lon": 127.7636827
   },
   {
     "name": "American Village Rooftop Bar",
@@ -297,7 +355,9 @@
     "address": "American Village, Chatan",
     "kidFriendly": false,
     "rating": 4.5,
-    "notes": "View toàn cảnh American Village và vòng quay Ferris wheel về đêm."
+    "notes": "View toàn cảnh American Village và vòng quay Ferris wheel về đêm.",
+    "lat": 26.3165214,
+    "lon": 127.7573637
   },
   {
     "name": "Naha Airport Soba House",
@@ -306,8 +366,10 @@
     "priceRange": "700-1000 yên/người",
     "address": "Sân bay Naha, khu vực trong nhà ga",
     "kidFriendly": true,
-    "rating": 4.0,
-    "notes": "Phù hợp ăn nhanh trước/sau chuyến bay, phục vụ nhanh."
+    "rating": 4,
+    "notes": "Phù hợp ăn nhanh trước/sau chuyến bay, phục vụ nhanh.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Kokusai Dori Sweets Cafe",
@@ -317,7 +379,9 @@
     "address": "Kokusai Street, Naha",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Món zenzai đá bào đặc trưng Okinawa, phù hợp nghỉ chân giữa buổi mua sắm."
+    "notes": "Món zenzai đá bào đặc trưng Okinawa, phù hợp nghỉ chân giữa buổi mua sắm.",
+    "lat": 26.2185154,
+    "lon": 127.6937121
   },
   {
     "name": "Tsuboya Pottery Street Diner",
@@ -327,7 +391,9 @@
     "address": "Tsuboya, Naha (phố gốm cổ)",
     "kidFriendly": true,
     "rating": 4.1,
-    "notes": "Khu phố gốm truyền thống, quán nhỏ ít khách du lịch, giá tốt."
+    "notes": "Khu phố gốm truyền thống, quán nhỏ ít khách du lịch, giá tốt.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Shuri Castle View Teahouse",
@@ -337,7 +403,9 @@
     "address": "Shuri, gần Shuri Castle",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Phù hợp nghỉ chân sau khi thăm Shuri Castle, có món chinsuko truyền thống."
+    "notes": "Phù hợp nghỉ chân sau khi thăm Shuri Castle, có món chinsuko truyền thống.",
+    "lat": 26.2191726,
+    "lon": 127.7255525
   },
   {
     "name": "Naminoue Beach Diner",
@@ -347,7 +415,9 @@
     "address": "Gần bãi biển Naminoue, Naha",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Bãi biển gần trung tâm Naha nhất, phù hợp ăn nhẹ sau khi tắm biển."
+    "notes": "Bãi biển gần trung tâm Naha nhất, phù hợp ăn nhẹ sau khi tắm biển.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Kerama Islands Ferry Cafe",
@@ -356,8 +426,10 @@
     "priceRange": "600-1200 yên/người",
     "address": "Tomari Port, Naha",
     "kidFriendly": true,
-    "rating": 4.0,
-    "notes": "Phù hợp trước khi đi phà sang quần đảo Kerama lặn biển."
+    "rating": 4,
+    "notes": "Phù hợp trước khi đi phà sang quần đảo Kerama lặn biển.",
+    "lat": 26.2253274,
+    "lon": 127.6827988
   },
   {
     "name": "Ishigaki Beef Yakiniku",
@@ -367,7 +439,9 @@
     "address": "Ishigaki Island",
     "kidFriendly": true,
     "rating": 4.7,
-    "notes": "Đặc sản bò Ishigaki nổi tiếng, nên đặt trước vào mùa cao điểm."
+    "notes": "Đặc sản bò Ishigaki nổi tiếng, nên đặt trước vào mùa cao điểm.",
+    "lat": 24.4710165,
+    "lon": 124.2385061
   },
   {
     "name": "Miyako Soba Honpo",
@@ -377,7 +451,9 @@
     "address": "Miyako Island",
     "kidFriendly": true,
     "rating": 4.3,
-    "notes": "Sợi mì tròn đặc trưng của Miyako, khác Okinawa soba truyền thống."
+    "notes": "Sợi mì tròn đặc trưng của Miyako, khác Okinawa soba truyền thống.",
+    "lat": 24.813957,
+    "lon": 125.305579
   },
   {
     "name": "Kabira Bay Seafood Terrace",
@@ -387,7 +463,9 @@
     "address": "Kabira Bay, Ishigaki",
     "kidFriendly": true,
     "rating": 4.5,
-    "notes": "View vịnh Kabira nổi tiếng, phù hợp nghỉ chân sau tour thuyền đáy kính."
+    "notes": "View vịnh Kabira nổi tiếng, phù hợp nghỉ chân sau tour thuyền đáy kính.",
+    "lat": 24.4528003,
+    "lon": 124.143836
   },
   {
     "name": "Naha Kokusai Street Izakaya Umiryu",
@@ -397,7 +475,9 @@
     "address": "Kokusai Street, Naha",
     "kidFriendly": false,
     "rating": 4.4,
-    "notes": "Không gian izakaya truyền thống, phù hợp nhóm bạn buổi tối."
+    "notes": "Không gian izakaya truyền thống, phù hợp nhóm bạn buổi tối.",
+    "lat": 26.2185154,
+    "lon": 127.6937121
   },
   {
     "name": "Chatan Taco Truck Alley",
@@ -407,7 +487,9 @@
     "address": "Chatan, gần American Village",
     "kidFriendly": true,
     "rating": 4.1,
-    "notes": "Cụm xe đồ ăn đường phố phong cách Mỹ, giá rẻ, ăn nhanh."
+    "notes": "Cụm xe đồ ăn đường phố phong cách Mỹ, giá rẻ, ăn nhanh.",
+    "lat": 26.3200991,
+    "lon": 127.7636827
   },
   {
     "name": "Naha Family Curry Buffet",
@@ -416,8 +498,10 @@
     "priceRange": "1500-2500 yên/người",
     "address": "Naha (trong trung tâm thương mại)",
     "kidFriendly": true,
-    "rating": 4.0,
-    "notes": "Buffet giá cố định, phù hợp gia đình đông người, có góc trẻ em."
+    "rating": 4,
+    "notes": "Buffet giá cố định, phù hợp gia đình đông người, có góc trẻ em.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Sunabe Seawall Cafe",
@@ -427,7 +511,9 @@
     "address": "Sunabe, Chatan (khu lặn biển nổi tiếng)",
     "kidFriendly": true,
     "rating": 4.4,
-    "notes": "View bờ kè Sunabe nơi lặn biển phổ biến, phù hợp bữa sáng/trưa."
+    "notes": "View bờ kè Sunabe nơi lặn biển phổ biến, phù hợp bữa sáng/trưa.",
+    "lat": 26.3200991,
+    "lon": 127.7636827
   },
   {
     "name": "Naha Gyoza Bar",
@@ -437,7 +523,9 @@
     "address": "Naha",
     "kidFriendly": true,
     "rating": 4.2,
-    "notes": "Gyoza chiên giòn đặc trưng, phù hợp ăn tối nhẹ trước khi đi bar."
+    "notes": "Gyoza chiên giòn đặc trưng, phù hợp ăn tối nhẹ trước khi đi bar.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Zamami Island BBQ Hut",
@@ -447,7 +535,9 @@
     "address": "Zamami Island (quần đảo Kerama)",
     "kidFriendly": true,
     "rating": 4.5,
-    "notes": "Phù hợp sau khi lặn ngắm san hô ở Zamami, không gian đơn giản, view biển trong xanh."
+    "notes": "Phù hợp sau khi lặn ngắm san hô ở Zamami, không gian đơn giản, view biển trong xanh.",
+    "lat": 26.2289001,
+    "lon": 127.3031662
   },
   {
     "name": "Naha New Parco Food Hall",
@@ -457,7 +547,9 @@
     "address": "Naha, khu trung tâm thương mại",
     "kidFriendly": true,
     "rating": 4.1,
-    "notes": "Nhiều lựa chọn món ăn trong 1 khu, tiện cho nhóm có sở thích khác nhau."
+    "notes": "Nhiều lựa chọn món ăn trong 1 khu, tiện cho nhóm có sở thích khác nhau.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   },
   {
     "name": "Cape Manzamo View Restaurant",
@@ -467,7 +559,9 @@
     "address": "Gần Cape Manzamo, Onna",
     "kidFriendly": true,
     "rating": 4.4,
-    "notes": "View mỏm đá Manzamo nổi tiếng, phù hợp bữa trưa khi tham quan."
+    "notes": "View mỏm đá Manzamo nổi tiếng, phù hợp bữa trưa khi tham quan.",
+    "lat": 26.4974839,
+    "lon": 127.8534254
   },
   {
     "name": "Naha Michi-no-Eki Farmers Diner",
@@ -476,7 +570,9 @@
     "priceRange": "900-1600 yên/người",
     "address": "Trạm dừng chân nông sản, ngoại ô Naha",
     "kidFriendly": true,
-    "rating": 4.0,
-    "notes": "Nguyên liệu tươi từ nông trại địa phương, giá hợp lý."
+    "rating": 4,
+    "notes": "Nguyên liệu tươi từ nông trại địa phương, giá hợp lý.",
+    "lat": 26.2122345,
+    "lon": 127.6791452
   }
 ]

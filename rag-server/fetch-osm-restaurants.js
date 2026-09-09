@@ -193,6 +193,11 @@ async function main() {
       cuisine: humanizeCuisine(tags.cuisine, tags.amenity),
       priceRange: estimatePriceRange(tags.cuisine, tags.amenity),
       address: buildAddress(tags) || `Gần toạ độ ${lat.toFixed(5)}, ${lon.toFixed(5)}, Okinawa`,
+      // Structured (not just embedded in `notes`) so detectGeographicRisks() in app.js can use
+      // them directly — OSM nodes/ways always carry real coordinates, unlike the hand-curated
+      // file, which needs a separate one-time geocode pass (see geocode-curated.js).
+      lat,
+      lon,
       notes: buildNotes(tags, lat, lon)
     };
     if (tags.opening_hours) entry.hours = tags.opening_hours;

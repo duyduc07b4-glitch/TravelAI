@@ -37,7 +37,7 @@ Tóm tắt nhanh:
 - 🆚 **Vì sao TravelAI** — màn hình so sánh trực tiếp với AI Travel Planner truyền thống (tối ưu cá nhân) và TravelAI (tối ưu quyết định nhóm)
 - 🎙️ **Trợ lý giọng nói → tự tạo lịch trình** — không chỉ hỏi/đáp (Web Speech API): nói chuyện xong, bấm "Tạo lịch trình từ cuộc trò chuyện" (hoặc chỉ cần nói "tạo lịch trình cho tôi") là trợ lý tự đọc lại toàn bộ cuộc trò chuyện, trích xuất điểm đến/số ngày/ngân sách/nhóm đi cùng, rồi tạo lịch trình đầy đủ y như tab Lịch trình — và đưa luôn kết quả sang tab đó. Có **khung "Thông tin đã ghi nhận" hiện trực tiếp (VD: 4/6)** cho thấy rõ AI đã nắm được gì, thay vì hộp đen im lặng. Nếu còn thiếu thông tin bắt buộc (chưa biết đi đâu hoặc mấy ngày), trợ lý **chủ động hỏi lại đúng phần còn thiếu** — nhưng không chặn cứng: luôn có nút **"Tạo lịch trình luôn"** để AI tự điền phần thiếu bằng giá trị hợp lý và tạo ngay, không bắt buộc phải trả lời hết mới dùng được.
 - 🌧️ **Self-Healing Itinerary (giải thích được)** — khi có sự cố (thời tiết...), không chỉ đổi hoạt động mà còn cho thấy: **📉 mức độ hài lòng nhóm thay đổi thế nào** (VD: 64% → 63%) và **thay đổi theo từng thành viên** (VD: A -5%) — dựa trên sở thích thành viên đã khai ở tab Quyết định nhóm, tính cục bộ không qua LLM
-- 🚦 **Kiểm tra rủi ro chuyến đi** — quét tự động 4 loại rủi ro (đi bộ quá nhiều, ngân sách, thiếu phương tiện di chuyển, thời tiết xấu) ngay sau khi tạo lịch trình hoặc self-healing, kèm mức độ và gợi ý khắc phục
+- 🚦 **Kiểm tra rủi ro chuyến đi** — quét tự động 5 loại rủi ro (đi bộ quá nhiều, ngân sách, thiếu phương tiện di chuyển, thời tiết xấu, **và khoảng cách di chuyển vô lý giữa 2 điểm liên tiếp trong ngày** — dựa trên toạ độ thật trong knowledge base, phát hiện lịch trình "vòng vèo" AI tự sắp mà không biết khoảng cách thật) ngay sau khi tạo lịch trình hoặc self-healing, kèm mức độ và gợi ý khắc phục
 - 🌐 **Đa ngôn ngữ Việt/Nhật/Anh** — nút VI/JA/EN ở góc trên bên phải đổi toàn bộ giao diện, nội dung AI trả về (lịch trình, group matching, giọng nói, self-healing, camera), nhận diện/phát giọng nói theo đúng ngôn ngữ đang chọn. Lựa chọn ngôn ngữ được lưu lại cho lần sau.
 - ⚡ **Streaming** — kết quả AI hiện dần theo từng token thay vì đợi cả khối, cảm giác phản hồi nhanh hơn nhiều với lịch trình dài.
 - 📤 **Chia sẻ lịch trình** — nút "Chia sẻ" ở tab Lịch trình mở bảng chia sẻ native trên điện thoại (Messenger, Zalo, email...), hoặc copy văn bản đã format sẵn vào clipboard trên desktop. Có phương án dự phòng để vẫn copy được khi mở app qua địa chỉ IP LAN (http, không phải https).
@@ -104,6 +104,17 @@ node rag-server/ingest.js                               # đọc lại toàn b�
 ```
 
 Lưu ý: dữ liệu OSM là do cộng đồng đóng góp (giấy phép ODbL, cần ghi nguồn `© OpenStreetMap contributors` nếu phát hành lại), **chưa được kiểm chứng thủ công**, giờ mở cửa/địa chỉ có thể lỗi thời. OSM không có sẵn giá hay rating — **rating** bỏ qua hẳn (app coi là "chưa có đánh giá", không đoán), còn **giá** thì script tự gán một khoảng ước lượng theo loại quán (VD: ramen ~800-1300 yên, steak/BBQ ~2500-4500 yên...) vì tính năng chia chi phí cần có con số để hoạt động — luôn hiện kèm dấu `~` và ghi rõ "(ước lượng theo loại quán)" ở mọi nơi hiển thị, không lẫn với giá thật của 48 quán soạn tay. Chạy lại script này bất cứ lúc nào để lấy dữ liệu mới hơn hoặc đổi vùng/số lượng (sửa `OKINAWA_HONTO_BBOX` trong file để đổi khu vực, hoặc sửa bảng `PRICE_ESTIMATE_BANDS` để tinh chỉnh mức giá ước lượng).
+
+### Thêm toạ độ cho dữ liệu soạn tay (phục vụ cảnh báo khoảng cách di chuyển)
+
+`knowledge/restaurants.json` và `knowledge/attractions.json` (soạn tay) không có sẵn toạ độ như dữ liệu OSM. Chạy script này 1 lần (hoặc mỗi khi thêm quán/địa điểm mới chưa có toạ độ) để tự tra cứu toạ độ thật qua Nominatim (OpenStreetMap, miễn phí, không cần key) và ghi thêm field `lat`/`lon` vào 2 file đó — không đụng tới field nào khác đã soạn tay:
+
+```bash
+node rag-server/geocode-curated.js   # tự bỏ qua mục đã có lat/lon, chỉ tra những mục còn thiếu
+node rag-server/ingest.js            # rebuild embedding với toạ độ mới
+```
+
+Toạ độ này được dùng để tính khoảng cách thực tế giữa các hoạt động liên tiếp trong ngày (mục "🚦 Kiểm tra rủi ro chuyến đi" ở trên) — hoạt động nào không khớp được tên với dữ liệu có toạ độ sẽ bị bỏ qua (không đoán), chứ không làm sai lệch cảnh báo.
 
 ## Chạy test
 

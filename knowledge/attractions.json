@@ -7,7 +7,9 @@
     "address": "Ocean Expo Park, Motobu, Okinawa",
     "kidFriendly": true,
     "source": "https://churaumi.okinawa/en/",
-    "notes": "Nổi tiếng với bể Kuroshio Sea nuôi cá mập voi và cá đuối manta. Giờ mở cửa thay đổi theo mùa, nên kiểm tra lại trang chính thức trước khi đi."
+    "notes": "Nổi tiếng với bể Kuroshio Sea nuôi cá mập voi và cá đuối manta. Giờ mở cửa thay đổi theo mùa, nên kiểm tra lại trang chính thức trước khi đi.",
+    "lat": 26.689698,
+    "lon": 127.8766766
   },
   {
     "name": "American Village",
@@ -17,7 +19,9 @@
     "address": "Chatan, Okinawa",
     "kidFriendly": true,
     "source": "public knowledge",
-    "notes": "Khu phức hợp phong cách Mỹ, có vòng quay Ferris wheel, gần Sunset Beach, phù hợp chụp ảnh, mua sắm, ăn tối."
+    "notes": "Khu phức hợp phong cách Mỹ, có vòng quay Ferris wheel, gần Sunset Beach, phù hợp chụp ảnh, mua sắm, ăn tối.",
+    "lat": 26.3165214,
+    "lon": 127.7573637
   },
   {
     "name": "Shuri Castle",
@@ -27,7 +31,9 @@
     "address": "Shuri, Naha, Okinawa",
     "kidFriendly": true,
     "source": "public knowledge",
-    "notes": "Di sản văn hóa vương quốc Ryukyu cũ, từng bị cháy năm 2019 và đang trong quá trình phục dựng — nên kiểm tra tình trạng mở cửa thực tế trước khi đi."
+    "notes": "Di sản văn hóa vương quốc Ryukyu cũ, từng bị cháy năm 2019 và đang trong quá trình phục dựng — nên kiểm tra tình trạng mở cửa thực tế trước khi đi.",
+    "lat": 26.2170014,
+    "lon": 127.7193727
   },
   {
     "name": "Kokusai Street (Kokusai Dori)",
@@ -37,6 +43,68 @@
     "address": "Naha, Okinawa",
     "kidFriendly": true,
     "source": "public knowledge",
-    "notes": "Con phố chính dài ~1.6km ở Naha, tập trung nhà hàng, quán lưu niệm, dễ đi bộ khám phá."
+    "notes": "Con phố chính dài ~1.6km ở Naha, tập trung nhà hàng, quán lưu niệm, dễ đi bộ khám phá.",
+    "lat": 26.2182566,
+    "lon": 127.693454
+  },
+  {
+    "name": "Cape Manzamo",
+    "type": "Điểm ngắm cảnh, vách đá ven biển",
+    "hours": "Ngoài trời, mở cửa cả ngày (khu bãi đỗ xe/trung tâm du khách thường 09:00-18:00)",
+    "ticketPrice": "Miễn phí",
+    "address": "Onna, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Vách đá vôi hình đầu voi nổi tiếng, một trong những điểm ngắm hoàng hôn/biển đẹp nhất Okinawa. Tên tiếng Nhật: 万座毛 (Manzamo).",
+    "lat": 26.5050087,
+    "lon": 127.8502564
+  },
+  {
+    "name": "Sunset Beach",
+    "type": "Bãi biển",
+    "hours": "Ngoài trời, mở cửa cả ngày (bãi tắm chính thức thường có mùa, kiểm tra biển báo)",
+    "ticketPrice": "Miễn phí",
+    "address": "Chatan, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Bãi biển ngay cạnh American Village, nổi tiếng ngắm hoàng hôn, đông người buổi chiều tối.",
+    "lat": 26.3131692,
+    "lon": 127.7550968
+  },
+  {
+    "name": "Naha Airport",
+    "type": "Sân bay",
+    "hours": "Mở cửa 24/7 (giờ khai thác chuyến bay tùy hãng)",
+    "ticketPrice": "Miễn phí (khu vực công cộng)",
+    "address": "Naha, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Sân bay chính của Okinawa, cửa ngõ ra vào đảo — thường là điểm đầu/cuối lịch trình.",
+    "lat": 26.1966997,
+    "lon": 127.6489521
+  },
+  {
+    "name": "Cape Zanpa",
+    "type": "Điểm ngắm cảnh, hải đăng",
+    "hours": "Ngoài trời, mở cửa cả ngày (hải đăng có giờ riêng, thường 09:30-16:30)",
+    "ticketPrice": "Miễn phí (leo hải đăng có thể tính phí nhỏ)",
+    "address": "Yomitan, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Mũi đá vôi với hải đăng trắng nổi bật, view biển đẹp, ít đông khách hơn Cape Manzamo.",
+    "lat": 26.4404961,
+    "lon": 127.7119195
+  },
+  {
+    "name": "Naminoue Beach",
+    "type": "Bãi biển",
+    "hours": "Mùa bơi chính thức thường tháng 4-10, ngoài trời mở cả ngày",
+    "ticketPrice": "Miễn phí",
+    "address": "Naha, Okinawa",
+    "kidFriendly": true,
+    "source": "public knowledge",
+    "notes": "Bãi biển hiếm hoi ngay trong trung tâm Naha, cạnh đền Naminoue, tiện ghé qua giữa lịch trình trong thành phố.",
+    "lat": 26.2212939,
+    "lon": 127.6721517
   }
 ]

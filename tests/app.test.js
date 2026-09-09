@@ -3,6 +3,7 @@ const assert = require('node:assert/strict');
 const {
   escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity, weatherDescription,
   buildDayRouteMapUrl, detectMealType, isVagueVenueMention, buildVenueActivityText, resolvePlannerVenues,
+  parseOpeningHoursRanges, isVenueOpenForMealType,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   formatYen, estimateEntryCostPerPerson, isFoodKnowledgeEntry, plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
@@ -12,6 +13,7 @@ const {
   detectPreferenceConflicts, generateCompromiseOptions, pickPrimaryKnowledgeEntry, buildReasoningReceipt,
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   computeItinerarySatisfaction, computeSatisfactionDelta, detectTravelRisks,
+  haversineDistanceKm, findKnowledgeEntryForActivity, detectGeographicRisks,
   renderSatisfactionDeltaHtml, renderRiskPanelHtml,
   buildForecastEventFromDaily, parseSelfHealingInput,
   canonicalHealedActivities, buildPlannerDataFromHealedData, normalizeSelfHealingAiResult, relocalizeHealedData, normalizeMemberImpactAi,
@@ -235,6 +237,59 @@ describe('resolvePlannerVenues', () => {
     const plan = { days: [{ day: 1, activities: [{ text: 'Ăn trưa gần đó' }] }] };
     const resolved = resolvePlannerVenues(plan, [], members, 'vi');
     assert.equal(resolved.days[0].activities[0].text, 'Ăn trưa gần đó');
+  });
+  test('never fills a breakfast slot with a venue only open for dinner, when a breakfast-hours venue is available', () => {
+    const candidates = [
+      { name: 'Dinner Only Grill', cuisine: 'Nướng', hours: '18:00-23:00', rating: '4.8' }, // higher rating, but wrong hours
+      { name: 'Morning Cafe', cuisine: 'Cà phê', hours: '07:00-11:00', rating: '4.0' }
+    ];
+    const plan = { days: [{ day: 1, activities: [{ text: 'Ăn sáng gần đó' }] }] };
+    const resolved = resolvePlannerVenues(plan, candidates, members, 'vi');
+    assert.equal(resolved.days[0].activities[0].text, 'Ăn sáng tại Morning Cafe');
+  });
+  test('falls back to the full pool when the hours check would leave nothing open', () => {
+    const candidates = [{ name: 'Dinner Only Grill', cuisine: 'Nướng', hours: '18:00-23:00', rating: '4.8' }];
+    const plan = { days: [{ day: 1, activities: [{ text: 'Ăn sáng gần đó' }] }] };
+    const resolved = resolvePlannerVenues(plan, candidates, members, 'vi');
+    assert.equal(resolved.days[0].activities[0].text, 'Ăn sáng tại Dinner Only Grill');
+  });
+});
+
+describe('parseOpeningHoursRanges', () => {
+  test('parses a simple range', () => {
+    assert.deepEqual(parseOpeningHoursRanges('11:00-23:00'), [[660, 1380]]);
+  });
+  test('parses multiple ranges (lunch/dinner split)', () => {
+    assert.deepEqual(parseOpeningHoursRanges('11:30-15:00, 17:00-22:00'), [[690, 900], [1020, 1320]]);
+  });
+  test('handles a range that wraps past midnight', () => {
+    assert.deepEqual(parseOpeningHoursRanges('18:00-02:00'), [[1080, 1560]]);
+  });
+  test('returns an empty array for unparseable/missing text', () => {
+    assert.deepEqual(parseOpeningHoursRanges('Mo-Su'), []);
+    assert.deepEqual(parseOpeningHoursRanges(''), []);
+    assert.deepEqual(parseOpeningHoursRanges(null), []);
+  });
+});
+
+describe('isVenueOpenForMealType', () => {
+  test('true when the venue\'s hours overlap the meal window', () => {
+    assert.equal(isVenueOpenForMealType('11:00-23:00', 'lunch'), true);
+    assert.equal(isVenueOpenForMealType('11:30-15:00, 17:00-22:00', 'dinner'), true);
+  });
+  test('false when the venue is closed during that meal\'s window', () => {
+    assert.equal(isVenueOpenForMealType('18:00-23:00', 'breakfast'), false);
+  });
+  test('true for "24/7" regardless of meal type', () => {
+    assert.equal(isVenueOpenForMealType('24/7', 'breakfast'), true);
+  });
+  test('true when hours are missing or unparseable — never blocks on missing information', () => {
+    assert.equal(isVenueOpenForMealType('', 'breakfast'), true);
+    assert.equal(isVenueOpenForMealType(null, 'dinner'), true);
+    assert.equal(isVenueOpenForMealType('Mo-Su', 'lunch'), true);
+  });
+  test('true for the generic "meal" type regardless of hours (no specific window to check)', () => {
+    assert.equal(isVenueOpenForMealType('18:00-23:00', 'meal'), true);
   });
 });
 
@@ -795,6 +850,55 @@ describe('normalizeSelfHealingAiResult', () => {
     assert.equal(normalized.updated_days[0].activities.length, 2);
     assert.equal(normalized.updated_days[1].activities.length, 2);
   });
+
+  test('applies a replacement hint to every occurrence of a repeated activity, not just the first', () => {
+    // Regression test: a plan legitimately repeats "Ăn sáng tại khách sạn" on both days (an
+    // unaffected, indoor activity under a storm incident, so buildSelfHealingPlan itself leaves
+    // both untouched). The AI's {original, replacement} hint carries no day/position info, so
+    // there's no way to know which occurrence it means — applyReplacementHintsToDays used to just
+    // take the first match in day order, silently leaving Day 2's identical activity unfixed.
+    const base = buildSelfHealingPlan(
+      { days: [
+        { day: 1, activities: ['Ăn sáng tại khách sạn', 'Bãi biển'] },
+        { day: 2, activities: ['Ăn sáng tại khách sạn', 'Bảo tàng'] }
+      ] },
+      ['Ăn sáng tại khách sạn', 'Bãi biển', 'Ăn sáng tại khách sạn', 'Bảo tàng'],
+      'Bão lớn kèm gió mạnh',
+      { days: 2, budget: '90000', group: '2 người', notes: '' }
+    );
+    assert.equal(base.updated_days[0].activities[0].changed, false);
+    assert.equal(base.updated_days[1].activities[0].changed, false);
+
+    const normalized = normalizeSelfHealingAiResult(base, {
+      replacements: [{ original: 'Ăn sáng tại khách sạn', replacement: 'Ăn sáng tại nhà hàng trong nhà', reason: 'Bão lớn' }]
+    });
+    assert.equal(normalized.updated_days[0].activities[0].text, 'Ăn sáng tại nhà hàng trong nhà');
+    assert.equal(normalized.updated_days[1].activities[0].text, 'Ăn sáng tại nhà hàng trong nhà');
+    assert.equal(normalized.updated_days[0].activities[0].changed, true);
+    assert.equal(normalized.updated_days[1].activities[0].changed, true);
+  });
+
+  test('does not reject a well-formed updated_itinerary just because the original plan repeats an activity name', () => {
+    // Regression test: dedupePlanItems() used to run on the AI's returned updated_itinerary before
+    // comparing its length against baselineCount. A plan that legitimately repeats an activity
+    // (e.g. the same breakfast spot both days) has baselineCount counting both occurrences, but the
+    // AI's echoed-back list — after being wrongly deduped — would come up one short, so the whole
+    // response was rejected and no healing applied at all, purely because of the repeat.
+    const base = buildSelfHealingPlan(
+      { days: [
+        { day: 1, activities: ['Ăn sáng tại khách sạn', 'Bãi biển'] },
+        { day: 2, activities: ['Ăn sáng tại khách sạn', 'Bảo tàng'] }
+      ] },
+      ['Ăn sáng tại khách sạn', 'Bãi biển', 'Ăn sáng tại khách sạn', 'Bảo tàng'],
+      'Bão lớn kèm gió mạnh',
+      { days: 2, budget: '90000', group: '2 người', notes: '' }
+    );
+    const normalized = normalizeSelfHealingAiResult(base, {
+      updated_itinerary: ['Ăn sáng tại khách sạn', 'Bảo tàng trong nhà', 'Ăn sáng tại khách sạn', 'Bảo tàng']
+    });
+    assert.equal(normalized.updated_days.length, 2);
+    assert.equal(normalized.updated_days[0].activities[1].text, 'Bảo tàng trong nhà');
+  });
 });
 
 describe('buildPlannerDataFromHealedData', () => {
@@ -1264,6 +1368,93 @@ describe('detectTravelRisks', () => {
   });
   test('returns an empty array when nothing is risky', () => {
     assert.deepEqual(detectTravelRisks(['Museum'], { budget: '200000', days: 1, notes: 'Thuê xe' }, null, 'vi'), []);
+  });
+});
+
+describe('haversineDistanceKm', () => {
+  test('returns 0 for the same point', () => {
+    assert.equal(haversineDistanceKm(26.2, 127.68, 26.2, 127.68), 0);
+  });
+  test('roughly matches the real distance between Naha and Nago (~55km)', () => {
+    const km = haversineDistanceKm(26.2124, 127.6809, 26.5926, 127.9770);
+    assert.ok(km > 45 && km < 65, `expected ~55km, got ${km}`);
+  });
+  test('returns null when any coordinate is missing/non-numeric', () => {
+    assert.equal(haversineDistanceKm(26.2, 127.68, null, 127.7), null);
+    assert.equal(haversineDistanceKm(26.2, NaN, 26.3, 127.7), null);
+  });
+});
+
+describe('findKnowledgeEntryForActivity', () => {
+  const candidates = [
+    { name: 'BBQ Naha Grill', lat: 26.21, lon: 127.68 },
+    { name: 'Churaumi Aquarium', lat: 26.69, lon: 127.88 }
+  ];
+  test('matches by exact name', () => {
+    assert.equal(findKnowledgeEntryForActivity('BBQ Naha Grill', candidates).name, 'BBQ Naha Grill');
+  });
+  test('matches when the activity text contains the venue name (e.g. with a meal prefix)', () => {
+    assert.equal(findKnowledgeEntryForActivity('Ăn trưa tại BBQ Naha Grill', candidates).name, 'BBQ Naha Grill');
+  });
+  test('returns null instead of guessing when nothing matches — no fallback to "just pick one"', () => {
+    assert.equal(findKnowledgeEntryForActivity('Một hoạt động không liên quan gì', candidates), null);
+    assert.equal(findKnowledgeEntryForActivity('', candidates), null);
+  });
+});
+
+describe('detectGeographicRisks', () => {
+  // Real-ish coordinates: BBQ Naha Grill and American Village are both in south Okinawa, close
+  // together; Churaumi Aquarium is up in Motobu, ~80km north.
+  const candidates = [
+    { name: 'BBQ Naha Grill', lat: 26.2122, lon: 127.6791 },
+    { name: 'American Village', lat: 26.3165, lon: 127.7574 },
+    { name: 'Churaumi Aquarium', lat: 26.6897, lon: 127.8767 }
+  ];
+  test('flags a high-severity jump when two consecutive stops are very far apart', () => {
+    const plan = { days: [{ day: 1, activities: [{ text: 'BBQ Naha Grill' }, { text: 'Churaumi Aquarium' }] }] };
+    const risks = detectGeographicRisks(plan, candidates, 'vi');
+    const geo = risks.find(r => r.type === 'geography');
+    assert.ok(geo);
+    assert.equal(geo.level, 'high');
+  });
+  test('does not flag nearby consecutive stops', () => {
+    const plan = { days: [{ day: 1, activities: [{ text: 'BBQ Naha Grill' }, { text: 'American Village' }] }] };
+    const risks = detectGeographicRisks(plan, candidates, 'vi');
+    assert.equal(risks.find(r => r.type === 'geography'), undefined);
+  });
+  test('skips an unmatched activity without breaking the chain around it', () => {
+    const plan = { days: [{ day: 1, activities: [{ text: 'BBQ Naha Grill' }, { text: 'Một nơi không có trong dữ liệu' }, { text: 'Churaumi Aquarium' }] }] };
+    // The unmatched middle activity is never assigned a coordinate (never guessed at), but it also
+    // doesn't reset the chain — the two activities that DO match on either side of it are still
+    // compared directly, so the real ~57km Naha-to-Motobu jump is still caught even with an
+    // unresolved stop in between (exactly the case a real itinerary produces most often: a
+    // well-known attraction on each side, an ordinary restaurant pick that doesn't resolve, in
+    // between).
+    const risks = detectGeographicRisks(plan, candidates, 'vi');
+    const geo = risks.find(r => r.type === 'geography');
+    assert.ok(geo);
+    assert.equal(geo.level, 'high');
+  });
+  test('flags nothing when no activity in the day matches a coordinate-bearing entry', () => {
+    const plan = { days: [{ day: 1, activities: [{ text: 'Một nơi lạ' }, { text: 'Một nơi lạ khác' }] }] };
+    const risks = detectGeographicRisks(plan, candidates, 'vi');
+    assert.equal(risks.find(r => r.type === 'geography'), undefined);
+  });
+  test('checks each day independently', () => {
+    const plan = {
+      days: [
+        { day: 1, activities: [{ text: 'BBQ Naha Grill' }, { text: 'American Village' }] },
+        { day: 2, activities: [{ text: 'American Village' }, { text: 'Churaumi Aquarium' }] }
+      ]
+    };
+    const risks = detectGeographicRisks(plan, candidates, 'vi');
+    const geoRisks = risks.filter(r => r.type === 'geography');
+    assert.equal(geoRisks.length, 1);
+    assert.ok(geoRisks[0].detail.includes('2') || /day.*2/i.test(geoRisks[0].detail));
+  });
+  test('returns an empty array with no candidates or no days', () => {
+    assert.deepEqual(detectGeographicRisks({ days: [] }, candidates, 'vi'), []);
+    assert.deepEqual(detectGeographicRisks({ days: [{ day: 1, activities: [{ text: 'BBQ Naha Grill' }] }] }, [], 'vi'), []);
   });
 });
 

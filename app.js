@@ -346,14 +346,16 @@ const I18N = {
     risk: {
       title: '🚦 Kiểm tra rủi ro chuyến đi',
       level: { low: 'Thấp', medium: 'Vừa', high: 'Cao' },
-      type: { walking: 'Đi bộ nhiều', budget: 'Rủi ro ngân sách', transport: 'Di chuyển', weather: 'Thời tiết' },
+      type: { walking: 'Đi bộ nhiều', budget: 'Rủi ro ngân sách', transport: 'Di chuyển', weather: 'Thời tiết', geography: 'Khoảng cách di chuyển' },
       walkingHigh: (count) => `${count} hoạt động ngoài trời liên tiếp — nhóm có thể mệt, nên xen kẽ hoạt động trong nhà hoặc thêm thời gian nghỉ.`,
       walkingMedium: (count) => `${count} hoạt động ngoài trời trong danh sách — cân nhắc xen kẽ nghỉ ngơi.`,
       budgetHigh: (perDay) => `Ngân sách chỉ khoảng ${perDay} yên/ngày — khá eo hẹp so với chi phí du lịch Nhật Bản, dễ vượt ngân sách.`,
       budgetMedium: (perDay) => `Ngân sách khoảng ${perDay} yên/ngày — vừa đủ, nên ưu tiên các lựa chọn giá hợp lý.`,
       transportMedium: 'Nhiều hoạt động nhưng không có phương tiện di chuyển rõ ràng trong lịch trình — cân nhắc thuê xe hoặc đặt taxi trước.',
       weatherHigh: 'Thời tiết xấu nghiêm trọng — nhiều khả năng phải đổi kế hoạch giữa chừng.',
-      weatherMedium: 'Thời tiết không thuận lợi — nên chuẩn bị phương án dự phòng trong nhà.'
+      weatherMedium: 'Thời tiết không thuận lợi — nên chuẩn bị phương án dự phòng trong nhà.',
+      geographyHigh: (day, km) => `Ngày ${day}: có 2 điểm liên tiếp cách nhau tới ~${km}km — lịch trình có thể đang di chuyển vòng vèo không hợp lý, nên sắp xếp lại các hoạt động theo khu vực gần nhau.`,
+      geographyMedium: (day, km) => `Ngày ${day}: có 2 điểm liên tiếp cách nhau ~${km}km — kiểm tra lại thời gian di chuyển thực tế giữa 2 điểm này trước khi đi.`
     },
     weatherCodes: {
       0: 'trời quang', 1: 'quang, ít mây', 2: 'có mây rải rác', 3: 'nhiều mây',
@@ -704,14 +706,16 @@ const I18N = {
     risk: {
       title: '🚦 旅程のリスクチェック',
       level: { low: '低い', medium: '中程度', high: '高い' },
-      type: { walking: '徒歩が多い', budget: '予算リスク', transport: '移動手段', weather: '天候' },
+      type: { walking: '徒歩が多い', budget: '予算リスク', transport: '移動手段', weather: '天候', geography: '移動距離' },
       walkingHigh: (count) => `屋外アクティビティが${count}件連続しています — グループが疲れる可能性があるため、屋内アクティビティや休憩を挟むことをおすすめします。`,
       walkingMedium: (count) => `旅程に屋外アクティビティが${count}件あります — 休憩を挟むことを検討してください。`,
       budgetHigh: (perDay) => `予算が1日あたり約${perDay}円と、日本旅行の費用としてはやや厳しめです。予算オーバーに注意してください。`,
       budgetMedium: (perDay) => `予算は1日あたり約${perDay}円 — ちょうど良い水準です。コストパフォーマンスの良い選択を優先してください。`,
       transportMedium: 'アクティビティは多いですが、旅程に明確な移動手段がありません — レンタカーやタクシーの事前手配を検討してください。',
       weatherHigh: '深刻な悪天候です — 旅程の途中変更が必要になる可能性が高いです。',
-      weatherMedium: '天候が良くありません — 屋内の代替プランを準備しておくとよいでしょう。'
+      weatherMedium: '天候が良くありません — 屋内の代替プランを準備しておくとよいでしょう。',
+      geographyHigh: (day, km) => `${day}日目：連続する2つのスポットが約${km}km離れています — 旅程が非効率な移動ルートになっている可能性があります。近い場所同士でまとめ直すことをおすすめします。`,
+      geographyMedium: (day, km) => `${day}日目：連続する2つのスポットが約${km}km離れています — 出発前に実際の移動時間を確認してください。`
     },
     weatherCodes: {
       0: '快晴', 1: 'ほぼ晴れ', 2: '所により曇り', 3: '曇り',
@@ -1062,14 +1066,16 @@ const I18N = {
     risk: {
       title: '🚦 Travel risk check',
       level: { low: 'Low', medium: 'Medium', high: 'High' },
-      type: { walking: 'Excessive walking', budget: 'Budget risk', transport: 'Transportation', weather: 'Weather' },
+      type: { walking: 'Excessive walking', budget: 'Budget risk', transport: 'Transportation', weather: 'Weather', geography: 'Travel distance' },
       walkingHigh: (count) => `${count} outdoor activities back to back — the group may get tired, consider mixing in indoor activities or extra rest.`,
       walkingMedium: (count) => `${count} outdoor activities in this itinerary — consider spacing them with breaks.`,
       budgetHigh: (perDay) => `Budget is only about ¥${perDay}/day — tight for travel costs in Japan, easy to go over.`,
       budgetMedium: (perDay) => `Budget is about ¥${perDay}/day — reasonable, prioritize good-value options.`,
       transportMedium: 'Many activities but no clear transportation in the itinerary — consider arranging a rental car or taxi ahead of time.',
       weatherHigh: 'Severe bad weather — the plan will likely need a mid-trip change.',
-      weatherMedium: "Weather isn't great — prepare an indoor backup plan."
+      weatherMedium: "Weather isn't great — prepare an indoor backup plan.",
+      geographyHigh: (day, km) => `Day ${day}: two consecutive stops are ~${km}km apart — the itinerary may be zigzagging inefficiently; consider grouping nearby activities together instead.`,
+      geographyMedium: (day, km) => `Day ${day}: two consecutive stops are ~${km}km apart — double-check the real travel time between them before you go.`
     },
     weatherCodes: {
       0: 'clear sky', 1: 'mainly clear', 2: 'partly cloudy', 3: 'overcast',
@@ -1215,6 +1221,49 @@ const MEAL_TYPE_LABEL = {
   en: { breakfast: 'Breakfast', lunch: 'Lunch', dinner: 'Dinner', meal: 'Meal' }
 };
 
+// Typical serving window for each meal type (minutes since midnight) — used to sanity-check a
+// venue's opening_hours before picking it, so a breakfast slot doesn't get filled with a place
+// that opens at 17:00. Deliberately generous (wider than any single restaurant's real hours) since
+// this is a coarse sanity check, not a booking system.
+const MEAL_TIME_WINDOW = {
+  breakfast: [6 * 60, 10 * 60 + 30],
+  lunch: [11 * 60, 14 * 60 + 30],
+  dinner: [17 * 60 + 30, 21 * 60 + 30]
+};
+
+const ALWAYS_OPEN_RE = /24\s*\/\s*7|24h|24時間|終日|24 giờ|cả ngày/i;
+const TIME_RANGE_GLOBAL_RE = /(\d{1,2}):(\d{2})\s*[-~〜]\s*(\d{1,2}):(\d{2})/g;
+
+/** Extracts every "HH:MM-HH:MM" range in an opening-hours string, in minutes since midnight; handles a range that wraps past midnight (e.g. "18:00-02:00"). Empty array if the text has no parseable range. */
+function parseOpeningHoursRanges(hoursText) {
+  const ranges = [];
+  for (const m of String(hoursText || '').matchAll(TIME_RANGE_GLOBAL_RE)) {
+    const open = Number(m[1]) * 60 + Number(m[2]);
+    let close = Number(m[3]) * 60 + Number(m[4]);
+    if (close <= open) close += 24 * 60;
+    ranges.push([open, close]);
+  }
+  return ranges;
+}
+
+/**
+ * True when a venue's opening_hours plausibly covers a given meal's typical serving window —
+ * "plausibly" because this is a coarse sanity check, not a live lookup: an entry with no hours
+ * field at all, or hours text this can't parse (e.g. day-of-week-only OSM syntax with no time
+ * range), returns true rather than false — missing/unparseable information should never block a
+ * pick that might well be fine, only a genuine mismatch (breakfast slot, dinner-only venue) should.
+ */
+function isVenueOpenForMealType(hoursText, mealType) {
+  const window = MEAL_TIME_WINDOW[mealType];
+  if (!window) return true; // generic 'meal' type has no specific time to check against
+  if (!hoursText) return true;
+  if (ALWAYS_OPEN_RE.test(hoursText)) return true;
+  const ranges = parseOpeningHoursRanges(hoursText);
+  if (!ranges.length) return true;
+  const [wantOpen, wantClose] = window;
+  return ranges.some(([open, close]) => open < wantClose && close > wantOpen);
+}
+
 /** Composes "<meal> at <venue>" in the given language's natural phrasing. */
 function buildVenueActivityText(mealType, venueName, lang) {
   const label = (MEAL_TYPE_LABEL[lang] || MEAL_TYPE_LABEL.vi)[mealType] || MEAL_TYPE_LABEL.vi.meal;
@@ -1234,6 +1283,11 @@ function buildVenueActivityText(mealType, venueName, lang) {
  * satisfaction, then rating) so the same restaurant isn't named for both lunch and dinner unless the
  * candidate pool is too small to avoid it. No-op (returns planData unchanged) when there are no food
  * candidates to draw from — e.g. a destination outside this demo's indexed knowledge base.
+ *
+ * Also cross-checks each candidate's opening_hours (when the entry has one) against the meal
+ * being filled — see isVenueOpenForMealType — so a breakfast slot doesn't get filled with a venue
+ * that's only open for dinner. Falls back to the unfiltered pool when the hours check would leave
+ * nothing to pick from (an imperfect pick beats none — same trade-off as the "used" fallback above).
  */
 function resolvePlannerVenues(planData, foodCandidates, members, lang) {
   const foodPool = (foodCandidates || []).filter(c => c && c.name && isFoodKnowledgeEntry(c));
@@ -1244,14 +1298,17 @@ function resolvePlannerVenues(planData, foodCandidates, members, lang) {
     const activities = day.activities.map(activity => {
       const text = plannerActivityText(activity);
       if (!text || !isVagueVenueMention(text)) return activity;
+      const mealType = detectMealType(text);
       const available = foodPool.filter(c => !used.has(c.name));
-      const pool = available.length ? available : foodPool;
+      let pool = available.length ? available : foodPool;
+      const openNow = pool.filter(c => isVenueOpenForMealType(c.hours, mealType));
+      if (openNow.length) pool = openNow;
       const scored = pool
         .map(entry => ({ entry, group: computeGroupSatisfaction(members || [], entry, lang) }))
         .sort((a, b) => (b.group.overall - a.group.overall) || ((parseFloat(b.entry.rating) || 0) - (parseFloat(a.entry.rating) || 0)));
       const best = scored[0].entry;
       used.add(best.name);
-      const newText = buildVenueActivityText(detectMealType(text), best.name, lang);
+      const newText = buildVenueActivityText(mealType, best.name, lang);
       const slot = plannerActivitySlot(activity);
       const price = estimateEntryCostPerPerson(best);
       return { text: newText, slot, ...(price != null ? { price } : {}) };
@@ -2519,6 +2576,12 @@ function cloneSelfHealingDays(days) {
   }));
 }
 
+// NOT deduped: a plan legitimately repeating the same activity text across days (e.g. "Ăn sáng tại
+// khách sạn" every morning) is two distinct real occurrences, not one — every caller here needs the
+// true count/list (baselineCount and candidateCount below compare against each other to catch a
+// dropped day, and canonicalHealedActivities uses this as the actual flat itinerary shown to the
+// user and fed into satisfaction/risk scoring). Silently collapsing a legitimate repeat used to
+// undercount baselineCount, which then rejected a well-formed AI response for no real reason.
 function flattenSelfHealingActivitiesFromDays(days) {
   const flat = [];
   cloneSelfHealingDays(days).forEach(day => {
@@ -2526,11 +2589,15 @@ function flattenSelfHealingActivitiesFromDays(days) {
       if (activity && activity.text) flat.push(activity.text);
     });
   });
-  return dedupePlanItems(flat);
+  return flat;
 }
 
+// NOT deduped: this maps activityList onto templateDays purely by position (list[cursor], one
+// entry per original activity slot in order) — deduping it first would desync that mapping the
+// moment the plan has a real repeated activity, shifting every activity after the repeat onto the
+// wrong day/slot instead of just leaving the repeat itself alone.
 function buildDaysFromActivityList(templateDays, activityList) {
-  const list = dedupePlanItems(Array.isArray(activityList) ? activityList : []);
+  const list = Array.isArray(activityList) ? activityList : [];
   if (!list.length) return [];
 
   const template = cloneSelfHealingDays(templateDays);
@@ -2591,6 +2658,22 @@ function normalizeAiReplacementHints(replacements) {
   return out;
 }
 
+/**
+ * Applies the AI's {original, replacement} hints onto the day-structured plan. The AI's hint
+ * schema carries only a name pair, no day/position — so when a plan legitimately repeats the same
+ * activity text across days (e.g. "Ăn sáng tại khách sạn" every morning), there is genuinely no
+ * information in the hint to say which occurrence it means (and no, checking whether the incident
+ * "applies" to that activity doesn't help disambiguate either — two occurrences with the exact same
+ * text always classify identically, so a text-based relevance check can only ever accept or reject
+ * BOTH of them together, never pick one over the other).
+ *
+ * Given that real ambiguity, this applies the hint to every currently-unclaimed activity matching
+ * `original`, not just the first one in day order. Previously it took only the first match, which
+ * wasn't actually more correct — it was arbitrary, and looked like a deliberate choice while quietly
+ * leaving the same-named activity on every other day (possibly the one the incident actually meant)
+ * unfixed. Applying to all of them is at least a predictable, explainable rule instead of a silent
+ * day-order coin flip.
+ */
 function applyReplacementHintsToDays(days, replacementHints) {
   const hints = normalizeAiReplacementHints(replacementHints);
   if (!hints.length) return cloneSelfHealingDays(days);
@@ -2605,21 +2688,22 @@ function applyReplacementHintsToDays(days, replacementHints) {
     const sourceKey = normalizeHealedText(hint.original);
     const hintKey = `${sourceKey}=>${normalizeHealedText(hint.replacement)}`;
     if (used.has(hintKey)) return;
-    let applied = false;
 
+    const matches = [];
     normalizedDays.forEach(day => {
-      if (applied) return;
       day.activities.forEach(activity => {
-        if (applied) return;
-        if (normalizeHealedText(activity.original) !== sourceKey) return;
-        activity.text = hint.replacement;
-        activity.changed = normalizeHealedText(activity.text) !== normalizeHealedText(activity.original);
-        activity.reason = hint.reason || activity.reason || '';
-        applied = true;
+        if (activity.changed) return; // already claimed by an earlier hint this pass
+        if (normalizeHealedText(activity.original) === sourceKey) matches.push(activity);
       });
     });
+    if (!matches.length) return;
 
-    if (applied) used.add(hintKey);
+    matches.forEach(activity => {
+      activity.text = hint.replacement;
+      activity.changed = normalizeHealedText(activity.text) !== normalizeHealedText(activity.original);
+      activity.reason = hint.reason || activity.reason || '';
+    });
+    used.add(hintKey);
   });
 
   return normalizedDays;
@@ -2698,7 +2782,12 @@ function normalizeSelfHealingAiResult(baseData, aiData) {
     updatedDays = applyReplacementHintsToDays(fallback.updated_days, aiData.replacements);
   }
   if (!updatedDays.length && Array.isArray(aiData.updated_itinerary) && aiData.updated_itinerary.length) {
-    const normalizedList = dedupePlanItems(aiData.updated_itinerary.map(cleanSelfHealingActivityText).filter(Boolean));
+    // NOT deduped: buildDaysFromActivityList maps this list onto the original days purely by
+    // position (list[cursor]), so it never needed unique text — but a plan legitimately repeating
+    // the same activity across days (e.g. "Ăn sáng tại khách sạn" every morning) would otherwise
+    // get collapsed to one entry here, undercounting against baselineCount and rejecting a
+    // perfectly good AI response for no reason other than the original itinerary having a repeat.
+    const normalizedList = aiData.updated_itinerary.map(cleanSelfHealingActivityText).filter(Boolean);
     // Keep day mapping stable: only map by position when the LLM keeps the exact activity count.
     if (baselineCount > 0 && normalizedList.length === baselineCount) {
       updatedDays = buildDaysFromActivityList(fallback.updated_days, normalizedList);
@@ -2859,6 +2948,104 @@ function computeSatisfactionDelta(members, beforeActivities, afterActivities, la
   return { before: before.overall, after: after.overall, perMember };
 }
 
+/** Great-circle distance in km between two lat/lon points. Null if any coordinate is missing/non-numeric. */
+function haversineDistanceKm(lat1, lon1, lat2, lon2) {
+  if (![lat1, lon1, lat2, lon2].every(Number.isFinite)) return null;
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+/**
+ * Finds the knowledge-base entry (curated or OSM) matching an activity's text by name, exact then
+ * substring — same matching pickPrimaryKnowledgeEntry uses, but WITHOUT its "nothing matched, just
+ * take the first candidate" fallback. That fallback is fine for pickPrimaryKnowledgeEntry's use
+ * case (scoring the one place a user explicitly typed), but here it would silently attach a
+ * random venue's coordinates to an unrelated activity and manufacture a fake distance — so no
+ * match here correctly means "location unknown", not "assume it's this one".
+ */
+// Generic qualifiers stripped out when comparing an activity's text against a knowledge-base
+// name's significant words — "Okinawa Churaumi Aquarium" should still match "Đi tham quan
+// Churaumi Aquarium" even though the activity text never repeats the prefecture name.
+const NAME_MATCH_STOPWORDS = new Set(['okinawa', 'the', 'a', 'an']);
+
+function coreNameTokens(name) {
+  return String(name || '').toLowerCase().split(/[\s,()]+/).filter(t => t && !NAME_MATCH_STOPWORDS.has(t));
+}
+
+function findKnowledgeEntryForActivity(activityText, candidates) {
+  const text = String(activityText || '').trim().toLowerCase();
+  if (!text) return null;
+  const named = (candidates || []).filter(c => c && c.name);
+  const exact = named.find(c => c.name.trim().toLowerCase() === text);
+  if (exact) return exact;
+  const substring = named.find(c => text.includes(c.name.trim().toLowerCase()) || c.name.trim().toLowerCase().includes(text));
+  if (substring) return substring;
+  // Fallback: every one of the venue name's significant words shows up somewhere in the activity
+  // text, ignoring generic qualifiers like "Okinawa" — catches a verb-phrase wrapper ("Đi tham
+  // quan ...", "Thăm dò ...") the substring check above doesn't tolerate. Requires at least 2
+  // matching tokens so a single common word (e.g. just "cafe") can't cause a loose mismatch.
+  return named.find(c => {
+    const tokens = coreNameTokens(c.name);
+    return tokens.length >= 2 && tokens.every(t => text.includes(t));
+  }) || null;
+}
+
+// Consecutive-stop distance thresholds (km) for detectGeographicRisks — Okinawa's main island is
+// roughly 100km end to end, so a ~15-30km hop between back-to-back stops already means real
+// driving time the itinerary's ordering gave no indication of.
+const GEO_JUMP_MEDIUM_KM = 15;
+const GEO_JUMP_HIGH_KM = 30;
+
+/**
+ * Flags a day whose consecutive activities are geographically far apart from each other — a
+ * zigzag or simply unrealistic itinerary the planner LLM has no way to catch on its own (it only
+ * ever sees place names, never real coordinates). Deterministic, using whatever coordinates the
+ * RAG knowledge base happens to have (curated entries geocoded via rag-server/geocode-curated.js,
+ * OSM entries via rag-server/fetch-osm-restaurants.js) — an activity that doesn't match a
+ * coordinate-bearing entry is simply skipped rather than guessed at, so this only ever warns about
+ * jumps it can actually verify, never invents one from a bad match.
+ * Returns risk objects in the same {type, level, detail} shape as detectTravelRisks, meant to be
+ * concatenated with its output before rendering (see renderRiskPanelHtml).
+ */
+function detectGeographicRisks(planData, candidates, lang) {
+  if (!planData || !Array.isArray(planData.days) || !candidates || !candidates.length) return [];
+  const risks = [];
+  planData.days.forEach((day, i) => {
+    if (!day || !Array.isArray(day.activities)) return;
+    const dayLabel = day.day || (i + 1);
+    let prevCoords = null;
+    let maxJumpKm = 0;
+    day.activities.forEach(activity => {
+      const text = plannerActivityText(activity);
+      if (!text) return;
+      const entry = findKnowledgeEntryForActivity(text, candidates);
+      const lat = entry && parseFloat(entry.lat);
+      const lon = entry && parseFloat(entry.lon);
+      // An unmatched activity is simply invisible to the chain — never breaks it, never
+      // contributes to it — so the two nearest activities that DO have coordinates on either
+      // side of it still get compared directly. That's the whole point: most days interleave
+      // known attractions with restaurant picks that don't resolve to a coordinate, and a
+      // "Naha -> [some unresolved lunch spot] -> Motobu" day is exactly the itinerary this
+      // function exists to flag, not a case to silently give a pass.
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+      if (prevCoords) {
+        const dist = haversineDistanceKm(prevCoords.lat, prevCoords.lon, lat, lon);
+        if (dist != null) maxJumpKm = Math.max(maxJumpKm, dist);
+      }
+      prevCoords = { lat, lon };
+    });
+    if (maxJumpKm >= GEO_JUMP_HIGH_KM) {
+      risks.push({ type: 'geography', level: 'high', detail: tr(lang, 'risk.geographyHigh', dayLabel, Math.round(maxJumpKm)) });
+    } else if (maxJumpKm >= GEO_JUMP_MEDIUM_KM) {
+      risks.push({ type: 'geography', level: 'medium', detail: tr(lang, 'risk.geographyMedium', dayLabel, Math.round(maxJumpKm)) });
+    }
+  });
+  return risks;
+}
+
 /**
  * Rule-based travel risk scan: excessive walking, budget, transportation, weather.
  * Entirely deterministic — reuses classifyActivity()/classifyIncident() already
@@ -2996,6 +3183,7 @@ const AppCore = {
   DEFAULT_LANG, SUPPORTED_LANGS, I18N, tr, normalizeLang,
   escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity, buildDayRouteMapUrl,
   detectMealType, isVagueVenueMention, buildVenueActivityText, resolvePlannerVenues,
+  parseOpeningHoursRanges, isVenueOpenForMealType,
   weatherDescription,
   buildForecastEventFromDaily,
   findFirstJsonObject, extractJson, extractChunkContent,
@@ -3016,6 +3204,7 @@ const AppCore = {
   canonicalHealedActivities, buildPlannerDataFromHealedData, normalizeSelfHealingAiResult,
   relocalizeHealedData, normalizeMemberImpactAi, renderImpactAiHtml,
   computeItinerarySatisfaction, computeSatisfactionDelta, detectTravelRisks,
+  haversineDistanceKm, findKnowledgeEntryForActivity, detectGeographicRisks,
   renderSatisfactionDeltaHtml, renderRiskPanelHtml,
   STORAGE_KEYS, VOICE_LOG_MAX, safeSave, safeLoad, safeSaveString, safeLoadString
 };
@@ -3990,7 +4179,10 @@ function initApp() {
         group: saved.group || '',
         notes: saved.notes || ''
       });
-      const savedRisks = detectTravelRisks(flattenActivities(saved.data), { budget: saved.budget, days: saved.days, group: saved.group, notes: saved.notes }, null, currentLang);
+      // Prefer the risks saved alongside the plan (includes geographic-distance checks, which need
+      // the RAG candidate pool from generation time and can't be recomputed from storage alone) —
+      // falls back to a fresh flat-list scan for older saved state from before that was added.
+      const savedRisks = saved.risks || detectTravelRisks(flattenActivities(saved.data), { budget: saved.budget, days: saved.days, group: saved.group, notes: saved.notes }, null, currentLang);
       const savedInnerHtml = `${renderPlannerHtml(saved.data, saved.dest || '', currentLang, saved.days)}${renderRiskPanelHtml(savedRisks, currentLang)}`;
       lastGeneratedTrip = { destination: saved.dest || '', days: saved.days || '', startDate: saved.startDate || '', budget: saved.budget || '', group: saved.group || '', notes: saved.notes || '', data: saved.data };
       pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(savedInnerHtml)}</div>`;
@@ -4017,13 +4209,14 @@ function initApp() {
       const rawData = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
       const data = resolvePlannerVenues(rawData, ragCandidates, members, currentLang);
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
-      const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
+      const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang)
+        .concat(detectGeographicRisks(data, ragCandidates, currentLang));
       renderPlannerSatisfaction(members, flattenActivities(data));
       renderPlannerCostSummary(data, members.length);
       const innerHtml = `${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
       pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
       updatePlannerShareState(data, dest);
-      savePlannerState({ data });
+      savePlannerState({ data, risks });
       showInviteBox({ destination: dest, days, startDate, budget, group, notes, data });
     } catch (err) { showError(pResult, err); pShare.style.display = 'none'; }
   });
@@ -4511,7 +4704,8 @@ function initApp() {
       const data = resolvePlannerVenues(rawData, ragCandidates, members, currentLang);
 
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
-      const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
+      const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang)
+        .concat(detectGeographicRisks(data, ragCandidates, currentLang));
       const satisfactionHtml = computePlannerSatisfactionHtml(members, flattenActivities(data));
       const costSummaryHtml = renderItineraryCostSummaryHtml(data, members.length, currentLang);
       const innerHtml = `${satisfactionHtml}${costSummaryHtml}${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
@@ -4526,7 +4720,7 @@ function initApp() {
       const plannerInnerHtml = `${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
       pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(plannerInnerHtml)}</div>`;
       updatePlannerShareState(data, dest);
-      savePlannerState({ data });
+      savePlannerState({ data, risks });
       showInviteBox({ destination: dest, days, startDate, budget: finalSlots.budget, group: finalSlots.group, notes, data });
 
       const readyMsg = tr(currentLang, 'voice.itineraryReady', dest, days);
