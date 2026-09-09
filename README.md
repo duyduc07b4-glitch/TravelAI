@@ -103,7 +103,7 @@ node rag-server/fetch-osm-restaurants.js --limit 300   # ghi ra knowledge/restau
 node rag-server/ingest.js                               # đọc lại toàn bộ knowledge/, rebuild embedding — cần rag-server đã npm install
 ```
 
-Lưu ý: dữ liệu OSM là do cộng đồng đóng góp (giấy phép ODbL, cần ghi nguồn `© OpenStreetMap contributors` nếu phát hành lại), **chưa được kiểm chứng thủ công** — không có sẵn giá/rating thật (app tự áp dụng mức giá tối thiểu suy luận và bỏ qua đánh giá khi thiếu, y như với hoạt động AI tự ước tính), và giờ mở cửa/địa chỉ có thể lỗi thời. Chạy lại script này bất cứ lúc nào để lấy dữ liệu mới hơn hoặc đổi vùng/số lượng (sửa `OKINAWA_HONTO_BBOX` trong file để đổi khu vực).
+Lưu ý: dữ liệu OSM là do cộng đồng đóng góp (giấy phép ODbL, cần ghi nguồn `© OpenStreetMap contributors` nếu phát hành lại), **chưa được kiểm chứng thủ công**, giờ mở cửa/địa chỉ có thể lỗi thời. OSM không có sẵn giá hay rating — **rating** bỏ qua hẳn (app coi là "chưa có đánh giá", không đoán), còn **giá** thì script tự gán một khoảng ước lượng theo loại quán (VD: ramen ~800-1300 yên, steak/BBQ ~2500-4500 yên...) vì tính năng chia chi phí cần có con số để hoạt động — luôn hiện kèm dấu `~` và ghi rõ "(ước lượng theo loại quán)" ở mọi nơi hiển thị, không lẫn với giá thật của 48 quán soạn tay. Chạy lại script này bất cứ lúc nào để lấy dữ liệu mới hơn hoặc đổi vùng/số lượng (sửa `OKINAWA_HONTO_BBOX` trong file để đổi khu vực, hoặc sửa bảng `PRICE_ESTIMATE_BANDS` để tinh chỉnh mức giá ước lượng).
 
 ## Chạy test
 

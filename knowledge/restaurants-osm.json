@@ -2,18 +2,21 @@
   {
     "name": "あぐーしゃぶしゃぶ我那覇牧場",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44954, 127.80423, Okinawa",
     "notes": "Toạ độ: 26.44954, 127.80423 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "沖縄料理",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~700-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.45077, 127.80429, Okinawa",
     "notes": "Toạ độ: 26.45077, 127.80429 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "A&W",
     "cuisine": "Burger",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "中頭郡北谷町上勢頭549−2",
     "notes": "SĐT: +81-98-936-6593 · Web: https://www.awok.co.jp/ · Toạ độ: 26.32978, 127.77781 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "24/7"
@@ -21,30 +24,35 @@
   {
     "name": "農家の食卓",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.65721, 127.98278, Okinawa",
     "notes": "Toạ độ: 26.65721, 127.98278 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ヒロ・コーヒー・ファーム",
     "cuisine": "Cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.66355, 128.24880, Okinawa",
     "notes": "Web: http://www.churashima.net/shima/special/cafe/okinawa/hirocoffeefarm/index.html · Toạ độ: 26.66355, 128.24880 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "SHINJO",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.69256, 127.92801, Okinawa",
     "notes": "Toạ độ: 26.69256, 127.92801 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "モスバーガー",
     "cuisine": "Burger",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21378, 127.67983, Okinawa",
     "notes": "Toạ độ: 26.21378, 127.67983 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "CoCo壱番屋",
     "cuisine": "Cà ri, Nhật Bản",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県那覇市金城５丁目１−１",
     "notes": "SĐT: 098-891-8277 · Web: https://tenpo.ichibanya.co.jp/ · Toạ độ: 26.19825, 127.66891 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "11:00-24:00"
@@ -52,6 +60,7 @@
   {
     "name": "麻月",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21572, 127.68741, Okinawa",
     "notes": "SĐT: 098-862-1620 · Toạ độ: 26.21572, 127.68741 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "11:00-14:30,17:00-01:00"
@@ -59,6 +68,7 @@
   {
     "name": "Han's",
     "cuisine": "Steak",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県那覇市久茂地３－２７－１０",
     "notes": "SĐT: +81 50-5831-4156 · Toạ độ: 26.21638, 127.68358 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:00-23:00"
@@ -66,12 +76,14 @@
   {
     "name": "我那覇焼肉店",
     "cuisine": "Đồ nướng/BBQ",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21736, 127.68173, Okinawa",
     "notes": "Toạ độ: 26.21736, 127.68173 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ミンク",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21902, 127.68848, Okinawa",
     "notes": "Toạ độ: 26.21902, 127.68848 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "24/7"
@@ -79,24 +91,28 @@
   {
     "name": "ほっともっと",
     "cuisine": "Nhật Bản",
+    "priceRange": "~700-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.18397, 127.67642, Okinawa",
     "notes": "Web: http://hottomotto.com · Toạ độ: 26.18397, 127.67642 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "杏屋",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.18348, 127.67734, Okinawa",
     "notes": "Toạ độ: 26.18348, 127.67734 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "エバークィーン",
     "cuisine": "Trung Hoa",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "那覇市小禄 5-15-22",
     "notes": "Toạ độ: 26.19117, 127.67299 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ドミノ・ピザ",
     "cuisine": "Pizza",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 那覇市 二丁目 2",
     "notes": "SĐT: +81 98 859 2261 · Toạ độ: 26.19230, 127.67576 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "24/7"
@@ -104,66 +120,77 @@
   {
     "name": "海樹HOUSE",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19242, 127.67542, Okinawa",
     "notes": "Toạ độ: 26.19242, 127.67542 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Ease",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21115, 127.67856, Okinawa",
     "notes": "Toạ độ: 26.21115, 127.67856 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "肥後勝",
     "cuisine": "Sushi",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21151, 127.67849, Okinawa",
     "notes": "Toạ độ: 26.21151, 127.67849 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Curiya",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21117, 127.67803, Okinawa",
     "notes": "Toạ độ: 26.21117, 127.67803 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "チェントロ",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21097, 127.67861, Okinawa",
     "notes": "Toạ độ: 26.21097, 127.67861 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "とみや",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21102, 127.67877, Okinawa",
     "notes": "Toạ độ: 26.21102, 127.67877 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "まこと屋",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21118, 127.67838, Okinawa",
     "notes": "Toạ độ: 26.21118, 127.67838 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ぱいかじ",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21513, 127.68381, Okinawa",
     "notes": "SĐT: 098-863-3280 · Toạ độ: 26.21513, 127.68381 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "トラットリア ディマーレ",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21322, 127.67546, Okinawa",
     "notes": "Toạ độ: 26.21322, 127.67546 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "えん家",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.24584, 127.73770, Okinawa",
     "notes": "Toạ độ: 26.24584, 127.73770 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "浜っ子",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 浦添市 三丁目 1",
     "notes": "SĐT: 098-879-2553 · Toạ độ: 26.24574, 127.73731 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Tu-Su 17:00-22:30"
@@ -171,96 +198,112 @@
   {
     "name": "翔夢壱",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17676, 127.74716, Okinawa",
     "notes": "Toạ độ: 26.17676, 127.74716 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "サマンサ",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17683, 127.74715, Okinawa",
     "notes": "Toạ độ: 26.17683, 127.74715 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ジェミーラ",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17686, 127.74710, Okinawa",
     "notes": "Toạ độ: 26.17686, 127.74710 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "めぐみ",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17702, 127.74678, Okinawa",
     "notes": "Toạ độ: 26.17702, 127.74678 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "まんぷく食堂",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17625, 127.74777, Okinawa",
     "notes": "SĐT: 946-4839 · Toạ độ: 26.17625, 127.74777 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "牛屋",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21536, 127.68595, Okinawa",
     "notes": "SĐT: 861-8719 · Toạ độ: 26.21536, 127.68595 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "牛角",
     "cuisine": "Đồ nướng/BBQ",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "那覇市 4 23",
     "notes": "SĐT: 098-866-2929 · Web: http://e-map.ne.jp · Toạ độ: 26.22511, 127.69897 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "クラブフジヤマ",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "2F",
     "notes": "Web: http://www.facebook.com/clubfujiyama · Toạ độ: 26.33617, 127.79812 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "しゃぶ葉",
     "cuisine": "Buffet",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19509, 127.66504, Okinawa",
     "notes": "Toạ độ: 26.19509, 127.66504 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "クライム",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20021, 127.67357, Okinawa",
     "notes": "Toạ độ: 26.20021, 127.67357 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ルーチェ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19816, 127.66873, Okinawa",
     "notes": "Toạ độ: 26.19816, 127.66873 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Herios Pub",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21559, 127.68565, Okinawa",
     "notes": "Toạ độ: 26.21559, 127.68565 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "琉球珈琲館",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21562, 127.68548, Okinawa",
     "notes": "Toạ độ: 26.21562, 127.68548 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "百甕",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21566, 127.68562, Okinawa",
     "notes": "Toạ độ: 26.21566, 127.68562 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "波照間",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21549, 127.68534, Okinawa",
     "notes": "Toạ độ: 26.21549, 127.68534 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "スターバックス",
     "cuisine": "Cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21638, 127.68814, Okinawa",
     "notes": "SĐT: 098-862-8026 · Toạ độ: 26.21638, 127.68814 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Fr 09:00-18:00; Sa-Su 08:00-00:00"
@@ -268,6 +311,7 @@
   {
     "name": "マクドナルド",
     "cuisine": "Burger",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 那覇市 2 1",
     "notes": "SĐT: 098-860-0719 · Web: https://map.mcdonalds.co.jp/ · Toạ độ: 26.21690, 127.68921 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "24/7"
@@ -275,12 +319,14 @@
   {
     "name": "守礼",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21684, 127.68912, Okinawa",
     "notes": "Toạ độ: 26.21684, 127.68912 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "どん亭",
     "cuisine": "beef bawl, Cà ri, Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21799, 127.69296, Okinawa",
     "notes": "Toạ độ: 26.21799, 127.69296 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "24/7"
@@ -288,84 +334,98 @@
   {
     "name": "アメリカ食堂",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21794, 127.69275, Okinawa",
     "notes": "Toạ độ: 26.21794, 127.69275 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "パイレーツ",
     "cuisine": "Steak, Nướng",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21720, 127.69048, Okinawa",
     "notes": "Toạ độ: 26.21720, 127.69048 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ブルーシール",
     "cuisine": "ice cream",
+    "priceRange": "~400-800 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県那覇市牧志２丁目７−２８",
     "notes": "SĐT: 098-867-7576 · Web: https://blueseal.co.jp/ · Toạ độ: 26.21737, 127.69108 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "八重山",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21725, 127.69079, Okinawa",
     "notes": "Toạ độ: 26.21725, 127.69079 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ピザーラ",
     "cuisine": "Pizza",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21996, 127.70691, Okinawa",
     "notes": "Toạ độ: 26.21996, 127.70691 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "梅八",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21998, 127.70686, Okinawa",
     "notes": "Toạ độ: 26.21998, 127.70686 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "島寿司",
     "cuisine": "Sushi",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21969, 127.70696, Okinawa",
     "notes": "Toạ độ: 26.21969, 127.70696 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "potohoto",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21727, 127.69867, Okinawa",
     "notes": "Toạ độ: 26.21727, 127.69867 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "かずさん亭",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21743, 127.70167, Okinawa",
     "notes": "Toạ độ: 26.21743, 127.70167 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ホームラン",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21763, 127.70196, Okinawa",
     "notes": "Toạ độ: 26.21763, 127.70196 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "地球屋",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21673, 127.69611, Okinawa",
     "notes": "Toạ độ: 26.21673, 127.69611 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "彩花",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21722, 127.70054, Okinawa",
     "notes": "Toạ độ: 26.21722, 127.70054 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "花盛",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21717, 127.69883, Okinawa",
     "notes": "Toạ độ: 26.21717, 127.69883 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "クリオネ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21489, 127.69498, Okinawa",
     "notes": "Toạ độ: 26.21489, 127.69498 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "We-Mo 09:30-23:30"
@@ -373,18 +433,21 @@
   {
     "name": "スナック ゆうゆう",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21614, 127.69567, Okinawa",
     "notes": "Toạ độ: 26.21614, 127.69567 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ポンテ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21236, 127.69372, Okinawa",
     "notes": "Toạ độ: 26.21236, 127.69372 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "吉野家",
     "cuisine": "Cơm thịt bò (gyudon)",
+    "priceRange": "~700-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21385, 127.69444, Okinawa",
     "notes": "Toạ độ: 26.21385, 127.69444 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "24/7"
@@ -392,204 +455,238 @@
   {
     "name": "味平",
     "cuisine": "Sushi",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20675, 127.69094, Okinawa",
     "notes": "Toạ độ: 26.20675, 127.69094 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ぎおん祭り",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20245, 127.68815, Okinawa",
     "notes": "Toạ độ: 26.20245, 127.68815 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "JOYステーキ",
     "cuisine": "Steak",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20209, 127.68751, Okinawa",
     "notes": "Toạ độ: 26.20209, 127.68751 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "和同開珎",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20192, 127.68309, Okinawa",
     "notes": "Toạ độ: 26.20192, 127.68309 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Roots",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20084, 127.67608, Okinawa",
     "notes": "Toạ độ: 26.20084, 127.67608 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "TWO-THREE",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20088, 127.67617, Okinawa",
     "notes": "Toạ độ: 26.20088, 127.67617 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ギャラリー小禄",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20072, 127.67568, Okinawa",
     "notes": "Toạ độ: 26.20072, 127.67568 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "天下一品",
     "cuisine": "Ramen",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20119, 127.67729, Okinawa",
     "notes": "Toạ độ: 26.20119, 127.67729 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "いこい",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20006, 127.67512, Okinawa",
     "notes": "Toạ độ: 26.20006, 127.67512 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "翔琉亭",
     "cuisine": "Mì, Ramen",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19839, 127.67579, Okinawa",
     "notes": "Toạ độ: 26.19839, 127.67579 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ピザパルコ",
     "cuisine": "Pizza",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19171, 127.67550, Okinawa",
     "notes": "Toạ độ: 26.19171, 127.67550 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "いさんか魚",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.18930, 127.67408, Okinawa",
     "notes": "Toạ độ: 26.18930, 127.67408 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "小料理 はやと",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17558, 127.68320, Okinawa",
     "notes": "Toạ độ: 26.17558, 127.68320 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ケンタッキーフライドチキン",
     "cuisine": "Gà",
+    "priceRange": "~700-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.16564, 127.69238, Okinawa",
     "notes": "Web: https://www.kfc.co.jp/ · Toạ độ: 26.16564, 127.69238 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ファミリー居酒屋 味城",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.16770, 127.69380, Okinawa",
     "notes": "Toạ độ: 26.16770, 127.69380 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "沖縄家庭料理 だきるん",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.16611, 127.69284, Okinawa",
     "notes": "Toạ độ: 26.16611, 127.69284 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "グリーンバーム",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.16117, 127.68945, Okinawa",
     "notes": "Toạ độ: 26.16117, 127.68945 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "百花の風",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.14639, 127.69339, Okinawa",
     "notes": "Toạ độ: 26.14639, 127.69339 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "花キング",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.13464, 127.68700, Okinawa",
     "notes": "Toạ độ: 26.13464, 127.68700 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "優美堂",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.09557, 127.69096, Okinawa",
     "notes": "Toạ độ: 26.09557, 127.69096 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "でいごレストラン",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.09601, 127.69138, Okinawa",
     "notes": "Toạ độ: 26.09601, 127.69138 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "凮月",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.16869, 127.74012, Okinawa",
     "notes": "Toạ độ: 26.16869, 127.74012 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "よしや食堂",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.18447, 127.73157, Okinawa",
     "notes": "Toạ độ: 26.18447, 127.73157 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "CONEMA",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19170, 127.72842, Okinawa",
     "notes": "Toạ độ: 26.19170, 127.72842 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "くいものBar TANTO",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21779, 127.72402, Okinawa",
     "notes": "Toạ độ: 26.21779, 127.72402 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "カフェ スマイリー",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21809, 127.72365, Okinawa",
     "notes": "Toạ độ: 26.21809, 127.72365 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "スナック さち",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21816, 127.72391, Okinawa",
     "notes": "Toạ độ: 26.21816, 127.72391 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "はな家",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21854, 127.69548, Okinawa",
     "notes": "Toạ độ: 26.21854, 127.69548 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "大戸屋",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21879, 127.69093, Okinawa",
     "notes": "Toạ độ: 26.21879, 127.69093 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "酒来喰",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21757, 127.68258, Okinawa",
     "notes": "Toạ độ: 26.21757, 127.68258 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "サムズアンカーイン",
     "cuisine": "ステーキ",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21442, 127.68228, Okinawa",
     "notes": "Toạ độ: 26.21442, 127.68228 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "キャプテンズ イン",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21455, 127.68264, Okinawa",
     "notes": "Toạ độ: 26.21455, 127.68264 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "還元商店",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21466, 127.68371, Okinawa",
     "notes": "Toạ độ: 26.21466, 127.68371 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ブルーシールリックビット",
     "cuisine": "Kem",
+    "priceRange": "~400-800 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21538, 127.68508, Okinawa",
     "notes": "SĐT: 098-867-1450 · Web: http://map.blueseal.co.jp · Toạ độ: 26.21538, 127.68508 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 10:00-22:30"
@@ -597,42 +694,49 @@
   {
     "name": "そば街角",
     "cuisine": "Mì, Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21622, 127.68843, Okinawa",
     "notes": "Toạ độ: 26.21622, 127.68843 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "サムズセーラーイン",
     "cuisine": "Steak",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21615, 127.68831, Okinawa",
     "notes": "Toạ độ: 26.21615, 127.68831 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ステーキハウス88",
     "cuisine": "Steak",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21627, 127.68854, Okinawa",
     "notes": "Toạ độ: 26.21627, 127.68854 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ちぬまん",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21552, 127.68543, Okinawa",
     "notes": "Toạ độ: 26.21552, 127.68543 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "トリコ",
     "cuisine": "Ý",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19814, 127.66961, Okinawa",
     "notes": "Toạ độ: 26.19814, 127.66961 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "花ぐすく",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19853, 127.67048, Okinawa",
     "notes": "Toạ độ: 26.19853, 127.67048 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "cafe 帆風",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 東村 758-104",
     "notes": "SĐT: 0980-43-3277 · Web: https://hokaze.ti-da.net · Toạ độ: 26.60335, 128.13596 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Tu-Sa 11:30-15:00; Mo,Su,PH off"
@@ -640,6 +744,7 @@
   {
     "name": "カフェ 山甌",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.66812, 128.24022, Okinawa",
     "notes": "SĐT: +81 0980 43 2624 · Web: https://www.mco.ne.jp/~yamagame/ · Toạ độ: 26.66812, 128.24022 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Th 11:00-18:00"
@@ -647,6 +752,7 @@
   {
     "name": "The Green Room",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.67402, 127.94140, Okinawa",
     "notes": "SĐT: 0980-56-5941 · Web: http://thegreenroom.cc/ · Toạ độ: 26.67402, 127.94140 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "We-Mo 11:30-20:00"
@@ -654,6 +760,7 @@
   {
     "name": "花人逢 (Kajinho)",
     "cuisine": "Pizza",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.66858, 127.90065, Okinawa",
     "notes": "SĐT: 0980-47-5537 · Toạ độ: 26.66858, 127.90065 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Th-Mo 11:30-19:00"
@@ -661,42 +768,49 @@
   {
     "name": "藍風",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.66429, 127.94179, Okinawa",
     "notes": "SĐT: 0980-47-5583 · Web: http://aikaze.jp/ · Toạ độ: 26.66429, 127.94179 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ゼッテリア",
     "cuisine": "Burger",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.23537, 127.70080, Okinawa",
     "notes": "Toạ độ: 26.23537, 127.70080 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "オーシャンズピザ",
     "cuisine": "Pizza",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.40934, 127.71627, Okinawa",
     "notes": "Toạ độ: 26.40934, 127.71627 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "58バル",
     "cuisine": "Pizza",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44749, 127.80448, Okinawa",
     "notes": "Toạ độ: 26.44749, 127.80448 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "すき家",
     "cuisine": "Cơm thịt bò (gyudon)",
+    "priceRange": "~700-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.15727, 127.72117, Okinawa",
     "notes": "Web: https://sukiya.jp/ · Toạ độ: 26.15727, 127.72117 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Chicken Heart",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44836, 127.80387, Okinawa",
     "notes": "Toạ độ: 26.44836, 127.80387 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Hawaiian Juice Bar",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31339, 127.75565, Okinawa",
     "notes": "Toạ độ: 26.31339, 127.75565 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su,PH 12:00-21:00"
@@ -704,66 +818,77 @@
   {
     "name": "ピンクマーリンクラブ",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44720, 127.80389, Okinawa",
     "notes": "Toạ độ: 26.44720, 127.80389 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ココナツムーン",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.43501, 127.78407, Okinawa",
     "notes": "Toạ độ: 26.43501, 127.78407 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "シーキャプテン",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.43645, 127.79827, Okinawa",
     "notes": "Toạ độ: 26.43645, 127.79827 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Eagle",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.50839, 127.86729, Okinawa",
     "notes": "Toạ độ: 26.50839, 127.86729 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "おもろ茶屋",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.42168, 127.79761, Okinawa",
     "notes": "Toạ độ: 26.42168, 127.79761 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ここなカフェ＆ダイニング",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.32546, 127.96096, Okinawa",
     "notes": "Toạ độ: 26.32546, 127.96096 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "やしなみき",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.16756, 127.79177, Okinawa",
     "notes": "Toạ độ: 26.16756, 127.79177 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "カフェあった",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.51129, 127.89905, Okinawa",
     "notes": "Toạ độ: 26.51129, 127.89905 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ケイブカフェ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.14181, 127.74678, Okinawa",
     "notes": "Toạ độ: 26.14181, 127.74678 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ペンション&カフェテラスたちがあ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.63078, 128.21440, Okinawa",
     "notes": "Toạ độ: 26.63078, 128.21440 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "カフェ 土花土花",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44585, 127.80711, Okinawa",
     "notes": "Web: https://dokadoka.jp/cafe · Toạ độ: 26.44585, 127.80711 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Sa 08:00-18:00"
@@ -771,60 +896,70 @@
   {
     "name": "美ら海カフェ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.50647, 127.87858, Okinawa",
     "notes": "Toạ độ: 26.50647, 127.87858 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Drive-in Hawaii",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.63816, 127.88192, Okinawa",
     "notes": "Toạ độ: 26.63816, 127.88192 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "グリーンヒル",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.15468, 127.78407, Okinawa",
     "notes": "Toạ độ: 26.15468, 127.78407 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Johnny's",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.67614, 127.89086, Okinawa",
     "notes": "Toạ độ: 26.67614, 127.89086 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "シーハーモニー",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.43686, 127.80308, Okinawa",
     "notes": "Toạ độ: 26.43686, 127.80308 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ステーキハウスjam",
     "cuisine": "Steak, Hải sản",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.45250, 127.80592, Okinawa",
     "notes": "Toạ độ: 26.45250, 127.80592 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "あぐの隠れ家",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.46183, 127.81425, Okinawa",
     "notes": "Toạ độ: 26.46183, 127.81425 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ウエスタンワールド",
     "cuisine": "Mỹ",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.35389, 127.74520, Okinawa",
     "notes": "Toạ độ: 26.35389, 127.74520 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "まるの家",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.30604, 127.76239, Okinawa",
     "notes": "Toạ độ: 26.30604, 127.76239 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "鶴小",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 北谷町 一丁目 10",
     "notes": "SĐT: 098-926-2202 · Web: https://www.okinawa-soba.co.jp/ · Toạ độ: 26.30673, 127.76124 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "We-Mo 11:30-22:00"
@@ -832,24 +967,28 @@
   {
     "name": "丸亀製麺",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.32453, 127.75532, Okinawa",
     "notes": "Toạ độ: 26.32453, 127.75532 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "丸吉食品",
     "cuisine": "Tempura, Hải sản, Nhật Bản",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.32703, 127.95188, Okinawa",
     "notes": "SĐT: 098-977-7905 · Toạ độ: 26.32703, 127.95188 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "とんとんや",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.38119, 127.75575, Okinawa",
     "notes": "Toạ độ: 26.38119, 127.75575 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "想作和食 花浅葱",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 読谷村 3",
     "notes": "SĐT: 080-3961-5756 · Toạ độ: 26.40449, 127.75883 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Tu-We, Fr 11:00-14:00,18:00-22:00; Mo,Th,Sa 18:00-22:00"
@@ -857,36 +996,42 @@
   {
     "name": "仲泊海產物料理店",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.43752, 127.79995, Okinawa",
     "notes": "SĐT: 098-965-4137 · Toạ độ: 26.43752, 127.79995 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "くろとん屋",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44745, 127.80373, Okinawa",
     "notes": "Toạ độ: 26.44745, 127.80373 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "あしびなー",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.45259, 127.80625, Okinawa",
     "notes": "Toạ độ: 26.45259, 127.80625 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "三線の花",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.45344, 127.80686, Okinawa",
     "notes": "Toạ độ: 26.45344, 127.80686 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "琉球亭居酒屋",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.46318, 127.81837, Okinawa",
     "notes": "SĐT: 0989894991 · Toạ độ: 26.46318, 127.81837 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "名護曲レストラン",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖繩縣 名護市 世富慶 574",
     "notes": "SĐT: 0980-53-5498 · Toạ độ: 26.57361, 127.98314 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Fr 11:00-21:30; Sa-Su 11:00-22:00"
@@ -894,18 +1039,21 @@
   {
     "name": "本部そば",
     "cuisine": "Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.63943, 127.88143, Okinawa",
     "notes": "Toạ độ: 26.63943, 127.88143 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "食と館",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.69594, 128.02044, Okinawa",
     "notes": "Toạ độ: 26.69594, 128.02044 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "あけぼの弁当",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 読谷村",
     "notes": "SĐT: 098-958-3188 · Toạ độ: 26.39759, 127.75736 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Tu-Th 08:00-24:00; Fr 08:00-17:00"
@@ -913,12 +1061,14 @@
   {
     "name": "おべんとう",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.37274, 127.75511, Okinawa",
     "notes": "Toạ độ: 26.37274, 127.75511 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "おんなまつり",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.45206, 127.80604, Okinawa",
     "notes": "Toạ độ: 26.45206, 127.80604 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Fr-We,PH 17:00-01:00"
@@ -926,42 +1076,49 @@
   {
     "name": "かりゆし食堂",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.13318, 127.77142, Okinawa",
     "notes": "Toạ độ: 26.13318, 127.77142 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "くいな",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.73232, 128.16947, Okinawa",
     "notes": "Toạ độ: 26.73232, 128.16947 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "こなや",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.23534, 127.68862, Okinawa",
     "notes": "Toạ độ: 26.23534, 127.68862 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "なかどまい",
     "cuisine": "Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44146, 127.80355, Okinawa",
     "notes": "SĐT: 098-965-7222 · Toạ độ: 26.44146, 127.80355 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ぬちまーす",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.36042, 127.99108, Okinawa",
     "notes": "Web: https://nuchima-su.co.jp · Toạ độ: 26.36042, 127.99108 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "みはま食堂",
     "cuisine": "Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31053, 127.76159, Okinawa",
     "notes": "Toạ độ: 26.31053, 127.76159 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "泰期",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 読谷村 1",
     "notes": "SĐT: 098-958-1110 · Toạ độ: 26.40715, 127.72032 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Sa-Su 11:00-15:00"
@@ -969,6 +1126,7 @@
   {
     "name": "もすぐそば くんなどぅ",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県南城市玉城志堅原460-2",
     "notes": "SĐT: 98-949-1066 · Toạ độ: 26.13367, 127.77268 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:00-19:00"
@@ -976,24 +1134,28 @@
   {
     "name": "やまと",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19841, 127.68822, Okinawa",
     "notes": "Toạ độ: 26.19841, 127.68822 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "エース",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19628, 127.76815, Okinawa",
     "notes": "Toạ độ: 26.19628, 127.76815 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "カサラティダ",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.43686, 127.80149, Okinawa",
     "notes": "Toạ độ: 26.43686, 127.80149 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "シーサイドドライブイン",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 恩納村 885",
     "notes": "SĐT: 098-964-2272 · Web: https://seaside-drivein.jp/ · Toạ độ: 26.44252, 127.80346 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 09:00-21:00; We off"
@@ -1001,12 +1163,14 @@
   {
     "name": "ステーキハウス",
     "cuisine": "Steak",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.46407, 127.81939, Okinawa",
     "notes": "Toạ độ: 26.46407, 127.81939 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "北谷龍",
     "cuisine": "Yakiniku (thịt nướng)",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 北谷町 北前一丁目 1",
     "notes": "SĐT: +81-50-5485-5349 · Web: https://fayz802.gorp.jp · Toạ độ: 26.30101, 127.76090 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su,PH 11:30-15:00,17:00-24:00; Jan 01 off"
@@ -1014,18 +1178,21 @@
   {
     "name": "ビーチロックビレッジ (Beach Rock Village)",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.67678, 127.96033, Okinawa",
     "notes": "Toạ độ: 26.67678, 127.96033 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "レッドロブスター",
     "cuisine": "Hải sản",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31499, 127.75592, Okinawa",
     "notes": "Web: https://www.redlobster.jp/ · Toạ độ: 26.31499, 127.75592 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "中本てんぷら店",
     "cuisine": "Tempura",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖繩縣南城市玉城字奧武9",
     "notes": "SĐT: 098-948-3583 · Toạ độ: 26.13156, 127.77194 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 10:00-18:00"
@@ -1033,60 +1200,70 @@
   {
     "name": "根夢",
     "cuisine": "Soba, Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 宜野湾市 伊佐四丁目",
     "notes": "Toạ độ: 26.28901, 127.75306 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "山下食堂",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20392, 127.67056, Okinawa",
     "notes": "Toạ độ: 26.20392, 127.67056 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "山原学びの森",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.72339, 128.26498, Okinawa",
     "notes": "Toạ độ: 26.72339, 128.26498 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "岬",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.70564, 127.88105, Okinawa",
     "notes": "Toạ độ: 26.70564, 127.88105 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "恩納そば",
     "cuisine": "Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.45384, 127.80681, Okinawa",
     "notes": "Toạ độ: 26.45384, 127.80681 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "浜の駅",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.62404, 127.88804, Okinawa",
     "notes": "Toạ độ: 26.62404, 127.88804 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "海鮮料理店島",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44180, 127.80366, Okinawa",
     "notes": "Toạ độ: 26.44180, 127.80366 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "読谷そば",
     "cuisine": "Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.38361, 127.75522, Okinawa",
     "notes": "Toạ độ: 26.38361, 127.75522 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "赤崎",
     "cuisine": "Soba",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.43271, 127.83168, Okinawa",
     "notes": "Toạ độ: 26.43271, 127.83168 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "食堂",
     "cuisine": "Cà ri",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.38793, 127.99165, Okinawa",
     "notes": "Toạ độ: 26.38793, 127.99165 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "10:00-15:00"
@@ -1094,18 +1271,21 @@
   {
     "name": "BLUE SEAL",
     "cuisine": "Kem",
+    "priceRange": "~400-800 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.69585, 128.02183, Okinawa",
     "notes": "Toạ độ: 26.69585, 128.02183 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ブルーシール古宇利島パーラー",
     "cuisine": "Kem",
+    "priceRange": "~400-800 yên/người (ước lượng theo loại quán)",
     "address": "国頭郡今帰仁村古宇利３２３",
     "notes": "Web: https://www.blueseal.co.jp/ · Toạ độ: 26.69599, 128.02060 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ブルーシールアイスクリーム",
     "cuisine": "Kem",
+    "priceRange": "~400-800 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.57611, 127.98397, Okinawa",
     "notes": "Toạ độ: 26.57611, 127.98397 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:00-21:00"
@@ -1113,6 +1293,7 @@
   {
     "name": "ジェフ",
     "cuisine": "Burger",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21281, 127.68927, Okinawa",
     "notes": "Web: https://www.jefokinawa.co.jp/ · Toạ độ: 26.21281, 127.68927 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 09:00-20:00"
@@ -1120,24 +1301,28 @@
   {
     "name": "小春や",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.70333, 128.14952, Okinawa",
     "notes": "Toạ độ: 26.70333, 128.14952 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "やき料理",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県国頭郡今帰仁村与那嶺４",
     "notes": "SĐT: 098-056-5003 · Toạ độ: 26.69594, 127.95144 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "やさい屋",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.69213, 127.95836, Okinawa",
     "notes": "Toạ độ: 26.69213, 127.95836 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "キングタコス",
     "cuisine": "Taco, Gà",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.28706, 127.76217, Okinawa",
     "notes": "Toạ độ: 26.28706, 127.76217 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 10:00-22:00"
@@ -1145,90 +1330,105 @@
   {
     "name": "くら寿司",
     "cuisine": "Sushi",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "中頭郡北谷町美浜3-1-3",
     "notes": "SĐT: 098-989-0677 · Web: http://www.kura-corpo.co.jp · Toạ độ: 26.32097, 127.75833 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Real Pool & Darts",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.41774, 127.82560, Okinawa",
     "notes": "Toạ độ: 26.41774, 127.82560 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "タージ沖縄",
     "cuisine": "Ấn Độ, Cà ri",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.32771, 127.76284, Okinawa",
     "notes": "Toạ độ: 26.32771, 127.76284 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Bbq Hamaashibi",
     "cuisine": "Yakiniku (thịt nướng)",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.50644, 127.87880, Okinawa",
     "notes": "Toạ độ: 26.50644, 127.87880 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "イタリアーノ",
     "cuisine": "Ý",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.30407, 127.75953, Okinawa",
     "notes": "Toạ độ: 26.30407, 127.75953 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "はな花",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.50299, 127.89052, Okinawa",
     "notes": "Toạ độ: 26.50299, 127.89052 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "マリブハウス",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.43506, 127.78331, Okinawa",
     "notes": "Toạ độ: 26.43506, 127.78331 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "琉球の牛",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.45191, 127.80559, Okinawa",
     "notes": "SĐT: 0989652233 · Toạ độ: 26.45191, 127.80559 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "飲食屋がちまい",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44989, 127.80442, Okinawa",
     "notes": "Toạ độ: 26.44989, 127.80442 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "我空",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.44584, 127.80439, Okinawa",
     "notes": "Toạ độ: 26.44584, 127.80439 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "びっくりドンキー",
     "cuisine": "Burger",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.30429, 127.76198, Okinawa",
     "notes": "Toạ độ: 26.30429, 127.76198 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ちゃんや〜",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.70597, 127.88085, Okinawa",
     "notes": "Toạ độ: 26.70597, 127.88085 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "まあるい島",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.69828, 128.02246, Okinawa",
     "notes": "Toạ độ: 26.69828, 128.02246 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "JyoGoo",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17040, 127.82557, Okinawa",
     "notes": "Toạ độ: 26.17040, 127.82557 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "海のイスキア",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17156, 127.82679, Okinawa",
     "notes": "Toạ độ: 26.17156, 127.82679 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 09:00-17:00; Tu off"
@@ -1236,6 +1436,7 @@
   {
     "name": "蒼",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.17071, 127.82604, Okinawa",
     "notes": "SĐT: 098-949-7688 · Toạ độ: 26.17071, 127.82604 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 10:00-18:00; We off"
@@ -1243,6 +1444,7 @@
   {
     "name": "きらく",
     "cuisine": "Đặc sản địa phương, Trung Hoa",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21440, 127.68817, Okinawa",
     "notes": "SĐT: 088-868-8564 · Toạ độ: 26.21440, 127.68817 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 10:00-20:00"
@@ -1250,6 +1452,7 @@
   {
     "name": "焼肉乃我那覇",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県名護市宮里1410-1 2F",
     "notes": "SĐT: 0980-53-5017 · Web: http://www.yanbaru-shimabuta.com/ · Toạ độ: 26.60522, 127.97611 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 16:00-06:00"
@@ -1257,6 +1460,7 @@
   {
     "name": "大家",
     "cuisine": "Cao cấp",
+    "priceRange": "~5000-8000 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県名護市中山90",
     "notes": "SĐT: 0980-53-0280 · Web: https://ufuya.com/ · Toạ độ: 26.62102, 127.96364 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "11:00-17:00,18:00-22:00"
@@ -1264,108 +1468,126 @@
   {
     "name": "ななしん屋",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21682, 127.68634, Okinawa",
     "notes": "Toạ độ: 26.21682, 127.68634 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "フェンディ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20055, 127.67440, Okinawa",
     "notes": "Toạ độ: 26.20055, 127.67440 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "とよみそば",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.19403, 127.69373, Okinawa",
     "notes": "Toạ độ: 26.19403, 127.69373 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "しゃぶしゃぶ歓福",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33674, 127.80145, Okinawa",
     "notes": "Toạ độ: 26.33674, 127.80145 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "でいご",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33401, 127.79942, Okinawa",
     "notes": "Toạ độ: 26.33401, 127.79942 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "炭焼きKENちゃん",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33619, 127.80119, Okinawa",
     "notes": "Toạ độ: 26.33619, 127.80119 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ICHARA",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33756, 127.80415, Okinawa",
     "notes": "Toạ độ: 26.33756, 127.80415 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "どん家",
     "cuisine": "Đồ ăn nhanh",
+    "priceRange": "~700-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33338, 127.79912, Okinawa",
     "notes": "Toạ độ: 26.33338, 127.79912 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "との馬",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33688, 127.80119, Okinawa",
     "notes": "Toạ độ: 26.33688, 127.80119 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Emerald Steak House",
     "cuisine": "Steak",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31796, 127.80086, Okinawa",
     "notes": "Toạ độ: 26.31796, 127.80086 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ブルーシール パレットくもじ店",
     "cuisine": "ice cream",
+    "priceRange": "~400-800 yên/người (ước lượng theo loại quán)",
     "address": "那覇市 パレットくもじ1階110号",
     "notes": "SĐT: 098-866-5850 · Web: https://www.blueseal.co.jp/ · Toạ độ: 26.21354, 127.67948 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ソムチャイ",
     "cuisine": "Thái",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33749, 127.80124, Okinawa",
     "notes": "Toạ độ: 26.33749, 127.80124 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "中央食堂",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.24876, 127.76646, Okinawa",
     "notes": "Web: https://coop.kyushu-bauc.or.jp/ryudai-coop/info03/ · Toạ độ: 26.24876, 127.76646 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "キッチンテラス　ココニール （CocoNeel）",
     "cuisine": "Ý",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.68510, 128.00485, Okinawa",
     "notes": "SĐT: 0980-56-5526 · Toạ độ: 26.68510, 128.00485 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "そば処夢舎",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.67754, 127.90441, Okinawa",
     "notes": "Toạ độ: 26.67754, 127.90441 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ポケットマーニー",
     "cuisine": "Châu Á, Cà ri",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.26257, 127.75204, Okinawa",
     "notes": "Toạ độ: 26.26257, 127.75204 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "SOUND M'S",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "那覇市",
     "notes": "Web: https://soundms.ti-da.net/ · Toạ độ: 26.21505, 127.68385 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "そら食堂",
     "cuisine": "Gà kiểu Jamaica",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "那覇市 3-9-3",
     "notes": "SĐT: +81 98 867 9352 · Toạ độ: 26.21443, 127.68075 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "11:00-22:00"
@@ -1373,84 +1595,98 @@
   {
     "name": "麺やKEIJIRO",
     "cuisine": "Ramen",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33552, 127.80051, Okinawa",
     "notes": "Toạ độ: 26.33552, 127.80051 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "串源",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33638, 127.80170, Okinawa",
     "notes": "Toạ độ: 26.33638, 127.80170 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "金城",
     "cuisine": "Đồ nướng/BBQ",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.29858, 127.75911, Okinawa",
     "notes": "Toạ độ: 26.29858, 127.75911 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "カスタマンダプネパールスパイスキッチン",
     "cuisine": "Ấn Độ, Cà ri, Nepal",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.29826, 127.76067, Okinawa",
     "notes": "Toạ độ: 26.29826, 127.76067 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ラウラ イリカイ",
     "cuisine": "Đặc sản địa phương, Hawaii",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.29955, 127.75852, Okinawa",
     "notes": "Toạ độ: 26.29955, 127.75852 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "串角",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.29994, 127.75854, Okinawa",
     "notes": "Toạ độ: 26.29994, 127.75854 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Wa-Ryu",
     "cuisine": "Bò",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.30040, 127.75837, Okinawa",
     "notes": "Toạ độ: 26.30040, 127.75837 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Doner Kabab",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.30085, 127.75870, Okinawa",
     "notes": "Toạ độ: 26.30085, 127.75870 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "パルメットカフェ",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.29846, 127.75844, Okinawa",
     "notes": "Toạ độ: 26.29846, 127.75844 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Rose Garden",
     "cuisine": "Mỹ",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 北中城村",
     "notes": "Toạ độ: 26.31101, 127.78860 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Bensons",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31625, 127.75676, Okinawa",
     "notes": "SĐT: 0988943333 · Toạ độ: 26.31625, 127.75676 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Depot's Garden",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31604, 127.75628, Okinawa",
     "notes": "Toạ độ: 26.31604, 127.75628 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Pocke Farm",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31616, 127.75675, Okinawa",
     "notes": "Toạ độ: 26.31616, 127.75675 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ジャッキーステーキハウス",
     "cuisine": "Steak",
+    "priceRange": "~2500-4500 yên/người (ước lượng theo loại quán)",
     "address": "沖繩縣那霸市 西1-7-3",
     "notes": "Toạ độ: 26.21290, 127.67246 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:00-01:00"
@@ -1458,6 +1694,7 @@
   {
     "name": "ジーウェーブカフェ",
     "cuisine": "Nhật Bản",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 宜野湾市 宇地泊三丁目 1",
     "notes": "SĐT: +81-98-942-8415 · Web: https://www.gbic.jp/cafe/ · Toạ độ: 26.27389, 127.72898 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "09:00-21:00; Mo,Su[2] off \"年末年始\""
@@ -1465,30 +1702,35 @@
   {
     "name": "ゆいそば",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.26880, 127.72837, Okinawa",
     "notes": "Toạ độ: 26.26880, 127.72837 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "雪岳山",
     "cuisine": "Hàn Quốc",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21696, 127.71284, Okinawa",
     "notes": "Toạ độ: 26.21696, 127.71284 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ちゃんるーむ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.22028, 127.71387, Okinawa",
     "notes": "Toạ độ: 26.22028, 127.71387 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "響",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21461, 127.68365, Okinawa",
     "notes": "Toạ độ: 26.21461, 127.68365 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "我那覇豚肉店",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21968, 127.68488, Okinawa",
     "notes": "SĐT: 098-863-5380 · Toạ độ: 26.21968, 127.68488 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Sa 11:30-14:30, 18:00-00:00"
@@ -1496,42 +1738,49 @@
   {
     "name": "SUI",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.22004, 127.71491, Okinawa",
     "notes": "Toạ độ: 26.22004, 127.71491 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "お食事処　信",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "那覇市松尾2-9-7",
     "notes": "Toạ độ: 26.21496, 127.68816 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ゴーディーズ",
     "cuisine": "Burger, chicken sandwich",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33401, 127.74750, Okinawa",
     "notes": "Toạ độ: 26.33401, 127.74750 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "プレイヤーズカフェ",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33883, 127.80016, Okinawa",
     "notes": "Toạ độ: 26.33883, 127.80016 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "いい友",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.14155, 127.66979, Okinawa",
     "notes": "Toạ độ: 26.14155, 127.66979 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "高良食堂",
     "cuisine": "Châu Á, Đặc sản địa phương, Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21897, 127.67345, Okinawa",
     "notes": "Toạ độ: 26.21897, 127.67345 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "すーまぬめぇ",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "那覇市 国場 40-1",
     "notes": "SĐT: 098-834-7428 · Toạ độ: 26.19623, 127.70268 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "11:00-16:00; Sa,Su,PH 11:00-18:00 || \"売切次第終了\""
@@ -1539,18 +1788,21 @@
   {
     "name": "浦添ベース",
     "cuisine": "Quán bar",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "浦添市 2-16-8",
     "notes": "Toạ độ: 26.25290, 127.71038 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "2 Jerks Caribbean restaurant",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.39325, 127.83229, Okinawa",
     "notes": "Toạ độ: 26.39325, 127.83229 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "FIFTH SON Sandwich Works",
     "cuisine": "Sandwich",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31809, 127.80374, Okinawa",
     "notes": "SĐT: 098-930-3235 · Toạ độ: 26.31809, 127.80374 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Tu-Su 08:00-15:00"
@@ -1558,30 +1810,35 @@
   {
     "name": "Chilies Too",
     "cuisine": "Burger",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33904, 127.79412, Okinawa",
     "notes": "Toạ độ: 26.33904, 127.79412 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Chili's",
     "cuisine": "Tex-Mex",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.34109, 127.77586, Okinawa",
     "notes": "Toạ độ: 26.34109, 127.77586 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "はま寿司",
     "cuisine": "Sushi",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県中頭郡北谷町伊平230",
     "notes": "SĐT: 098-982-7331 · Web: https://www.hamazushi.com/ · Toạ độ: 26.32131, 127.75903 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Cafeグリーンリバー",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.36776, 127.75496, Okinawa",
     "notes": "Toạ độ: 26.36776, 127.75496 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Pizzeria da ENZO",
     "cuisine": "Pizza",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 恩納村 真栄田塩焼原 715-3",
     "notes": "SĐT: +81-98-923-5924 · Web: https://pizzeriadaenzo.gorp.jp · Toạ độ: 26.44035, 127.76864 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su,PH 11:30-15:00,17:30-22:00 || \"不定休日あり\""
@@ -1589,6 +1846,7 @@
   {
     "name": "Jack's Place",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33016, 127.75448, Okinawa",
     "notes": "Toạ độ: 26.33016, 127.75448 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "off"
@@ -1596,12 +1854,14 @@
   {
     "name": "海の家ピース浜",
     "cuisine": "Cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Nakijin, Kouri 2803",
     "notes": "Web: http://kouriisland.com/ · Toạ độ: 26.71249, 128.02002 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Seaside Ristorante",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.35050, 127.74530, Okinawa",
     "notes": "Toạ độ: 26.35050, 127.74530 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Tu-Th 11:00-21:00; Fr 11:00-22:00; Sa-Su 09:00-15:00 \"Brunch Menu\"; Sa 15:00-22:00 \"Dinner Menu\"; Su 15:00-21:00 \"Dinner Menu\""
@@ -1609,48 +1869,56 @@
   {
     "name": "mofgmona",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.26271, 127.76054, Okinawa",
     "notes": "Toạ độ: 26.26271, 127.76054 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "新小屋",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21576, 127.69700, Okinawa",
     "notes": "Toạ độ: 26.21576, 127.69700 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "琉球茶房",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21956, 127.71964, Okinawa",
     "notes": "Toạ độ: 26.21956, 127.71964 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "浜辺の茶屋",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.13353, 127.78461, Okinawa",
     "notes": "SĐT: +81 98 948 2073 · Toạ độ: 26.13353, 127.78461 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "琉球新麺通堂",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 那覇市 5 6",
     "notes": "SĐT: 0988575577 · Toạ độ: 26.19795, 127.66632 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "港川外人住宅水果塔",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.26401, 127.71522, Okinawa",
     "notes": "SĐT: 0988752129 · Toạ độ: 26.26401, 127.71522 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "泡瀨漁港直賣店漁港食堂",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.32394, 127.83462, Okinawa",
     "notes": "SĐT: 0989385811 · Toạ độ: 26.32394, 127.83462 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ラーメン暖暮",
     "cuisine": "Ramen",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "沖繩縣那霸市牧志2-16-10",
     "notes": "SĐT: 098-863-8331 · Toạ độ: 26.21787, 127.68732 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:00-02:00"
@@ -1658,42 +1926,49 @@
   {
     "name": "通堂 寄宮十字路店",
     "cuisine": "Ramen",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.20568, 127.69894, Okinawa",
     "notes": "Toạ độ: 26.20568, 127.69894 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "和風亭",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.22478, 127.69488, Okinawa",
     "notes": "Toạ độ: 26.22478, 127.69488 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "久米二丁目",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21749, 127.67450, Okinawa",
     "notes": "Toạ độ: 26.21749, 127.67450 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "BAR HIGARO",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.26492, 127.72430, Okinawa",
     "notes": "SĐT: 090-9477-1762 · Toạ độ: 26.26492, 127.72430 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "BAR 18 ARTIST GUILD",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.22785, 127.69984, Okinawa",
     "notes": "Toạ độ: 26.22785, 127.69984 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "神戸Bar仲々",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21632, 127.68399, Okinawa",
     "notes": "Toạ độ: 26.21632, 127.68399 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "オハコルテ",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "浦添市 二丁目 1",
     "notes": "SĐT: +81 98-875-2129 · Web: https://ohacorte.com/shop/ · Toạ độ: 26.26250, 127.71534 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:30-19:00"
@@ -1701,6 +1976,7 @@
   {
     "name": "C&C Breakfast",
     "cuisine": "Mỹ",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21505, 127.68799, Okinawa",
     "notes": "SĐT: +81 98-948-2073 · Web: https://www.ccbokinawa.com/ · Toạ độ: 26.21505, 127.68799 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "We-Mo 09:00-17:00"
@@ -1708,6 +1984,7 @@
   {
     "name": "きしもと食堂",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "本部町渡久地",
     "notes": "SĐT: 0980472887 · Toạ độ: 26.66032, 127.89590 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Th-Tu 11:00-17:30"
@@ -1715,6 +1992,7 @@
   {
     "name": "目利きの銀次",
     "cuisine": "Nhật Bản",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.23010, 127.69290, Okinawa",
     "notes": "Toạ độ: 26.23010, 127.69290 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 18:00-02:00"
@@ -1722,12 +2000,14 @@
   {
     "name": "Cafe' Street",
     "cuisine": "Quán cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21501, 127.68815, Okinawa",
     "notes": "Toạ độ: 26.21501, 127.68815 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "大東そば",
     "cuisine": "Mì",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21673, 127.68603, Okinawa",
     "notes": "Toạ độ: 26.21673, 127.68603 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:00-21:00"
@@ -1735,6 +2015,7 @@
   {
     "name": "琉家拉麵",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖繩縣那霸市松尾 1-6-8",
     "notes": "SĐT: 098-862-3480 · Toạ độ: 26.21408, 127.68347 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Su-We 11:30-00:00; Fr-Sa 11:30-01:00"
@@ -1742,72 +2023,84 @@
   {
     "name": "海人食堂いゆの店",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.39026, 127.72334, Okinawa",
     "notes": "Toạ độ: 26.39026, 127.72334 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "満味",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.60578, 128.00112, Okinawa",
     "notes": "Toạ độ: 26.60578, 128.00112 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "前田食堂(名護店)",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.60075, 127.97620, Okinawa",
     "notes": "Toạ độ: 26.60075, 127.97620 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "てだこ",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.24816, 127.72063, Okinawa",
     "notes": "Toạ độ: 26.24816, 127.72063 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ふりっぱー",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.59482, 127.95944, Okinawa",
     "notes": "Toạ độ: 26.59482, 127.95944 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ゆきの",
     "cuisine": "Đặc sản địa phương",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県 名護市",
     "notes": "Toạ độ: 26.59379, 127.96499 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "夢・いおり",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21781, 127.68738, Okinawa",
     "notes": "Toạ độ: 26.21781, 127.68738 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "ぽこあぽこ",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.30455, 127.75952, Okinawa",
     "notes": "Toạ độ: 26.30455, 127.75952 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "みかど",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21723, 127.67973, Okinawa",
     "notes": "SĐT: +81 98 868 7082 · Toạ độ: 26.21723, 127.67973 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "fish market",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.32359, 127.83481, Okinawa",
     "notes": "Toạ độ: 26.32359, 127.83481 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "麺や 偶もとなり",
     "cuisine": "Ramen",
+    "priceRange": "~800-1300 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21522, 127.67959, Okinawa",
     "notes": "SĐT: +81 98 943 3302 · Toạ độ: 26.21522, 127.67959 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "花笠食堂",
     "cuisine": "Nhật Bản",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "沖縄県那覇市牧志3-2-48",
     "notes": "SĐT: 0988666085 · Toạ độ: 26.21490, 127.68895 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Su 11:00-20:00"
@@ -1815,18 +2108,21 @@
   {
     "name": "Okinawa Brewing Cafe",
     "cuisine": "Pub",
+    "priceRange": "~2000-3500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.31568, 127.75580, Okinawa",
     "notes": "Toạ độ: 26.31568, 127.75580 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Banyon Tree Club",
     "cuisine": "Mỹ, Burger, Gà, Pizza, Sandwich",
+    "priceRange": "~800-1500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.34322, 127.78034, Okinawa",
     "notes": "Toạ độ: 26.34322, 127.78034 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "Cafe Latte",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33907, 127.78726, Okinawa",
     "notes": "SĐT: 966-7416 · Web: https://kadenafss.com/oclub/ · Toạ độ: 26.33907, 127.78726 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Th 06:30-22:00; Fr 06:30-24:00; Sa 07:30-24:00; Su 14:00-22:00"
@@ -1834,6 +2130,7 @@
   {
     "name": "Green Beans Coffee",
     "cuisine": "Cà phê",
+    "priceRange": "~600-1200 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.34594, 127.78476, Okinawa",
     "notes": "Toạ độ: 26.34594, 127.78476 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Fr 07:00-16:00"
@@ -1841,6 +2138,7 @@
   {
     "name": "Marshall Dining Facility",
     "cuisine": "Mỹ",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.33831, 127.77781, Okinawa",
     "notes": "Toạ độ: 26.33831, 127.77781 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng.",
     "hours": "Mo-Fr 00:00-00:30,05:30-08:00,10:30-13:00,16:00-19:30,22:00-24:00; Sa,Su 00:00-00:30,06:30-13:00,16:00-19:00,22:00-24:00"
@@ -1848,12 +2146,14 @@
   {
     "name": "彩食酒蔵OUKA",
     "cuisine": "Nhà hàng",
+    "priceRange": "~1500-2500 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21803, 127.67995, Okinawa",
     "notes": "Toạ độ: 26.21803, 127.67995 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   },
   {
     "name": "兄弟鮨",
     "cuisine": "Sushi",
+    "priceRange": "~2000-4000 yên/người (ước lượng theo loại quán)",
     "address": "Gần toạ độ 26.21824, 127.68032, Okinawa",
     "notes": "Toạ độ: 26.21824, 127.68032 · Dữ liệu từ OpenStreetMap (cộng đồng đóng góp, giấy phép ODbL) — CHƯA được kiểm chứng thủ công, có thể sai/lỗi thời. Luôn kiểm tra lại qua Google Maps trước khi dùng."
   }

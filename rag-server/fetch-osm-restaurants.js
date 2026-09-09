@@ -10,9 +10,16 @@
 // Data source & license: © OpenStreetMap contributors, https://www.openstreetmap.org/copyright —
 // data licensed under ODbL (keep this attribution if the file is redistributed). This is
 // crowd-sourced map data, NOT independently verified: names/addresses/hours can be outdated or
-// wrong, and OSM has no price or rating fields at all — left out entirely below rather than
-// guessed, so app.js's existing "hours not verified" disclaimer and food-price floor safety net
-// both still apply to these entries exactly as they do for AI-estimated ones.
+// wrong, and OSM has no rating field at all — left out entirely rather than guessed.
+//
+// OSM also has no price field, but unlike rating, a price is needed for the app's cost-summary
+// feature to say anything at all about these venues — so `priceRange` here is a ROUGH ESTIMATE
+// derived from cuisine/venue type (a ramen shop costs roughly X, a steakhouse roughly Y), not a
+// real observed price. This is clearly marked as such: every value starts with "~" and ends with
+// "(ước lượng theo loại quán)" — same "~" convention app.js already uses to mark an inferred price
+// elsewhere (see correctedActivityPrice) — so it reads as an estimate everywhere it's shown
+// (cost summaries, the "Vì sao chọn" reasoning line), never mistaken for the hand-curated file's
+// real, verified prices.
 //
 // Usage: node rag-server/fetch-osm-restaurants.js [--limit 300]
 
@@ -56,6 +63,41 @@ function humanizeCuisine(cuisineTag, amenity) {
     const key = c.trim().toLowerCase();
     return CUISINE_LABEL_VI[key] || key.replace(/_/g, ' ');
   }).join(', ');
+}
+
+// Rough price bands (yen/person) by cuisine keyword, checked most-specific-first — OSM has no
+// price field at all, and unlike rating, the app's cost-summary/cost-split feature needs SOME
+// number to work with for these venues, so this fills the gap with an estimate rather than
+// leaving every OSM-sourced activity to hit the app's generic 800-yen food floor regardless of
+// whether it's a quick soba stand or a steakhouse. Never claimed as real — see estimatePriceRange.
+const PRICE_ESTIMATE_BANDS = [
+  { keywords: ['fine_dining'], range: [5000, 8000] },
+  { keywords: ['steak_house', 'steak', 'yakiniku', 'barbecue'], range: [2500, 4500] },
+  { keywords: ['sushi', 'seafood'], range: [2000, 4000] },
+  { keywords: ['izakaya'], range: [2000, 3500] },
+  { keywords: ['ramen', 'soba', 'udon', 'noodle', 'noodles', 'curry'], range: [800, 1300] },
+  { keywords: ['burger', 'sandwich', 'pizza', 'tacos', 'fast_food'], range: [800, 1500] },
+  { keywords: ['coffee_shop'], range: [600, 1200] }
+];
+
+// Fallback by amenity type, when no cuisine keyword above matched (or there's no cuisine tag).
+const AMENITY_PRICE_BAND = {
+  ice_cream: [400, 800], cafe: [600, 1200], fast_food: [700, 1200],
+  bar: [2000, 3500], pub: [2000, 3500], restaurant: [1500, 2500]
+};
+
+/**
+ * Estimated price range for a venue with no real price data — deliberately formatted so it can
+ * never be mistaken for a real, verified price: prefixed "~" (the same convention app.js already
+ * uses to flag an inferred price, see correctedActivityPrice) and suffixed "(ước lượng theo loại
+ * quán)" so the estimate is visible wherever this string is shown as-is (cost summaries, the "Vì
+ * sao chọn" reasoning line) — not just buried in a notes field a user might not read.
+ */
+function estimatePriceRange(cuisineTag, amenity) {
+  const tokens = String(cuisineTag || '').split(';').map(c => c.trim().toLowerCase()).filter(Boolean);
+  const band = PRICE_ESTIMATE_BANDS.find(b => b.keywords.some(k => tokens.includes(k)));
+  const [lo, hi] = band ? band.range : (AMENITY_PRICE_BAND[amenity] || AMENITY_PRICE_BAND.restaurant);
+  return `~${lo}-${hi} yên/người (ước lượng theo loại quán)`;
 }
 
 /** Japan's block/chome addressing doesn't decompose into housenumber/street the way OSM's schema
@@ -149,15 +191,16 @@ async function main() {
     const entry = {
       name,
       cuisine: humanizeCuisine(tags.cuisine, tags.amenity),
+      priceRange: estimatePriceRange(tags.cuisine, tags.amenity),
       address: buildAddress(tags) || `Gần toạ độ ${lat.toFixed(5)}, ${lon.toFixed(5)}, Okinawa`,
       notes: buildNotes(tags, lat, lon)
     };
     if (tags.opening_hours) entry.hours = tags.opening_hours;
     if (tags.highchair === 'yes') entry.kidFriendly = true;
     else if (tags.highchair === 'no') entry.kidFriendly = false;
-    // No priceRange/rating fields: OSM has neither, and this app already treats a missing
-    // price/rating as "unknown" everywhere (correctedActivityPrice's food-price floor,
-    // scoreEntryForMember's isNaN(rating) check) rather than needing a fabricated placeholder.
+    // No `rating` field: OSM has none, and this app already treats a missing rating as "unrated"
+    // everywhere (scoreEntryForMember's isNaN(rating) check) rather than needing a fabricated
+    // placeholder — unlike price, a missing rating doesn't block any feature from working.
 
     entries.push(entry);
     if (entries.length >= limit) break;
