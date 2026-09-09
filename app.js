@@ -13,15 +13,14 @@ const SUPPORTED_LANGS = ['vi', 'ja', 'en'];
 // Every leaf is either a string or a function(...) => string (for messages needing interpolation).
 const I18N = {
   vi: {
-    appSubtitle: 'AI giúp cả nhóm quyết định cùng nhau · chạy local qua Ollama · dùng được cả từ điện thoại trong cùng mạng',
+    appSubtitle: 'AI giúp cả nhóm quyết định cùng nhau · chạy bằng Claude API qua proxy riêng · dùng được cả từ điện thoại trong cùng mạng',
     checkConnBtn: 'Kiểm tra kết nối',
     connect: {
-      defaultHint: 'Cần cài <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> trên máy này trước (miễn phí, chạy hoàn toàn offline). Sau khi cài: mở Terminal chạy <code>ollama pull llama3.2</code> để tải model, rồi bấm "Kiểm tra kết nối". Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:11434</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.',
-      connecting: 'Đang kết nối tới Ollama...',
-      noModel: (model) => `⚠️ Kết nối được nhưng chưa có model nào. Chạy: <code>ollama pull ${model}</code> rồi thử lại.`,
-      modelMissing: (names, model) => `⚠️ Server có các model: ${names} — không thấy "${model}". Sửa lại tên model hoặc chạy <code>ollama pull ${model}</code>.`,
-      ready: (model) => `✅ Đã kết nối Ollama, model "${model}" sẵn sàng — AI chạy trên máy này, hoàn toàn offline/miễn phí.`,
-      failed: (base, err) => `⚠️ Không kết nối được tới ${base}. Kiểm tra: Ollama đã chạy chưa, đúng địa chỉ IP chưa, và nếu gọi từ điện thoại/máy khác thì đã bật <code>OLLAMA_HOST=0.0.0.0</code> và <code>OLLAMA_ORIGINS=*</code> chưa. Lỗi: ${err}`
+      defaultHint: 'Cần chạy <code>claude-server</code> trước (xem README): copy <code>claude-server/config.example.json</code> thành <code>config.json</code>, dán API key Anthropic vào, rồi <code>npm install && npm start</code> trong thư mục đó. Xong thì bấm "Kiểm tra kết nối". Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:8901</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.',
+      connecting: 'Đang kết nối tới claude-server...',
+      noApiKey: '⚠️ Kết nối được tới claude-server nhưng chưa có API key — mở <code>claude-server/config.json</code>, dán API key Anthropic vào field "apiKey", rồi khởi động lại server.',
+      ready: (model) => `✅ Đã kết nối, model "${model}" sẵn sàng qua Claude API.`,
+      failed: (base, err) => `⚠️ Không kết nối được tới ${base}. Kiểm tra: claude-server đã chạy chưa (<code>npm start</code> trong thư mục <code>claude-server/</code>), đúng địa chỉ chưa. Lỗi: ${err}`
     },
     tabs: { planner: '🗺️ Lịch trình', group: '👥 Quyết định nhóm', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Vì sao TravelAI' },
     common: {
@@ -31,7 +30,7 @@ const I18N = {
       dayLabel: (n) => `Day ${n}`,
       noResult: 'Không có kết quả.',
       noChange: 'Không có thay đổi.',
-      dayCountMismatch: (actual, requested) => `⚠️ Bạn yêu cầu ${requested} ngày nhưng AI chỉ tạo được ${actual} ngày — model có thể quá nhỏ để giữ đúng số ngày dài. Thử bấm "Tạo lịch trình" lại lần nữa, hoặc đổi sang model mạnh hơn (VD: llama3.1, qwen2.5).`,
+      dayCountMismatch: (actual, requested) => `⚠️ Bạn yêu cầu ${requested} ngày nhưng AI chỉ tạo được ${actual} ngày. Thử bấm "Tạo lịch trình" lại lần nữa.`,
       aiFinal: '🤖 AI chốt:',
       copied: '✅ Đã copy lịch trình vào clipboard!',
       shareFailed: '⚠️ Không tự copy được — hãy chọn và copy đoạn văn bản dưới đây.',
@@ -51,8 +50,7 @@ const I18N = {
     errors: {
       timeout: 'AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.',
       cannotConnect: (base) => `Không gọi được tới ${base}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`,
-      visionCannotConnect: (base) => `Không gọi được tới ${base}. Kiểm tra Ollama đang chạy chưa.`,
-      modelNotFoundSuffix: (model) => ` — có thể chưa tải model. Chạy: ollama pull ${model}`,
+      visionCannotConnect: (base) => `Không gọi được tới ${base}. Kiểm tra claude-server đã chạy chưa (npm start trong thư mục claude-server/).`,
       noJson: 'AI không trả về dữ liệu dạng JSON như yêu cầu — model có thể quá nhỏ để tuân theo định dạng. Thử lại hoặc đổi sang model khác.',
       malformedJson: 'AI trả về JSON không hợp lệ (bị lỗi cú pháp giữa chừng). Thử lại hoặc đổi sang model khác.'
     },
@@ -259,18 +257,16 @@ const I18N = {
       modeLabel: 'Chế độ',
       modeFood: '🍜 Món ăn',
       modeLandmark: '🏯 Địa danh',
-      visionModelLabel: 'Vision model (Ollama)',
-      modelHint: 'Model mặc định <code>moondream</code> nhẹ, chạy nhanh trên local nhưng nhận diện còn thô. Muốn chính xác hơn: <code>ollama pull llama3.2-vision</code> rồi đổi ô model.',
       fileLabel: 'Chụp hoặc chọn ảnh',
       runBtn: 'Phân tích ảnh',
       step1: 'Đang nhìn ảnh (bước 1/2)...',
       step2: 'Đang phân tích & viết câu trả lời (bước 2/2)...',
-      noCaption: (model) => `Model vision "${model}" không trả về mô tả nào cho ảnh này — thử ảnh khác hoặc đổi model.`,
-      fallbackUnknown: (model) => `AI vision "${model}" chưa xác định được nội dung ảnh rõ ràng. Đây là fallback an toàn: ảnh có thể quá mờ, thiếu sáng hoặc model hiện tại quá nhẹ. Hãy thử chụp lại với ánh sáng tốt hơn, không che chữ trên ảnh, hoặc đổi sang model vision mạnh hơn như llama3.2-vision / qwen2.5vl.`,
-      fallbackFood: (guess) => `AI vision chưa đọc đủ chi tiết để khẳng định món ăn chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một món ăn'} — thử chụp ảnh gần hơn, góc chụp rõ hơn và tránh ánh sáng quá tối để model nhận diện tốt hơn.`,
-      fallbackLandmark: (guess) => `AI vision chưa nhận diện được địa danh này một cách chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một địa danh/công trình'} — thử chụp hình rộng hơn, rõ biển tên hoặc đổi sang model mạnh hơn để phân tích chính xác hơn.`,
+      noCaption: (model) => `${model} không trả về mô tả nào cho ảnh này — thử ảnh khác.`,
+      fallbackUnknown: (model) => `${model} chưa xác định được nội dung ảnh rõ ràng. Đây là fallback an toàn: ảnh có thể quá mờ hoặc thiếu sáng. Hãy thử chụp lại với ánh sáng tốt hơn, không che chữ trên ảnh.`,
+      fallbackFood: (guess) => `AI vision chưa đọc đủ chi tiết để khẳng định món ăn chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một món ăn'} — thử chụp ảnh gần hơn, góc chụp rõ hơn và tránh ánh sáng quá tối.`,
+      fallbackLandmark: (guess) => `AI vision chưa nhận diện được địa danh này một cách chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một địa danh/công trình'} — thử chụp hình rộng hơn, rõ biển tên.`,
       fallbackAdvice: 'Nếu ảnh không ổn, hãy chụp lại ở góc sáng đủ, không che chữ trên biển hiệu/menu, và ưu tiên dùng ảnh rõ nét hơn.',
-      disclaimer: (model) => `⚠️ AI vision chạy local (${model}) dễ nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.`,
+      disclaimer: (model) => `⚠️ AI vision (${model}) vẫn có thể nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.`,
       systemPromptFood: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.',
       systemPromptLandmark: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.',
       userPrompt: (caption) => `Mô tả từ AI vision: "${caption}"`
@@ -373,15 +369,14 @@ const I18N = {
     geocodeLang: 'vi'
   },
   ja: {
-    appSubtitle: 'グループ全員で決める旅行をAIがサポート · Ollamaでローカル動作 · 同じネットワーク内ならスマホからも利用可',
+    appSubtitle: 'グループ全員で決める旅行をAIがサポート · 専用プロキシ経由でClaude APIを使用 · 同じネットワーク内ならスマホからも利用可',
     checkConnBtn: '接続確認',
     connect: {
-      defaultHint: 'まずこの端末に<a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a>をインストールしてください（無料・完全オフライン動作）。インストール後、ターミナルで <code>ollama pull llama3.2</code> を実行してモデルを取得し、「接続確認」を押してください。スマホから使う場合：スマホは同じWi-Fiに接続し、Server欄の <code>localhost</code> をこの端末のLAN IPアドレスに置き換え（例：<code>http://192.168.3.23:11434</code>）、スマホでは <code>http://192.168.3.23:8765/app.html</code> を開いてください。',
-      connecting: 'Ollamaに接続中...',
-      noModel: (model) => `⚠️ 接続はできましたが、モデルがまだありません。<code>ollama pull ${model}</code> を実行してから再試行してください。`,
-      modelMissing: (names, model) => `⚠️ サーバーにあるモデル：${names} — 「${model}」が見つかりません。モデル名を修正するか <code>ollama pull ${model}</code> を実行してください。`,
-      ready: (model) => `✅ Ollamaに接続済み、モデル「${model}」使用可能 — この端末上で完全オフライン・無料で動作しています。`,
-      failed: (base, err) => `⚠️ ${base} に接続できません。Ollamaが起動しているか、IPアドレスが正しいか確認してください。スマホ/他端末から接続する場合は <code>OLLAMA_HOST=0.0.0.0</code> と <code>OLLAMA_ORIGINS=*</code> を設定してください。エラー内容：${err}`
+      defaultHint: '先に <code>claude-server</code> を起動してください（README参照）：<code>claude-server/config.example.json</code> を <code>config.json</code> にコピーし、Anthropicの APIキーを貼り付けてから、そのフォルダで <code>npm install && npm start</code>。起動後「接続確認」を押してください。スマホから使う場合：スマホは同じWi-Fiに接続し、Server欄の <code>localhost</code> をこの端末のLAN IPアドレスに置き換え（例：<code>http://192.168.3.23:8901</code>）、スマホでは <code>http://192.168.3.23:8765/app.html</code> を開いてください。',
+      connecting: 'claude-serverに接続中...',
+      noApiKey: '⚠️ claude-serverには接続できましたが、APIキーが未設定です。<code>claude-server/config.json</code> を開き、「apiKey」欄にAnthropicのAPIキーを貼り付けてからサーバーを再起動してください。',
+      ready: (model) => `✅ 接続済み、モデル「${model}」がClaude API経由で使用可能です。`,
+      failed: (base, err) => `⚠️ ${base} に接続できません。claude-serverが起動しているか（<code>claude-server/</code> フォルダで <code>npm start</code>）、アドレスが正しいか確認してください。エラー内容：${err}`
     },
     tabs: { planner: '🗺️ 旅程', group: '👥 グループ決定', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラAI', diff: '🆚 TravelAIの違い' },
     common: {
@@ -391,7 +386,7 @@ const I18N = {
       dayLabel: (n) => `${n}日目`,
       noResult: '結果がありません。',
       noChange: '変更はありません。',
-      dayCountMismatch: (actual, requested) => `⚠️ ${requested}日間を指定しましたが、AIは${actual}日分しか作成しませんでした — モデルが小さく、長い日数を正しく保持できない可能性があります。もう一度「旅程を作成」を試すか、より強力なモデル（例：llama3.1、qwen2.5）に変更してください。`,
+      dayCountMismatch: (actual, requested) => `⚠️ ${requested}日間を指定しましたが、AIは${actual}日分しか作成しませんでした。もう一度「旅程を作成」を試してください。`,
       aiFinal: '🤖 AIの結論：',
       copied: '✅ 旅程をクリップボードにコピーしました！',
       shareFailed: '⚠️ 自動コピーできませんでした — 下のテキストを選択してコピーしてください。',
@@ -411,8 +406,7 @@ const I18N = {
     errors: {
       timeout: 'AIが60秒以内に応答しませんでした — モデルの初回読み込みに時間がかかっているか、端末の負荷が高い可能性があります。再試行するか、より軽量なモデルに変更してください。',
       cannotConnect: (base) => `${base} に接続できませんでした。右上の「接続確認」で診断してください。`,
-      visionCannotConnect: (base) => `${base} に接続できませんでした。Ollamaが起動しているか確認してください。`,
-      modelNotFoundSuffix: (model) => ` — モデルが未取得の可能性があります。実行：ollama pull ${model}`,
+      visionCannotConnect: (base) => `${base} に接続できませんでした。claude-serverが起動しているか確認してください（claude-server/ で npm start）。`,
       noJson: 'AIが要求されたJSON形式でデータを返しませんでした — モデルが小さすぎて形式に従えない可能性があります。再試行するか、別のモデルに変更してください。',
       malformedJson: 'AIが返したJSONが不正な形式です（途中で構文エラー）。再試行するか、別のモデルに変更してください。'
     },
@@ -619,18 +613,16 @@ const I18N = {
       modeLabel: 'モード',
       modeFood: '🍜 料理',
       modeLandmark: '🏯 観光地',
-      visionModelLabel: 'Vision モデル（Ollama）',
-      modelHint: 'デフォルトの<code>moondream</code>は軽量でローカルでも高速に動きますが、認識精度は粗めです。より正確にしたい場合は <code>ollama pull llama3.2-vision</code> を実行してモデル欄を変更してください。',
       fileLabel: '写真を撮影または選択',
       runBtn: '画像を分析',
       step1: '画像を確認中（ステップ1/2）...',
       step2: '分析して回答を作成中（ステップ2/2）...',
-      noCaption: (model) => `Visionモデル「${model}」がこの画像の説明を返しませんでした — 別の画像を試すか、モデルを変更してください。`,
-      fallbackUnknown: (model) => `Visionモデル「${model}」はこの画像の中身をはっきり認識できませんでした。これは安全側のフォールバックです。画像がぼやけている、暗すぎる、または現在のモデルが軽すぎる可能性があります。明るい場所で再撮影し、看板やメニューの文字が隠れないようにしてから、より強いvision modelに切り替えてください。`,
+      noCaption: (model) => `${model}がこの画像の説明を返しませんでした — 別の画像を試してください。`,
+      fallbackUnknown: (model) => `${model}はこの画像の中身をはっきり認識できませんでした。これは安全側のフォールバックです。画像がぼやけている、または暗すぎる可能性があります。明るい場所で再撮影し、看板やメニューの文字が隠れないようにしてください。`,
       fallbackFood: (guess) => `Vision AIは料理の細部を十分に読み取れず、断定はできませんでした。現時点の情報からすると、これは${guess || '料理'}の可能性が高いです。より近くで、角度を変えて、明るく撮影した画像を試してください。`,
-      fallbackLandmark: (guess) => `Vision AIはこの場所を確実に識別できませんでした。現時点の情報からすると、これは${guess || '観光地・建造物'}の可能性が高いです。看板や全景を入れて再撮影するか、より強いモデルに切り替えると判定が安定します。`,
+      fallbackLandmark: (guess) => `Vision AIはこの場所を確実に識別できませんでした。現時点の情報からすると、これは${guess || '観光地・建造物'}の可能性が高いです。看板や全景を入れて再撮影してください。`,
       fallbackAdvice: '画像がうまく読めない場合は、曖昧な画角を避け、建物名・看板・食べ物の輪郭がはっきり見える写真を選びましょう。',
-      disclaimer: (model) => `⚠️ ローカル動作のVision AI（${model}）は誤認識しやすく、特に画像内の文字（メニューや看板）やマイナーな料理・観光地では精度が落ちます。参考程度に留め、断定的な結論とはみなさないでください。`,
+      disclaimer: (model) => `⚠️ Vision AI（${model}）は誤認識しやすく、特に画像内の文字（メニューや看板）やマイナーな料理・観光地では精度が落ちます。参考程度に留め、断定的な結論とはみなさないでください。`,
       systemPromptFood: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の料理と考えられるか。2) 見える材料。3) 似ていて試す価値のある料理を1〜2つ提案。価格やカロリーを正確に断定しないでください — 触れる場合は概算であることを明記してください。説明が曖昧すぎて判断できない場合は、正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
       systemPromptLandmark: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の観光地・建造物と考えられるか。2) 確かな情報があれば歴史・文化的背景を少し。3) 近くにありそうな似た種類の観光スポット。説明が曖昧すぎて識別できない場合は、当てずっぽうで答えず正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
       userPrompt: (caption) => `Vision AIによる説明：「${caption}」`
@@ -733,15 +725,14 @@ const I18N = {
     geocodeLang: 'ja'
   },
   en: {
-    appSubtitle: 'The AI that helps your group decide together · runs locally via Ollama · usable from your phone on the same network',
+    appSubtitle: 'The AI that helps your group decide together · runs on Claude API via a local proxy · usable from your phone on the same network',
     checkConnBtn: 'Check connection',
     connect: {
-      defaultHint: 'You need <a href="https://ollama.com/download" target="_blank" style="color:var(--accent)">Ollama</a> installed on this machine first (free, fully offline). After installing: open a terminal and run <code>ollama pull llama3.2</code> to fetch the model, then click "Check connection". To use it from your phone: your phone must be on the same Wi-Fi, replace <code>localhost</code> in the Server field with this machine\'s LAN IP address (e.g. <code>http://192.168.3.23:11434</code>), and open this page on your phone via <code>http://192.168.3.23:8765/app.html</code>.',
-      connecting: 'Connecting to Ollama...',
-      noModel: (model) => `⚠️ Connected, but no model is available yet. Run: <code>ollama pull ${model}</code> and try again.`,
-      modelMissing: (names, model) => `⚠️ The server has these models: ${names} — "${model}" wasn't found. Fix the model name or run <code>ollama pull ${model}</code>.`,
-      ready: (model) => `✅ Connected to Ollama, model "${model}" is ready — running fully offline/free on this machine.`,
-      failed: (base, err) => `⚠️ Couldn't connect to ${base}. Check that Ollama is running, the IP address is correct, and — if calling from a phone/other device — that <code>OLLAMA_HOST=0.0.0.0</code> and <code>OLLAMA_ORIGINS=*</code> are set. Error: ${err}`
+      defaultHint: 'You need <code>claude-server</code> running first (see README): copy <code>claude-server/config.example.json</code> to <code>config.json</code>, paste in an Anthropic API key, then run <code>npm install && npm start</code> in that folder. Then click "Check connection". To use it from your phone: your phone must be on the same Wi-Fi, replace <code>localhost</code> in the Server field with this machine\'s LAN IP address (e.g. <code>http://192.168.3.23:8901</code>), and open this page on your phone via <code>http://192.168.3.23:8765/app.html</code>.',
+      connecting: 'Connecting to claude-server...',
+      noApiKey: '⚠️ Connected to claude-server, but no API key is set yet — open <code>claude-server/config.json</code>, paste an Anthropic API key into the "apiKey" field, then restart the server.',
+      ready: (model) => `✅ Connected, model "${model}" is ready via the Claude API.`,
+      failed: (base, err) => `⚠️ Couldn't connect to ${base}. Check that claude-server is running (<code>npm start</code> in the <code>claude-server/</code> folder) and the address is correct. Error: ${err}`
     },
     tabs: { planner: '🗺️ Itinerary', group: '👥 Group Decision', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Why TravelAI' },
     common: {
@@ -751,7 +742,7 @@ const I18N = {
       dayLabel: (n) => `Day ${n}`,
       noResult: 'No results.',
       noChange: 'No changes.',
-      dayCountMismatch: (actual, requested) => `⚠️ You asked for ${requested} days but the AI only generated ${actual} — the model might be too small to hold onto a long day count. Try clicking "Create itinerary" again, or switch to a stronger model (e.g. llama3.1, qwen2.5).`,
+      dayCountMismatch: (actual, requested) => `⚠️ You asked for ${requested} days but the AI only generated ${actual}. Try clicking "Create itinerary" again.`,
       aiFinal: '🤖 AI\'s call:',
       copied: '✅ Itinerary copied to clipboard!',
       shareFailed: '⚠️ Could not auto-copy — select and copy the text below manually.',
@@ -771,8 +762,7 @@ const I18N = {
     errors: {
       timeout: "The AI didn't respond within 60 seconds — the model might be loading for the first time (slower than usual), or the machine is under heavy load. Try again, or switch to a lighter model.",
       cannotConnect: (base) => `Couldn't reach ${base}. Click "Check connection" up top to diagnose.`,
-      visionCannotConnect: (base) => `Couldn't reach ${base}. Check that Ollama is running.`,
-      modelNotFoundSuffix: (model) => ` — the model might not be pulled yet. Run: ollama pull ${model}`,
+      visionCannotConnect: (base) => `Couldn't reach ${base}. Check that claude-server is running (npm start in the claude-server/ folder).`,
       noJson: "The AI didn't return the JSON it was asked for — the model might be too small to follow the format. Try again or switch to a different model.",
       malformedJson: 'The AI returned invalid JSON (a syntax error partway through). Try again or switch to a different model.'
     },
@@ -979,18 +969,16 @@ const I18N = {
       modeLabel: 'Mode',
       modeFood: '🍜 Food',
       modeLandmark: '🏯 Landmark',
-      visionModelLabel: 'Vision model (Ollama)',
-      modelHint: 'The default <code>moondream</code> model is lightweight and fast locally but recognition is rough. For better accuracy: <code>ollama pull llama3.2-vision</code> and change the model field.',
       fileLabel: 'Take or choose a photo',
       runBtn: 'Analyze image',
       step1: 'Looking at the image (step 1/2)...',
       step2: 'Analyzing and writing a reply (step 2/2)...',
-      noCaption: (model) => `The vision model "${model}" returned no description for this image — try a different image or model.`,
-      fallbackUnknown: (model) => `The vision model "${model}" could not confidently identify the image. This is a safe fallback: the photo may be blurry, poorly lit, or the current model is too lightweight. Try taking a sharper photo with better lighting, avoid blocking text, or switch to a stronger vision model such as llama3.2-vision or qwen2.5vl.`,
+      noCaption: (model) => `${model} returned no description for this image — try a different image.`,
+      fallbackUnknown: (model) => `${model} could not confidently identify the image. This is a safe fallback: the photo may be blurry or poorly lit. Try taking a sharper photo with better lighting, and avoid blocking any text.`,
       fallbackFood: (guess) => `The vision model could not read enough detail to be certain. Based on the current description, this is likely ${guess || 'a dish'} — try a closer, brighter shot and avoid glare or dark corners for better recognition.`,
-      fallbackLandmark: (guess) => `The vision model could not confidently identify this place. Based on the current description, this is likely ${guess || 'a landmark/building'} — try a wider shot with visible signage or switch to a stronger model for more reliable results.`,
+      fallbackLandmark: (guess) => `The vision model could not confidently identify this place. Based on the current description, this is likely ${guess || 'a landmark/building'} — try a wider shot with visible signage.`,
       fallbackAdvice: 'If the image is still unclear, capture a cleaner photo with more contrast, visible signage, and better lighting.',
-      disclaimer: (model) => `⚠️ The local vision AI (${model}) can misidentify things easily, especially text in the image (menus, signs) and less common dishes/landmarks. Treat this as a reference suggestion, not a firm conclusion.`,
+      disclaimer: (model) => `⚠️ The vision AI (${model}) can misidentify things easily, especially text in the image (menus, signs) and less common dishes/landmarks. Treat this as a reference suggestion, not a firm conclusion.`,
       systemPromptFood: "You receive an English description (from a vision AI) of a photo of a dish. Based on it, write in English: 1) What this dish might be. 2) Visible ingredients. 3) 1-2 similar dishes worth trying. Do NOT make up exact prices/calories — if you mention them, clearly label them as estimates. If the description is too vague to guess, say plainly that you're not sure. Keep it brief, no markdown.",
       systemPromptLandmark: "You receive an English description (from a vision AI) of a photo of a landmark/structure. Based on it, write in English: 1) What this landmark might be. 2) A bit of history/culture if you're confident about it. 3) Similar types of attractions likely nearby. If the description is too vague to identify, say plainly that you're not sure instead of guessing. Keep it brief, no markdown.",
       userPrompt: (caption) => `Description from vision AI: "${caption}"`
@@ -1605,7 +1593,7 @@ function findFirstJsonObject(text) {
 }
 
 /**
- * Parses one line of Ollama's streaming NDJSON /api/chat response and returns
+ * Parses one line of claude-server's streaming NDJSON /chat response and returns
  * the text delta it carries, or '' if the line is empty/unparseable/has no content.
  */
 function extractChunkContent(line) {
@@ -3139,8 +3127,7 @@ function buildCameraFallback(mode, caption, model, lang = DEFAULT_LANG) {
 // ---------- localStorage persistence (guarded — private mode can throw) ----------
 
 const STORAGE_KEYS = {
-  url: 'ollama_url',
-  model: 'ollama_model',
+  url: 'claude_proxy_url',
   ragUrl: 'rag_url',
   voiceName: 'voice_name',
   lang: 'app_lang',
@@ -3609,18 +3596,17 @@ function initApp() {
     if (usList) usList.innerHTML = T('diff.usItems').map(item => `<li>${escapeHtml(item)}</li>`).join('');
   }
 
-  // ---------- Ollama connection ----------
+  // ---------- Claude proxy connection (see claude-server/ — holds the Anthropic API key
+  // server-side, the browser never sees it) ----------
   const serverUrlInput = document.getElementById('serverUrl');
-  const modelSelect = document.getElementById('modelSelect');
   const statusDot = document.getElementById('statusDot');
   const loadProgress = document.getElementById('loadProgress');
   const loadModelBtn = document.getElementById('loadModelBtn');
 
-  serverUrlInput.value = safeLoadString(STORAGE_KEYS.url) || 'http://localhost:11434';
-  modelSelect.value = safeLoadString(STORAGE_KEYS.model) || 'llama3.2';
+  serverUrlInput.value = safeLoadString(STORAGE_KEYS.url) || 'http://localhost:8901';
 
-  function ollamaBase() {
-    return (serverUrlInput.value.trim() || 'http://localhost:11434').replace(/\/+$/, '');
+  function aiProxyBase() {
+    return (serverUrlInput.value.trim() || 'http://localhost:8901').replace(/\/+$/, '');
   }
 
   // ---------- RAG server (reads indexed docs from knowledge/, see rag-server/) ----------
@@ -3695,24 +3681,19 @@ function initApp() {
 
   async function checkConnection() {
     safeSaveString(STORAGE_KEYS.url, serverUrlInput.value.trim());
-    safeSaveString(STORAGE_KEYS.model, modelSelect.value.trim());
     loadModelBtn.disabled = true;
     setStatus('loading', T('connect.connecting'));
     try {
-      const res = await fetch(`${ollamaBase()}/api/tags`);
+      const res = await fetch(`${aiProxyBase()}/health`);
       if (!res.ok) throw new Error(res.status + ' ' + res.statusText);
       const data = await res.json();
-      const names = (data.models || []).map(m => m.name);
-      const model = modelSelect.value.trim();
-      if (names.length === 0) {
-        setStatus('off', T('connect.noModel', model || 'llama3.2'));
-      } else if (!names.some(n => n === model || n.startsWith(model + ':'))) {
-        setStatus('off', T('connect.modelMissing', names.join(', '), model));
+      if (!data.ok) {
+        setStatus('off', T('connect.noApiKey'));
       } else {
-        setStatus('ready', T('connect.ready', model));
+        setStatus('ready', T('connect.ready', data.model || 'claude-sonnet-5'));
       }
     } catch (err) {
-      setStatus('off', T('connect.failed', ollamaBase(), err.message));
+      setStatus('off', T('connect.failed', aiProxyBase(), err.message));
     } finally {
       loadModelBtn.disabled = false;
     }
@@ -3729,24 +3710,23 @@ function initApp() {
     });
   });
 
-  // ---------- Local LLM call (Ollama server, chạy trên máy/mạng LAN, không cloud) ----------
+  // ---------- Claude API call (via claude-server/, the local proxy that holds the API key) ----------
   /**
-   * Calls Ollama's /api/chat with streaming enabled so callers can show tokens as they
-   * arrive instead of a spinner-then-everything-at-once. The 60s timeout is a rolling
-   * "no new data" idle timeout (reset on every chunk), not a total-request cap — a
-   * response that's steadily streaming shouldn't be killed just because it's long.
+   * Calls claude-server's /chat with streaming enabled so callers can show tokens as they arrive
+   * instead of a spinner-then-everything-at-once. The proxy re-emits Claude's response as the same
+   * newline-delimited {"message":{"content":"..."}} shape Ollama's /api/chat used to stream, so the
+   * accumulation loop below (extractChunkContent) is unchanged from the local-Ollama version.
+   * `json` is accepted for call-site compatibility but no longer sets any special request flag —
+   * Claude follows the "reply with ONLY valid JSON" instructions already baked into every prompt
+   * reliably enough that extractJson()'s own balanced-brace fallback is sufficient on top.
+   * The 60s timeout is a rolling "no new data" idle timeout (reset on every chunk), not a total-
+   * request cap — a response that's steadily streaming shouldn't be killed just because it's long.
    */
   async function callClaude(system, userText, { json = false, onChunk } = {}) {
-    const model = modelSelect.value.trim() || 'llama3.2';
     const body = {
-      model,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: userText }
-      ],
-      stream: true
+      system,
+      user: userText
     };
-    if (json) body.format = 'json';
 
     const controller = new AbortController();
     let timeoutId;
@@ -3755,7 +3735,7 @@ function initApp() {
 
     let res;
     try {
-      res = await fetch(`${ollamaBase()}/api/chat`, {
+      res = await fetch(`${aiProxyBase()}/chat`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
@@ -3764,7 +3744,7 @@ function initApp() {
     } catch (err) {
       clearTimeout(timeoutId);
       if (err.name === 'AbortError') throw new Error(T('errors.timeout'));
-      throw new Error(T('errors.cannotConnect', ollamaBase()));
+      throw new Error(T('errors.cannotConnect', aiProxyBase()));
     }
     if (!res.ok) {
       clearTimeout(timeoutId);
@@ -5066,13 +5046,19 @@ function initApp() {
   const cPreview = document.getElementById('c-preview');
   const cRun = document.getElementById('c-run');
   let cImageBase64 = null;
+  let cImageMediaType = 'image/jpeg';
 
   cFile.addEventListener('change', () => {
     const file = cFile.files[0];
     if (!file) return;
     const reader = new FileReader();
     reader.onload = () => {
-      cImageBase64 = reader.result.split(',')[1];
+      const [prefix, base64] = reader.result.split(',');
+      cImageBase64 = base64;
+      // e.g. "data:image/png;base64" -> "image/png"; falls back to jpeg if the browser/file
+      // gave something Claude's API doesn't accept (only jpeg/png/gif/webp are valid).
+      const match = /^data:([^;]+);base64$/.exec(prefix);
+      cImageMediaType = (match && /^image\/(jpeg|png|gif|webp)$/.test(match[1])) ? match[1] : 'image/jpeg';
       cPreview.src = reader.result;
       cPreview.style.display = 'block';
       cRun.disabled = false;
@@ -5080,52 +5066,49 @@ function initApp() {
     reader.readAsDataURL(file);
   });
 
+  const CAMERA_MODEL_LABEL = 'Claude';
+
   cRun.addEventListener('click', async () => {
     if (!cImageBase64) return;
     const mode = document.getElementById('c-mode').value;
-    const visionModel = document.getElementById('c-model').value.trim() || 'moondream';
     const resultEl = document.getElementById('c-result');
     let caption = '';
 
     try {
       setLoading(resultEl, true, T('camera.step1'));
       const captionPrompt = 'Describe this image in detail, mentioning any text you can see.';
-      caption = await callVision(captionPrompt, cImageBase64, visionModel);
+      caption = await callVision(captionPrompt, cImageBase64, cImageMediaType);
       const normalized = typeof caption === 'string' ? caption.trim() : '';
       if (!normalized || normalized === '(no response)') {
-        throw new Error(T('camera.noCaption', visionModel));
+        throw new Error(T('camera.noCaption', CAMERA_MODEL_LABEL));
       }
 
       const system = mode === 'food' ? T('camera.systemPromptFood') : T('camera.systemPromptLandmark');
       const text = await callClaude(system, tr(currentLang, 'camera.userPrompt', caption), {
         onChunk: streamPreview(resultEl, T('camera.step2'))
       });
-      resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(visionModel))}</div>`;
+      resultEl.innerHTML = `<div class="result-box">${escapeHtml(text)}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(CAMERA_MODEL_LABEL))}</div>`;
     } catch (err) {
-      const fallbackText = buildCameraFallback(mode, caption, visionModel, currentLang);
-      resultEl.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(err.message)}</div><div class="result-box">${escapeHtml(fallbackText)}</div><div class="summary-note">${T('camera.fallbackAdvice')}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(visionModel))}</div>`;
+      const fallbackText = buildCameraFallback(mode, caption, CAMERA_MODEL_LABEL, currentLang);
+      resultEl.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(err.message)}</div><div class="result-box">${escapeHtml(fallbackText)}</div><div class="summary-note">${T('camera.fallbackAdvice')}</div><div class="summary-note">${T('camera.disclaimer', escapeHtml(CAMERA_MODEL_LABEL))}</div>`;
     }
   });
 
-  async function callVision(prompt, imageBase64, model) {
+  /** Calls claude-server's /vision (one-shot image caption, not streamed — captions are short). */
+  async function callVision(prompt, imageBase64, mediaType) {
     let res;
     try {
-      res = await fetch(`${ollamaBase()}/api/chat`, {
+      res = await fetch(`${aiProxyBase()}/vision`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: 'user', content: prompt, images: [imageBase64] }],
-          stream: false
-        })
+        body: JSON.stringify({ prompt, imageBase64, mediaType })
       });
     } catch (err) {
-      throw new Error(T('errors.visionCannotConnect', ollamaBase()));
+      throw new Error(T('errors.visionCannotConnect', aiProxyBase()));
     }
     if (!res.ok) {
       let msg = res.status + ' ' + res.statusText;
       try { const errJson = await res.json(); msg = errJson.error || msg; } catch (e) {}
-      if (/not found/i.test(msg)) msg += T('errors.modelNotFoundSuffix', model);
       throw new Error(msg);
     }
     const data = await res.json();

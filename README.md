@@ -1,6 +1,6 @@
 # TravelAI — AI-Powered Group Travel Decision Platform
 
-Không chỉ lên lịch trình — TravelAI giúp cả nhóm ra quyết định du lịch cùng nhau, và cho thấy rõ vì sao AI đề xuất mỗi lựa chọn. AI chạy hoàn toàn trên máy — không cloud, không thể phát sinh chi phí — qua [Ollama](https://ollama.com). Có đăng nhập (demo) để mỗi thành viên trong nhóm có tài khoản riêng và gửi lời mời chuyến đi cho nhau.
+Không chỉ lên lịch trình — TravelAI giúp cả nhóm ra quyết định du lịch cùng nhau, và cho thấy rõ vì sao AI đề xuất mỗi lựa chọn. AI chạy qua [Claude API](https://www.anthropic.com/api) (Anthropic) thông qua `claude-server` — một proxy nhỏ chạy trên máy bạn, giữ API key ở phía server nên trình duyệt không bao giờ thấy key thật (xem mục "Chạy claude-server" bên dưới). Có đăng nhập (demo) để mỗi thành viên trong nhóm có tài khoản riêng và gửi lời mời chuyến đi cho nhau.
 
 Ý tưởng gốc: [`AI Voice Travel Assistant.pdf`](./AI%20Voice%20Travel%20Assistant.pdf) (Product Vision).
 
@@ -10,7 +10,13 @@ Xem hướng dẫn đầy đủ (macOS + Windows) tại [`setup-guide.html`](./s
 
 Tóm tắt nhanh:
 
-1. Cài [Ollama](https://ollama.com/download), chạy `ollama pull llama3.2`
+1. Chạy `claude-server` (giữ API key, xem chi tiết ở mục bên dưới):
+   ```bash
+   cd claude-server
+   cp config.example.json config.json   # rồi mở config.json, dán API key Anthropic vào field "apiKey"
+   npm install
+   npm start        # chạy tại http://localhost:8901
+   ```
 2. macOS: double-click `start-mac.command` · Windows: double-click `start-windows.bat`
 3. Trình duyệt tự mở `app.html`, bấm "Kiểm tra kết nối" — dùng được ngay, không cần đăng nhập
 4. (Tuỳ chọn nhưng nên chạy) — để xem lịch trình rõ (không bị mờ) và dùng được tính năng mời/quản trị user, chạy thêm auth server:
@@ -20,6 +26,26 @@ Tóm tắt nhanh:
    npm start        # chạy tại http://localhost:8900
    ```
    Rồi bấm "Đăng nhập" ở góc trên bằng `admin1` / `user1` / `user2`, mật khẩu `123123`.
+
+## Chạy claude-server (bắt buộc — server giữ API key gọi Claude)
+
+App là 1 trang tĩnh chạy trong trình duyệt, không có backend riêng — nếu gọi thẳng Claude API từ trình duyệt thì API key sẽ lộ ra (ai mở DevTools/Network tab đều thấy được, kể cả người dùng chung LAN qua tính năng truy cập từ điện thoại). `claude-server/` là 1 proxy nhỏ đứng giữa: giữ key ở phía server (đọc từ `config.json`, không commit lên git), trình duyệt chỉ gọi vào proxy này.
+
+```bash
+cd claude-server
+cp config.example.json config.json   # copy file mẫu — config.json đã nằm trong .gitignore
+```
+
+Mở `config.json` vừa tạo, thay `YOUR_ANTHROPIC_API_KEY_HERE` bằng API key Anthropic thật của bạn (lấy tại [console.anthropic.com](https://console.anthropic.com/)). Có thể đổi luôn `model` (mặc định `claude-sonnet-5`) nếu muốn dùng model khác.
+
+```bash
+npm install
+npm start        # chạy tại http://localhost:8901
+```
+
+Trong app, ô "Server" ở góc trên để nguyên `http://localhost:8901` (hoặc đổi thành IP LAN của máy nếu dùng từ điện thoại khác, xem `setup-guide.html`), rồi bấm "Kiểm tra kết nối".
+
+**Lưu ý về chi phí**: mỗi lần app gọi AI (tạo lịch trình, chấm điểm nhóm, self-healing, camera AI...) đều tính phí vào tài khoản Anthropic của bạn theo lượng token thực tế dùng — không còn miễn phí như chạy Ollama local trước đây. Nên đặt budget alert trên [Anthropic Console](https://console.anthropic.com/) nếu demo nhiều lần liên tiếp.
 
 ## Tính năng
 
@@ -44,9 +70,9 @@ Tóm tắt nhanh:
 
 ## Giới hạn hiện tại
 
-- AI chạy local (llama3.2 qua Ollama) không có dữ liệu thời gian thực — giờ mở cửa, số điện thoại, địa chỉ do AI gợi ý **chưa được xác minh**, luôn kiểm tra qua nút "Xem bản đồ" trước khi đi.
-- Chất lượng phụ thuộc vào model đã pull và cấu hình máy chạy.
-- Chất lượng tiếng Nhật/Anh do AI sinh ra phụ thuộc vào model — `llama3.2` trả lời khá tốt nhưng không hoàn hảo, nên kiểm tra kỹ trước khi demo.
+- AI không có dữ liệu thời gian thực — giờ mở cửa, số điện thoại, địa chỉ do AI gợi ý **chưa được xác minh**, luôn kiểm tra qua nút "Xem bản đồ" trước khi đi.
+- Cần internet liên tục khi dùng (mỗi lần gọi AI đều qua Claude API) và cần 1 API key Anthropic hợp lệ — mỗi lượt gọi tính phí vào tài khoản Anthropic của bạn (xem mục "Chạy claude-server" ở trên).
+- `rag-server/` (tính năng RAG, tuỳ chọn) vẫn cần cài Ollama local để chạy embedding (`nomic-embed-text`) — Anthropic không cung cấp API embedding, đây là phần duy nhất còn phụ thuộc Ollama, tách biệt hoàn toàn với AI trả lời chính.
 - Đăng nhập chỉ là **demo cho hackathon**, không phải hệ thống bảo mật thật — mật khẩu chung ai cũng biết (`123123`), phiên đăng nhập lưu trong bộ nhớ server nên mất khi restart `auth-server`, và dữ liệu người dùng/lời mời chỉ nằm trên máy đang chạy `auth-server` (không đồng bộ giữa các máy).
 
 ## Cấu trúc file
@@ -55,7 +81,8 @@ Tóm tắt nhanh:
 |---|---|
 | `app.html` | Markup của giao diện chính |
 | `style.css` | Toàn bộ style (bao gồm responsive cho mobile) |
-| `app.js` | Toàn bộ logic — gọi Ollama, render kết quả, lưu trạng thái vào localStorage |
+| `app.js` | Toàn bộ logic — gọi `claude-server`, render kết quả, lưu trạng thái vào localStorage |
+| `claude-server/` | Proxy giữ API key Anthropic, gọi Claude API thay cho trình duyệt (xem mục "Chạy claude-server" ở trên) |
 | `start-mac.command` | Khởi chạy nhanh trên macOS |
 | `start-windows.bat` | Khởi chạy nhanh trên Windows |
 | `setup-guide.html` | Hướng dẫn cài đặt chi tiết |
@@ -65,7 +92,7 @@ Tóm tắt nhanh:
 | `knowledge/` | Dữ liệu tham khảo (nhà hàng, điểm tham quan, ghi chú) dùng để index cho `rag-server` |
 | `auth-server/` | (Tuỳ chọn nhưng nên chạy) server đăng nhập/quản lý user/lời mời (Express + file JSON, xem bên dưới) |
 
-Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang. Dữ liệu này chỉ nằm trên máy bạn, không gửi đi đâu. Trừ lời mời chuyến đi — thứ duy nhất được gửi qua `auth-server` để người khác đọc được.
+Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang, và không rời khỏi máy bạn trừ khi cần thiết: lời mời chuyến đi được gửi qua `auth-server` để người khác đọc được, và nội dung liên quan tới mỗi lượt tạo lịch trình/chấm điểm/self-healing/camera AI được gửi qua `claude-server` tới Claude API (Anthropic) để lấy câu trả lời — đây là nơi duy nhất dữ liệu chuyến đi của bạn rời khỏi máy.
 
 ## Chạy Auth server cho đăng nhập/mời/quản trị
 

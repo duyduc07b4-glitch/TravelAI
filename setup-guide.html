@@ -204,7 +204,7 @@
 <header class="hero">
   <p class="eyebrow">Hướng dẫn cài đặt nội bộ</p>
   <h1>AI Travel Companion</h1>
-  <p class="lede">Trợ lý lập kế hoạch du lịch chạy AI hoàn toàn trên máy của bạn — không cloud, không tài khoản, không thể phát sinh chi phí. Làm theo các bước dưới đây, mất khoảng 10 phút.</p>
+  <p class="lede">Trợ lý lập kế hoạch du lịch — dữ liệu chuyến đi lưu trên máy bạn, AI trả lời qua Claude API (Anthropic). Cần 1 API key Anthropic của riêng bạn. Làm theo các bước dưới đây, mất khoảng 10 phút.</p>
 </header>
 
 <div class="os-bar">
@@ -231,11 +231,11 @@
     </li>
     <li>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-      <div>Khoảng <strong>2 GB</strong> dung lượng trống ổ đĩa cho model AI</div>
+      <div>1 <strong>API key Anthropic</strong> (lấy tại <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>) — mỗi câu hỏi gửi AI sẽ tính phí vào tài khoản Anthropic của bạn</div>
     </li>
     <li>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-      <div>Mạng internet <strong>chỉ để tải lần đầu</strong> — sau đó AI chạy hoàn toàn offline</div>
+      <div>Mạng internet <strong>liên tục khi dùng</strong> — mỗi lần gọi AI đều cần kết nối tới Claude API</div>
     </li>
     <li data-only="win">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
@@ -249,29 +249,35 @@
   <div class="step">
     <div class="step-num">1</div>
     <div class="step-body">
-      <p>Xin 1 thư mục gồm 3 file sau từ người gửi cho bạn (Slack, Drive, USB đều được), lưu chung 1 chỗ trên máy — ví dụ ra Desktop:</p>
+      <p>Xin bộ file sau từ người gửi cho bạn (Slack, Drive, USB đều được), lưu chung 1 chỗ trên máy — ví dụ ra Desktop:</p>
       <div class="file-list">
         <div><span class="name">app.html</span><span class="desc">giao diện chính</span></div>
         <div><span class="name">start-mac.command</span><span class="desc">khởi chạy nhanh — macOS</span></div>
         <div><span class="name">start-windows.bat</span><span class="desc">khởi chạy nhanh — Windows</span></div>
+        <div><span class="name">claude-server/</span><span class="desc">server giữ API key, gọi AI (xem bước 2)</span></div>
       </div>
     </div>
   </div>
 </section>
 
 <section>
-  <h2>Bước 2 — Cài AI chạy local (Ollama)</h2>
+  <h2>Bước 2 — Bật AI (claude-server + Claude API)</h2>
 
   <div class="step" data-only="mac">
     <div class="step-num">2</div>
     <div class="step-body">
-      <h3>Cài Ollama</h3>
-      <p>Vào <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a>, tải bản macOS, mở file <code class="inline">.dmg</code> và kéo vào Applications. Mở app Ollama một lần — icon sẽ nằm ở thanh menu trên cùng, chạy nền tự động từ đó.</p>
-      <p>Sau đó mở <strong>Terminal</strong> và tải model AI:</p>
-      <pre><span class="tag">Terminal</span><code>ollama pull llama3.2</code></pre>
+      <h3>Cấu hình API key</h3>
+      <p>App gọi AI qua <code class="inline">claude-server</code> — một server nhỏ chạy ngay trên máy này, giữ API key giúp bạn (trình duyệt không bao giờ thấy key thật). Cần có sẵn 1 API key của Anthropic (lấy tại <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>).</p>
+      <p>Mở <strong>Terminal</strong>, vào thư mục <code class="inline">claude-server</code>, copy file cấu hình mẫu rồi mở lên dán key vào:</p>
+      <pre><span class="tag">Terminal</span><code>cd claude-server
+cp config.example.json config.json
+open config.json</code></pre>
+      <p>Trong file vừa mở, thay <code class="inline">YOUR_ANTHROPIC_API_KEY_HERE</code> bằng key thật của bạn rồi lưu lại. Sau đó cài và chạy server:</p>
+      <pre><span class="tag">Terminal</span><code>npm install
+npm start</code></pre>
       <div class="callout">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-        <div>Tải khoảng <strong>2GB</strong>, mất vài phút tùy mạng. Chỉ cần làm một lần.</div>
+        <div>Giữ cửa sổ Terminal này mở — đóng lại là server tắt, app sẽ không gọi được AI. Không commit file <code class="inline">config.json</code> lên git — nó đã nằm sẵn trong <code class="inline">.gitignore</code>.</div>
       </div>
     </div>
   </div>
@@ -279,13 +285,18 @@
   <div class="step" data-only="win">
     <div class="step-num">2</div>
     <div class="step-body">
-      <h3>Cài Ollama</h3>
-      <p>Vào <a href="https://ollama.com/download" target="_blank" rel="noopener">ollama.com/download</a>, tải bản Windows, chạy file <code class="inline">.exe</code> và làm theo trình cài đặt. Ollama sẽ tự chạy nền và nằm ở khay hệ thống (system tray) từ đó về sau.</p>
-      <p>Sau đó mở <strong>PowerShell</strong> hoặc <strong>Command Prompt</strong> và tải model AI:</p>
-      <pre><span class="tag">PowerShell</span><code>ollama pull llama3.2</code></pre>
+      <h3>Cấu hình API key</h3>
+      <p>App gọi AI qua <code class="inline">claude-server</code> — một server nhỏ chạy ngay trên máy này, giữ API key giúp bạn (trình duyệt không bao giờ thấy key thật). Cần có sẵn 1 API key của Anthropic (lấy tại <a href="https://console.anthropic.com/" target="_blank" rel="noopener">console.anthropic.com</a>).</p>
+      <p>Mở <strong>PowerShell</strong> hoặc <strong>Command Prompt</strong>, vào thư mục <code class="inline">claude-server</code>, copy file cấu hình mẫu rồi mở lên dán key vào:</p>
+      <pre><span class="tag">PowerShell</span><code>cd claude-server
+copy config.example.json config.json
+notepad config.json</code></pre>
+      <p>Trong file vừa mở, thay <code class="inline">YOUR_ANTHROPIC_API_KEY_HERE</code> bằng key thật của bạn rồi lưu lại. Sau đó cài và chạy server:</p>
+      <pre><span class="tag">PowerShell</span><code>npm install
+npm start</code></pre>
       <div class="callout">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
-        <div>Tải khoảng <strong>2GB</strong>, mất vài phút tùy mạng. Chỉ cần làm một lần.</div>
+        <div>Giữ cửa sổ dòng lệnh này mở — đóng lại là server tắt, app sẽ không gọi được AI. Không commit file <code class="inline">config.json</code> lên git — nó đã nằm sẵn trong <code class="inline">.gitignore</code>.</div>
       </div>
     </div>
   </div>
@@ -316,7 +327,7 @@
     <div class="step-num">4</div>
     <div class="step-body">
       <h3>Kết nối AI</h3>
-      <p>Trong app, ở góc trên: ô Server để nguyên <code class="inline">http://localhost:11434</code>, ô model để <code class="inline">llama3.2</code>, bấm <strong>"Kiểm tra kết nối"</strong>. Chấm tròn chuyển xanh là xong — thử ngay tab "Lịch trình".</p>
+      <p>Trong app, ở góc trên: ô Server để nguyên <code class="inline">http://localhost:8901</code> (địa chỉ của <code class="inline">claude-server</code>), bấm <strong>"Kiểm tra kết nối"</strong>. Chấm tròn chuyển xanh là xong — thử ngay tab "Lịch trình".</p>
     </div>
   </div>
 </section>
@@ -343,16 +354,11 @@
 
           <rect class="node-bg" x="470" y="35" width="110" height="50" rx="8"/>
           <text x="525" y="55" text-anchor="middle" font-size="13" font-weight="600">Máy chủ</text>
-          <text x="525" y="72" text-anchor="middle" class="label">Ollama chạy đây</text>
+          <text x="525" y="72" text-anchor="middle" class="label">claude-server chạy đây</text>
         </svg>
       </div>
-      <p>Trên máy chạy Ollama, cần bật cho phép truy cập mạng + CORS:</p>
-      <pre data-only="mac"><span class="tag">Terminal — trước khi mở Ollama</span><code>launchctl setenv OLLAMA_HOST "0.0.0.0"
-launchctl setenv OLLAMA_ORIGINS "*"</code></pre>
-      <pre data-only="win"><span class="tag">PowerShell — rồi khởi động lại Ollama</span><code>setx OLLAMA_HOST "0.0.0.0"
-setx OLLAMA_ORIGINS "*"</code></pre>
-      <p>Khởi động lại Ollama, rồi tìm địa chỉ IP mạng LAN của máy đó (macOS: System Settings → Wi-Fi → Details; Windows: <code class="inline">ipconfig</code> trong cmd, xem dòng IPv4).</p>
-      <p>Trên điện thoại (cùng Wi-Fi), mở <code class="inline">http://[IP-máy]:8765/app.html</code>, rồi trong app đổi Server thành <code class="inline">http://[IP-máy]:11434</code>.</p>
+      <p><code class="inline">claude-server</code> đã tự lắng nghe trên mọi địa chỉ mạng của máy — không cần bật thêm gì. Chỉ cần tìm địa chỉ IP mạng LAN của máy đang chạy nó (macOS: System Settings → Wi-Fi → Details; Windows: <code class="inline">ipconfig</code> trong cmd, xem dòng IPv4).</p>
+      <p>Trên điện thoại (cùng Wi-Fi), mở <code class="inline">http://[IP-máy]:8765/app.html</code>, rồi trong app đổi Server thành <code class="inline">http://[IP-máy]:8901</code>.</p>
     </div>
   </details>
 </section>
@@ -361,18 +367,13 @@ setx OLLAMA_ORIGINS "*"</code></pre>
   <h2>Xử lý sự cố thường gặp</h2>
 
   <details>
-    <summary>"Không kết nối được tới Ollama" <span class="badge">Cả hai hệ điều hành</span></summary>
-    <div class="answer">Kiểm tra Ollama có đang chạy không — macOS: icon trên thanh menu; Windows: icon ở khay hệ thống. Nếu không thấy, mở lại app Ollama rồi bấm "Kiểm tra kết nối" trong trang web lần nữa.</div>
+    <summary>"Không kết nối được tới claude-server" <span class="badge">Cả hai hệ điều hành</span></summary>
+    <div class="answer">Kiểm tra cửa sổ Terminal/dòng lệnh chạy <code class="inline">npm start</code> trong thư mục <code class="inline">claude-server</code> có còn mở không — đóng cửa sổ đó là server tắt. Mở lại rồi bấm "Kiểm tra kết nối" trong trang web lần nữa.</div>
   </details>
 
   <details>
-    <summary>App báo "không thấy model llama3.2"</summary>
-    <div class="answer">Model chưa tải xong hoặc gõ sai tên. Chạy lại <code class="inline">ollama pull llama3.2</code> và đợi đến khi thấy chữ "success".</div>
-  </details>
-
-  <details>
-    <summary>Trả lời rất chậm hoặc máy nóng/giật</summary>
-    <div class="answer">Máy cấu hình thấp sẽ chạy chậm hơn — đây là bình thường với AI chạy local. Có thể thử model nhẹ hơn: <code class="inline">ollama pull llama3.2:1b</code>, rồi đổi ô model trong app thành <code class="inline">llama3.2:1b</code>.</div>
+    <summary>App báo "chưa có API key"</summary>
+    <div class="answer">Mở <code class="inline">claude-server/config.json</code>, kiểm tra field <code class="inline">"apiKey"</code> đã là key thật của bạn (không còn là <code class="inline">YOUR_ANTHROPIC_API_KEY_HERE</code>) — sau khi sửa, khởi động lại server (Ctrl+C trong Terminal rồi <code class="inline">npm start</code> lại).</div>
   </details>
 
   <details>
@@ -382,14 +383,14 @@ setx OLLAMA_ORIGINS "*"</code></pre>
 
   <details>
     <summary>Địa chỉ, giờ mở cửa, số điện thoại AI gợi ý có đáng tin không?</summary>
-    <div class="answer">Không nên tin tuyệt đối. AI chạy local không có dữ liệu thời gian thực, nên tên quán có thể đúng nhưng giờ mở cửa hay số điện thoại có thể sai. App luôn có nút "Xem bản đồ" cạnh mỗi địa điểm — bấm vào để xem thông tin thật trên Google Maps trước khi đi.</div>
+    <div class="answer">Không nên tin tuyệt đối. AI không có dữ liệu thời gian thực, nên tên quán có thể đúng nhưng giờ mở cửa hay số điện thoại có thể sai. App luôn có nút "Xem bản đồ" cạnh mỗi địa điểm — bấm vào để xem thông tin thật trên Google Maps trước khi đi.</div>
   </details>
 </section>
 
 </main>
 
 <footer>
-  AI Travel Companion — chạy 100% trên máy cá nhân, không gửi dữ liệu ra ngoài.
+  AI Travel Companion — dữ liệu chuyến đi lưu trên máy cá nhân; các câu hỏi gửi tới AI đi qua Claude API (Anthropic) để lấy câu trả lời.
 </footer>
 
 <script>

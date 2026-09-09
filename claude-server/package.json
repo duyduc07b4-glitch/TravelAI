@@ -1,0 +1,13 @@
+{
+  "name": "claude-server",
+  "version": "1.0.0",
+  "description": "Local proxy for TravelAI's AI calls: holds the Anthropic API key server-side (never sent to the browser) and forwards chat/vision requests to Claude.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

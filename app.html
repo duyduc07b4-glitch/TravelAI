@@ -18,8 +18,7 @@
     </div>
     <div class="apikey-row">
       <span id="statusDot" class="status-dot status-off"></span>
-      <input type="text" id="serverUrl" placeholder="http://localhost:11434" size="22">
-      <input type="text" id="modelSelect" placeholder="llama3.2" size="12">
+      <input type="text" id="serverUrl" placeholder="http://localhost:8901" size="22">
       <button class="secondary small" id="loadModelBtn" data-i18n="checkConnBtn"></button>
       <div class="lang-switch" role="group" aria-label="Language / 言語 / Ngôn ngữ">
         <button type="button" class="lang-btn" data-lang="vi">VI</button>
@@ -211,9 +210,7 @@
             <option value="landmark" data-i18n="camera.modeLandmark"></option>
           </select>
         </div>
-        <div class="field"><label data-i18n="camera.visionModelLabel"></label><input type="text" id="c-model" placeholder="moondream" value="moondream"></div>
       </div>
-      <div class="hint" data-i18n="camera.modelHint" data-i18n-html="1"></div>
       <div class="field" style="margin-top:12px;">
         <label data-i18n="camera.fileLabel"></label>
         <input type="file" id="c-file" accept="image/*" capture="environment">
