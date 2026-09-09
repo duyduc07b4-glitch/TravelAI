@@ -25,7 +25,7 @@ Tóm tắt nhanh:
 
 - 🔐 **Đăng nhập & mời thành viên** — 3 tài khoản demo có sẵn: `admin1` / `user1` / `user2`, mật khẩu `123123`. App không bắt đăng nhập ngay từ đầu — cứ điền form và bấm "Tạo lịch trình" bình thường; nếu chưa đăng nhập, lịch trình vẫn được tạo thật nhưng hiện **mờ kèm khoá 🔒 và nút "Đăng nhập"** thay vì hiện rõ ngay, mời chào đăng nhập thay vì chặn cứng từ đầu. Đăng nhập xong là hiện rõ ngay, không cần tạo lại. Đã đăng nhập thì mỗi lần tạo lịch trình xong có thể chọn người khác và bấm "Gửi lời mời" — người được mời thấy huy hiệu ✉️ ở góc trên, mở ra xem và bấm "Dùng lịch trình này" để áp ngay vào tab của họ. Tài khoản `admin1` có thêm tab "Quản trị" để thêm/xoá người dùng. Chạy qua `auth-server/` (Express + file JSON, xem bên dưới) — đăng nhập demo, không phải hệ thống bảo mật thật.
 - 🗺️ **Dynamic Trip Planning** — tạo lịch trình theo ngày, có link Google Maps cho từng địa điểm và **🗺️ link "Xem lộ trình cả ngày"** nối toàn bộ hoạt động trong ngày thành một chỉ đường Google Maps duy nhất (origin → các điểm giữa → destination theo đúng thứ tự trong lịch). Có thể khai sở thích riêng từng thành viên (mục "Thành viên & sở thích" ngay trong tab này) — AI sẽ cố cân bằng hoạt động cho nhiều người nhất có thể thay vì chỉ tối ưu chung chung, và **📊 Điểm hài lòng của nhóm** hiện ngay sau khi tạo lịch trình (tính cục bộ, không qua LLM) — sửa sở thích một thành viên là điểm cập nhật tức thì, không cần tạo lại lịch trình.
-- 📍 **Tên quán ăn cụ thể thay vì chung chung** — khi tạo lịch trình, hệ thống tự tra RAG server (nếu đang chạy) để lấy tên nhà hàng/địa điểm thật gần điểm đến và đưa vào prompt cho AI, thay vì để AI tự đoán ra "ăn trưa gần đó". Nếu AI vẫn lỡ viết chung chung (hay gặp với model local nhỏ), có lớp xử lý tất định điền lại bằng một quán thật từ RAG (kèm giá thật của quán đó) — không quán nào bị lặp lại 2 lần trong cùng lịch trình nếu còn quán khác phù hợp.
+- 📍 **Tên quán ăn cụ thể thay vì chung chung** — khi tạo lịch trình, hệ thống tự tra RAG server (nếu đang chạy) để lấy tên nhà hàng/địa điểm thật gần điểm đến và đưa vào prompt cho AI, thay vì để AI tự đoán ra "ăn trưa gần đó". Nếu AI vẫn lỡ viết chung chung (hay gặp với model local nhỏ), có lớp xử lý tất định điền lại bằng một quán thật từ RAG (kèm giá thật của quán đó) — không quán nào bị lặp lại 2 lần trong cùng lịch trình nếu còn quán khác phù hợp. Kho dữ liệu gồm 48 quán soạn tay (có giá/rating thật) + có thể mở rộng thêm hàng trăm quán thật lấy miễn phí từ OpenStreetMap (xem mục "Mở rộng dữ liệu nhà hàng" bên dưới).
 - 💰 **Chi phí ước tính từng hoạt động + nhân theo đầu người** — AI ước tính giá mỗi hoạt động/quán ăn ngay trong lịch trình (VD: "Ăn trưa tại Yunangi — 1.500 yên", "Miễn phí"), cộng thành **chi phí mỗi người** và **tổng cho cả nhóm** (nhân đúng theo số thành viên, vì giá mỗi hoạt động vốn đã là giá/người chứ không phải chi phí chung cần chia ra) — cập nhật tức thì khi thêm/bớt thành viên, không cần tạo lại lịch trình. Có lớp kiểm tra tự động: nếu AI lỡ ghi một bữa ăn/quán bar là miễn phí (hay gặp với model local nhỏ), hệ thống tự thay bằng mức giá tối thiểu hợp lý và đánh dấu rõ bằng dấu "~" để không làm tổng chi phí bị ảo thấp. Chỉ là ước tính từ hiểu biết chung của AI, không phải giá thật đã kiểm chứng, và chưa gồm vé máy bay/khách sạn. 3 phương án A/B/C ở tab Quyết định nhóm cũng hiện giá ước tính riêng cho từng địa điểm khi dữ liệu tham khảo có giá.
 - 👥 **Group Decision Engine** — không chỉ chấm điểm, mà còn:
   - 📊 **Điểm hài lòng theo từng thành viên** (không chỉ điểm trung bình chung)
@@ -93,6 +93,17 @@ npm install
 npm run ingest   # index tài liệu trong knowledge/ (chạy lại mỗi khi đổi dữ liệu)
 npm start        # chạy server tại http://localhost:8899
 ```
+
+### Mở rộng dữ liệu nhà hàng từ OpenStreetMap (miễn phí, không cần API key)
+
+Ngoài `knowledge/restaurants.json` (48 quán soạn tay, có giá/rating thật) và `knowledge/attractions.json`, có thể lấy thêm hàng trăm quán ăn/uống thật trên đảo chính Okinawa từ OpenStreetMap (Overpass API) — miễn phí, không cần đăng ký hay API key:
+
+```bash
+node rag-server/fetch-osm-restaurants.js --limit 300   # ghi ra knowledge/restaurants-osm.json (mặc định 300 quán, không đè lên restaurants.json)
+node rag-server/ingest.js                               # đọc lại toàn bộ knowledge/, rebuild embedding — cần rag-server đã npm install
+```
+
+Lưu ý: dữ liệu OSM là do cộng đồng đóng góp (giấy phép ODbL, cần ghi nguồn `© OpenStreetMap contributors` nếu phát hành lại), **chưa được kiểm chứng thủ công** — không có sẵn giá/rating thật (app tự áp dụng mức giá tối thiểu suy luận và bỏ qua đánh giá khi thiếu, y như với hoạt động AI tự ước tính), và giờ mở cửa/địa chỉ có thể lỗi thời. Chạy lại script này bất cứ lúc nào để lấy dữ liệu mới hơn hoặc đổi vùng/số lượng (sửa `OKINAWA_HONTO_BBOX` trong file để đổi khu vực).
 
 ## Chạy test
 
