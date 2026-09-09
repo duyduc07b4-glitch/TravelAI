@@ -3291,6 +3291,20 @@ function initApp() {
     if (e.target.closest('.result-login-btn')) openLoginModal();
   });
 
+  // Everything past the first tab needs a login — Lịch trình (planner) stays open so a visitor can
+  // still see what the app does before committing to an account; the rest (Group Decision, Voice,
+  // Self-Healing, Camera AI, Why TravelAI) show a 🔒 badge and open the login modal instead of
+  // switching when nobody's logged in. `admin` isn't in this list — it's gated separately by role.
+  const LOGIN_GATED_TABS = ['group', 'voice', 'heal', 'camera', 'diff'];
+
+  /** Reflects currentUser onto the tab bar's lock badges — call after any login/logout. */
+  function updateTabLockUI() {
+    const locked = !currentUser;
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      if (LOGIN_GATED_TABS.includes(btn.dataset.tab)) btn.classList.toggle('tab-locked', locked);
+    });
+  }
+
   function openLoginModal() {
     loginErrorEl.style.display = 'none';
     loginOverlay.style.display = 'flex';
@@ -3330,11 +3344,23 @@ function initApp() {
       }
       refreshInvitesBadge();
       unlockLastPlannerResult();
+      updateTabLockUI();
     } else {
       userInfoEl.style.display = 'none';
       headerLoginBtn.style.display = '';
       adminTabBtn.style.display = 'none';
       invitesPanel.style.display = 'none';
+      updateTabLockUI();
+      // Logging out relocks every tab past Lịch trình — bounce back to it if one of those was open,
+      // same as the admin-panel redirect above, rather than leaving a now-locked panel on screen.
+      const activeGatedPanel = LOGIN_GATED_TABS.find(tab => {
+        const panel = document.getElementById('panel-' + tab);
+        return panel && panel.classList.contains('active');
+      });
+      if (activeGatedPanel) {
+        const plannerTabBtn = document.querySelector('.tab-btn[data-tab="planner"]');
+        if (plannerTabBtn) plannerTabBtn.click();
+      }
       // Inviting others requires being someone yourself — hide the send-invite box on logout
       // rather than leave it showing checkboxes for a session that can no longer send anything.
       const pInviteEl = document.getElementById('p-invite');
@@ -3698,6 +3724,10 @@ function initApp() {
   // ---------- Tabs ----------
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
+      if (!currentUser && LOGIN_GATED_TABS.includes(btn.dataset.tab)) {
+        openLoginModal();
+        return;
+      }
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
       btn.classList.add('active');
