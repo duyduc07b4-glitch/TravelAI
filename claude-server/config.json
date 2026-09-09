@@ -1,6 +1,0 @@
-{
-  "apiKey": "YOUR_ANTHROPIC_API_KEY_HERE",
-  "model": "claude-sonnet-5",
-  "port": 8901,
-  "maxTokens": 4096
-}
