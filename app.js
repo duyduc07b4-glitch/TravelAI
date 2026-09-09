@@ -3629,7 +3629,10 @@ function initApp() {
   function aiProxyBase() {
     const override = new URLSearchParams(window.location.search).get('server');
     if (override) return override.trim().replace(/\/+$/, '');
-    return `http://${window.location.hostname}:${AI_PROXY_PORT}`;
+    // location.hostname is an empty string for a page opened as a local file (file://app.html —
+    // e.g. double-clicked instead of served via start-mac.command/start-windows.bat), which would
+    // otherwise build the invalid "http://:8901". Falls back to localhost in that case.
+    return `http://${window.location.hostname || 'localhost'}:${AI_PROXY_PORT}`;
   }
 
   // ---------- RAG server (reads indexed docs from knowledge/, see rag-server/) ----------
