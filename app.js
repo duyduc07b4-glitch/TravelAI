@@ -3411,7 +3411,17 @@ function initApp() {
     authToken = null;
     currentUser = null;
     persistAuth();
-    applyAuthUI();
+    // This app is meant to be tried by more than one person on the same device (a hackathon booth,
+    // a shared laptop) — leaving one person's trip/members/voice-chat sitting in localStorage for
+    // the next person to see after logout isn't just stale UI, it's their data. Clear every
+    // trip-related key (not device-level settings like language or server URLs) and reload, which
+    // both lands back on the first tab and guarantees every in-memory variable/DOM field is reset
+    // to the exact same state a brand-new visit would have — no separate reset path to keep in
+    // sync as new features add more state.
+    [STORAGE_KEYS.planner, STORAGE_KEYS.group, STORAGE_KEYS.heal, STORAGE_KEYS.voiceLog].forEach(key => {
+      try { localStorage.removeItem(key); } catch (e) { /* ignore */ }
+    });
+    location.reload();
   });
 
   // ---------- Invites received ----------
