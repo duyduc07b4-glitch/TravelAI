@@ -4,6 +4,7 @@ const {
   escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity, weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
+  formatYen, estimateEntryCostPerPerson, plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
   classifyIncident, buildSelfHealingPlan,
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
   detectPreferenceConflicts, generateCompromiseOptions, pickPrimaryKnowledgeEntry, buildReasoningReceipt,
@@ -262,6 +263,98 @@ describe('renderPlannerHtml', () => {
     }, 'Okinawa', 'en');
     assert.match(html, /Aquarium/);
     assert.doesNotMatch(html, /\[object Object\]/);
+  });
+  test('shows a per-activity price when the activity carries one, and "free" for a 0 price', () => {
+    const html = renderPlannerHtml({
+      days: [{ day: 1, activities: [{ text: 'Churaumi Aquarium', price: 2180 }, { text: 'Cape Manzamo', price: 0 }] }]
+    }, 'Okinawa', 'vi');
+    assert.match(html, /2,180 yên/);
+    assert.match(html, /Miễn phí/);
+  });
+  test('shows no price markup for a plain-string activity (no price data)', () => {
+    const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Naha Airport'] }] }, 'Okinawa', 'vi');
+    assert.doesNotMatch(html, /activity-price/);
+  });
+});
+
+describe('formatYen', () => {
+  test('comma-groups thousands', () => {
+    assert.equal(formatYen(3000), '3,000');
+    assert.equal(formatYen(1234567), '1,234,567');
+    assert.equal(formatYen(120), '120');
+  });
+  test('returns an empty string for non-numeric input', () => {
+    assert.equal(formatYen(null), '');
+    assert.equal(formatYen(undefined), '');
+    assert.equal(formatYen(NaN), '');
+  });
+});
+
+describe('estimateEntryCostPerPerson', () => {
+  test('takes the high end of a priceRange', () => {
+    assert.equal(estimateEntryCostPerPerson({ priceRange: '2000-3000 yên/người' }), 3000);
+  });
+  test('falls back to ticketPrice when priceRange is absent', () => {
+    assert.equal(estimateEntryCostPerPerson({ ticketPrice: 'Người lớn khoảng 2,180 yên' }), 2180);
+  });
+  test('returns null when neither field has a parseable number (free, or unlisted)', () => {
+    assert.equal(estimateEntryCostPerPerson({ ticketPrice: 'Miễn phí' }), null);
+    assert.equal(estimateEntryCostPerPerson({}), null);
+    assert.equal(estimateEntryCostPerPerson(null), null);
+  });
+});
+
+describe('plannerActivityPrice', () => {
+  test('reads price off an object activity', () => {
+    assert.equal(plannerActivityPrice({ text: 'Aquarium', price: 2180 }), 2180);
+    assert.equal(plannerActivityPrice({ text: 'Free viewpoint', price: 0 }), 0);
+  });
+  test('returns null for a plain-string activity or a missing/invalid price', () => {
+    assert.equal(plannerActivityPrice('Naha Airport'), null);
+    assert.equal(plannerActivityPrice({ text: 'X' }), null);
+    assert.equal(plannerActivityPrice({ text: 'X', price: 'lots' }), null);
+    assert.equal(plannerActivityPrice({ text: 'X', price: -5 }), null);
+  });
+});
+
+describe('sumItineraryCost', () => {
+  test('sums every priced activity across all days', () => {
+    const planData = {
+      days: [
+        { day: 1, activities: [{ text: 'A', price: 1000 }, { text: 'B', price: 500 }] },
+        { day: 2, activities: [{ text: 'C', price: 2000 }, 'Plain string with no price'] }
+      ]
+    };
+    assert.deepEqual(sumItineraryCost(planData), { total: 3500, hasData: true });
+  });
+  test('reports hasData: false when nothing in the itinerary carries a price at all', () => {
+    const planData = { days: [{ day: 1, activities: ['Naha Airport', 'Lunch'] }] };
+    assert.deepEqual(sumItineraryCost(planData), { total: 0, hasData: false });
+  });
+  test('handles missing/malformed planData without throwing', () => {
+    assert.deepEqual(sumItineraryCost(null), { total: 0, hasData: false });
+    assert.deepEqual(sumItineraryCost({}), { total: 0, hasData: false });
+  });
+});
+
+describe('renderItineraryCostSummaryHtml', () => {
+  const planData = {
+    days: [{ day: 1, activities: [{ text: 'Aquarium', price: 2180 }, { text: 'Lunch', price: 1500 }] }]
+  };
+  test('shows the total and an even per-person split for more than 1 traveler', () => {
+    const html = renderItineraryCostSummaryHtml(planData, 3, 'vi');
+    assert.match(html, /3,680/); // total
+    assert.match(html, /1,227/); // 3680 / 3 rounded
+    assert.match(html, /3 người/);
+  });
+  test('omits the per-person line for a solo traveler (it would just repeat the total)', () => {
+    const html = renderItineraryCostSummaryHtml(planData, 1, 'vi');
+    assert.match(html, /3,680/);
+    assert.doesNotMatch(html, /costPerPersonLabel|Chia đều/);
+  });
+  test('returns an empty string when the itinerary has no price data at all', () => {
+    const noPriceData = { days: [{ day: 1, activities: ['Naha Airport'] }] };
+    assert.equal(renderItineraryCostSummaryHtml(noPriceData, 3, 'vi'), '');
   });
 });
 
@@ -740,6 +833,20 @@ describe('generateCompromiseOptions', () => {
     assert.deepEqual(options.map(o => o.strategy), ['safest', 'balanced', 'delight']);
     assert.equal(options.find(o => o.picked).strategy, 'safest');
   });
+  test('estimates per-person and total cost from the venue price, null when unlisted', () => {
+    const priced = [
+      { name: 'Seafood House', cuisine: 'Hải sản', priceRange: '2000-3000 yên/người' },
+      { name: 'Generic Park' }
+    ];
+    const options = generateCompromiseOptions(priced, members, 'vi');
+    const seafood = options.find(o => o.name === 'Seafood House');
+    const park = options.find(o => o.name === 'Generic Park');
+    assert.equal(seafood.costPerPerson, 3000);
+    assert.equal(seafood.memberCount, 2);
+    assert.equal(seafood.totalCost, 6000);
+    assert.equal(park.costPerPerson, null);
+    assert.equal(park.totalCost, null);
+  });
 });
 
 describe('generateCompromiseOptions — avoiding the "nobody loves it" compromise', () => {
@@ -847,6 +954,15 @@ describe('Group Decision render functions', () => {
     const html = renderCompromiseOptionsHtml(options, 'vi', 'Generic Park');
     assert.equal((html.match(/opt-choose-btn chosen/g) || []).length, 1);
     assert.match(html, /data-opt-name="Generic Park"[^>]*>✓ Đã chọn/);
+  });
+  test('renderCompromiseOptionsHtml shows the estimated cost only for options with a listed price', () => {
+    const members = [{ name: 'A', pref: 'Hải sản' }, { name: 'C', pref: 'Ăn chay' }];
+    const candidates = [{ name: 'Seafood House', cuisine: 'Hải sản', priceRange: '2000-3000 yên/người' }, { name: 'Generic Park' }];
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    const html = renderCompromiseOptionsHtml(options, 'vi');
+    assert.equal((html.match(/opt-cost/g) || []).length, 1);
+    assert.match(html, /3,000 yên\/người/);
+    assert.match(html, /tổng ≈ 6,000 yên cho 2 người/);
   });
 });
 

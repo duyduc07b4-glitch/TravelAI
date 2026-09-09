@@ -43,7 +43,9 @@ const I18N = {
       plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.',
       unlimitedBudget: 'không giới hạn',
       soloTraveler: 'một mình',
-      close: 'Đóng'
+      close: 'Đóng',
+      yen: 'yên',
+      free: 'Miễn phí'
     },
     errors: {
       timeout: 'AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.',
@@ -67,8 +69,12 @@ const I18N = {
       runBtn: 'Tạo lịch trình',
       shareBtn: '📤 Chia sẻ',
       loading: 'Đang tạo lịch trình...',
-      systemPrompt: 'Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. QUAN TRỌNG VỀ SỐ NGÀY: mảng "days" PHẢI có ĐỦ và ĐÚNG số ngày người dùng yêu cầu — không được rút gọn hay chỉ trả về 1 ngày nếu người dùng yêu cầu nhiều ngày hơn. Đánh số "day" liên tục từ 1 đến hết số ngày được yêu cầu, mỗi ngày một phần tử riêng trong mảng. Nếu có danh sách "Sở thích riêng từng thành viên" bên dưới, hãy cố gắng chọn hoạt động cân bằng, phù hợp với nhiều người trong nhóm nhất có thể — có thể xen kẽ hoạt động ưu tiên từng người qua các ngày khác nhau, không dồn hết vào sở thích của một người. Mỗi hoạt động nên nêu tên địa điểm/quán cụ thể có thể tìm trên Google Maps (VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch"). Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt), không kèm text hay markdown code fence nào khác. Ví dụ schema cho chuyến 2 ngày (số phần tử trong "days" phải khớp đúng số ngày người dùng thực sự yêu cầu, không phải cố định theo ví dụ này):\n{"days":[{"day":1,"activities":["Naha Airport","Ăn trưa tại nhà hàng Yunangi","American Village","Sunset Beach","Ăn tối tại Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Ăn trưa gần đó","Cape Manzamo","Ăn tối hải sản"]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}',
-      userPrompt: (dest, days, startDate, budget, group, notes, members) => `Lên lịch trình du lịch ${dest}, bắt đầu từ ngày ${startDate || 'chưa xác định'}, ĐÚNG ${days} ngày — mảng "days" phải có đủ ${days} phần tử, đánh số day từ 1 đến ${days}, không được thiếu ngày nào. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Nếu ${startDate} là ngày du lịch cụ thể, hãy tính đến ngày nghỉ lễ, cuối tuần hoặc thời điểm đi để chọn hoạt động phù hợp. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực. Nhắc lại: PHẢI có đủ ${days} ngày trong kết quả.${(members && members.length) ? `\n\nSở thích riêng từng thành viên (hãy cân đối hoạt động để phù hợp với nhiều người nhất có thể, không chỉ ưu tiên một người):\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`
+      systemPrompt: 'Bạn là AI Travel Companion, trợ lý lập kế hoạch du lịch cá nhân hóa. QUAN TRỌNG VỀ SỐ NGÀY: mảng "days" PHẢI có ĐỦ và ĐÚNG số ngày người dùng yêu cầu — không được rút gọn hay chỉ trả về 1 ngày nếu người dùng yêu cầu nhiều ngày hơn. Đánh số "day" liên tục từ 1 đến hết số ngày được yêu cầu, mỗi ngày một phần tử riêng trong mảng. Nếu có danh sách "Sở thích riêng từng thành viên" bên dưới, hãy cố gắng chọn hoạt động cân bằng, phù hợp với nhiều người trong nhóm nhất có thể — có thể xen kẽ hoạt động ưu tiên từng người qua các ngày khác nhau, không dồn hết vào sở thích của một người. Mỗi hoạt động là 1 object gồm "text" (tên địa điểm/quán cụ thể có thể tìm trên Google Maps, VD: "Ăn trưa tại Yunangi Okinawan Cuisine" thay vì chỉ "Lunch") và "price" (số nguyên, ước tính chi phí trung bình MỖI NGƯỜI cho hoạt động đó tính bằng yên — vé vào cửa, tiền ăn...; ghi 0 nếu miễn phí hoặc không phát sinh chi phí như di chuyển/ngắm cảnh tự do). Đây chỉ là ước tính hợp lý dựa trên hiểu biết chung, không phải giá thật đã kiểm chứng. Bạn KHÔNG có dữ liệu thời gian thực nên KHÔNG được khẳng định giờ mở cửa, địa chỉ, số điện thoại, hay tình trạng giao thông/khoảng cách di chuyển thực tế của bất kỳ địa điểm nào — thứ tự hoạt động chỉ nên dựa trên suy luận hợp lý chung (VD: bãi biển buổi chiều, ngắm hoàng hôn cuối ngày), không khẳng định là tối ưu về đường đi hay đã kiểm tra kẹt xe thật. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt), không kèm text hay markdown code fence nào khác. Ví dụ schema cho chuyến 2 ngày (số phần tử trong "days" phải khớp đúng số ngày người dùng thực sự yêu cầu, không phải cố định theo ví dụ này):\n{"days":[{"day":1,"activities":[{"text":"Naha Airport","price":0},{"text":"Ăn trưa tại nhà hàng Yunangi","price":1500},{"text":"American Village","price":0},{"text":"Sunset Beach","price":0},{"text":"Ăn tối tại Steak House 88","price":3000}]},{"day":2,"activities":[{"text":"Churaumi Aquarium","price":2180},{"text":"Ăn trưa gần đó","price":1200},{"text":"Cape Manzamo","price":0},{"text":"Ăn tối hải sản","price":3500}]}],"summary":"1-2 câu tổng kết về chi phí ước tính và lưu ý chính, nhắc người dùng kiểm tra giờ mở cửa thật trước khi đi"}',
+      userPrompt: (dest, days, startDate, budget, group, notes, members) => `Lên lịch trình du lịch ${dest}, bắt đầu từ ngày ${startDate || 'chưa xác định'}, ĐÚNG ${days} ngày — mảng "days" phải có đủ ${days} phần tử, đánh số day từ 1 đến ${days}, không được thiếu ngày nào. Ngân sách: ${budget} yên. Nhóm: ${group}. ${notes ? 'Ghi chú: ' + notes : ''}\nSắp xếp hoạt động theo thứ tự hợp lý trong ngày (sáng/trưa/chiều/tối), phù hợp thời tiết chung của điểm đến, chi phí, và trải nghiệm phù hợp cả nhóm. Nếu ${startDate} là ngày du lịch cụ thể, hãy tính đến ngày nghỉ lễ, cuối tuần hoặc thời điểm đi để chọn hoạt động phù hợp. Không cần đảm bảo giờ mở cửa hay khoảng cách di chuyển chính xác vì bạn không có dữ liệu thời gian thực. Nhắc lại: PHẢI có đủ ${days} ngày trong kết quả.${(members && members.length) ? `\n\nSở thích riêng từng thành viên (hãy cân đối hoạt động để phù hợp với nhiều người nhất có thể, không chỉ ưu tiên một người):\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`,
+      costSummaryTitle: '💰 Chi phí ước tính',
+      costTotalLabel: 'Tổng cả chuyến',
+      costPerPersonLabel: (count) => `Chia đều cho ${count} người`,
+      costDisclaimer: 'Ước tính từ AI dựa trên hiểu biết chung, chưa phải giá thật đã kiểm chứng — chỉ để chuẩn bị chi phí, không tính vé máy bay/khách sạn.'
     },
     group: {
       title: 'Chấm điểm địa điểm cho cả nhóm',
@@ -126,6 +132,8 @@ const I18N = {
       chooseBtn: 'Chọn phương án này',
       chosenLabel: '✓ Đã chọn',
       needPlanFirst: 'Hãy tạo lịch trình ở tab "Lịch trình" trước khi dùng Quyết định nhóm.',
+      costPerPerson: (perPerson) => `≈ ${perPerson} yên/người`,
+      costTotal: (total, count) => `tổng ≈ ${total} yên cho ${count} người`,
       whyTitle: (name) => `🧾 Vì sao chọn "${name}"?`,
       reasonPrefMatch: (count, total) => `${count}/${total} thành viên có sở thích khớp với địa điểm này`,
       reasonBudget: (price) => `Mức giá: ${price}`,
@@ -391,7 +399,9 @@ const I18N = {
       plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ このAIはローカル動作でリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離はAIの一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。',
       unlimitedBudget: '無制限',
       soloTraveler: '一人旅',
-      close: '閉じる'
+      close: '閉じる',
+      yen: '円',
+      free: '無料'
     },
     errors: {
       timeout: 'AIが60秒以内に応答しませんでした — モデルの初回読み込みに時間がかかっているか、端末の負荷が高い可能性があります。再試行するか、より軽量なモデルに変更してください。',
@@ -415,8 +425,12 @@ const I18N = {
       runBtn: '旅程を作成',
       shareBtn: '📤 共有',
       loading: '旅程を作成中...',
-      systemPrompt: 'あなたはAI Travel Companion、パーソナライズされた旅行プランニングアシスタントです。日数について重要：「days」配列には、ユーザーが要求した日数と必ず同じ数の要素を含めてください — ユーザーが複数日を要求した場合に1日分だけ返すことは禁止です。「day」は要求された日数の分だけ1から連番で振ってください（配列の要素ごとに1日）。下に「メンバーごとの好み」の一覧がある場合は、できるだけ多くのメンバーに合うようバランス良くアクティビティを選んでください — 1人の好みだけに偏らせず、日ごとに優先するメンバーを変えても構いません。各アクティビティにはGoogleマップで検索できる具体的な店名・施設名を含めてください（例：「昼食はランチのみ」ではなく「Yunangi Okinawan Cuisineで昼食」）。あなたはリアルタイム情報を持たないため、営業時間・住所・電話番号・実際の交通状況や移動距離を断定してはいけません — アクティビティの順序は一般的な妥当性（例：午後はビーチ、1日の終わりに夕日鑑賞）に基づく推測に留め、経路が最適化されている、または渋滞を確認したとは主張しないでください。必ずJSONのみで回答し（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）、それ以外のテキストやMarkdownのコードフェンスは付けないでください。2日間の旅行のスキーマ例（「days」の要素数は必ずユーザーが実際に要求した日数に合わせること。この例の日数に固定しないこと）：\n{"days":[{"day":1,"activities":["那覇空港","Yunangi Okinawan Cuisineで昼食","American Village","サンセットビーチ","Steak House 88で夕食"]},{"day":2,"activities":["美ら海水族館","近くで昼食","万座毛","海鮮の夕食"]}],"summary":"概算費用と主な注意点についての1〜2文。出発前に実際の営業時間を確認するよう促すこと"}',
-      userPrompt: (dest, days, startDate, budget, group, notes, members) => `${dest}への旅行プランを作成してください。開始日は${startDate || '未指定'}、日数は必ず${days}日間 — 「days」配列には${days}個の要素を含め、dayは1から${days}まで振ってください。欠けている日があってはいけません。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n開始日${startDate || '未指定'}を踏まえて、連休・週末・祝日などの影響も考慮し、1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。念のため繰り返しますが、結果には必ず${days}日分すべてを含めてください。${(members && members.length) ? `\n\nメンバーごとの好み（できるだけ多くのメンバーに合うようバランス良く配置してください。1人だけに偏らないように）：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`
+      systemPrompt: 'あなたはAI Travel Companion、パーソナライズされた旅行プランニングアシスタントです。日数について重要：「days」配列には、ユーザーが要求した日数と必ず同じ数の要素を含めてください — ユーザーが複数日を要求した場合に1日分だけ返すことは禁止です。「day」は要求された日数の分だけ1から連番で振ってください（配列の要素ごとに1日）。下に「メンバーごとの好み」の一覧がある場合は、できるだけ多くのメンバーに合うようバランス良くアクティビティを選んでください — 1人の好みだけに偏らせず、日ごとに優先するメンバーを変えても構いません。各アクティビティは"text"（Googleマップで検索できる具体的な店名・施設名。例：「昼食はランチのみ」ではなく「Yunangi Okinawan Cuisineで昼食」）と"price"（整数。そのアクティビティの1人あたりの概算費用を円で — 入場料や食事代など。無料または移動・自由散策など費用が発生しない場合は0）を持つオブジェクトにしてください。これは一般的な知識に基づくおおよその目安であり、確認済みの実価格ではありません。あなたはリアルタイム情報を持たないため、営業時間・住所・電話番号・実際の交通状況や移動距離を断定してはいけません — アクティビティの順序は一般的な妥当性（例：午後はビーチ、1日の終わりに夕日鑑賞）に基づく推測に留め、経路が最適化されている、または渋滞を確認したとは主張しないでください。必ずJSONのみで回答し（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）、それ以外のテキストやMarkdownのコードフェンスは付けないでください。2日間の旅行のスキーマ例（「days」の要素数は必ずユーザーが実際に要求した日数に合わせること。この例の日数に固定しないこと）：\n{"days":[{"day":1,"activities":[{"text":"那覇空港","price":0},{"text":"Yunangi Okinawan Cuisineで昼食","price":1500},{"text":"American Village","price":0},{"text":"サンセットビーチ","price":0},{"text":"Steak House 88で夕食","price":3000}]},{"day":2,"activities":[{"text":"美ら海水族館","price":2180},{"text":"近くで昼食","price":1200},{"text":"万座毛","price":0},{"text":"海鮮の夕食","price":3500}]}],"summary":"概算費用と主な注意点についての1〜2文。出発前に実際の営業時間を確認するよう促すこと"}',
+      userPrompt: (dest, days, startDate, budget, group, notes, members) => `${dest}への旅行プランを作成してください。開始日は${startDate || '未指定'}、日数は必ず${days}日間 — 「days」配列には${days}個の要素を含め、dayは1から${days}まで振ってください。欠けている日があってはいけません。予算：${budget}円。メンバー：${group}。${notes ? '補足：' + notes : ''}\n開始日${startDate || '未指定'}を踏まえて、連休・週末・祝日などの影響も考慮し、1日の中で時間帯（朝/昼/午後/夜）ごとに妥当な順序でアクティビティを配置し、目的地の一般的な気候、費用、グループ全員に合う体験を考慮してください。リアルタイム情報がないため、営業時間や正確な移動距離は保証しなくて構いません。念のため繰り返しますが、結果には必ず${days}日分すべてを含めてください。${(members && members.length) ? `\n\nメンバーごとの好み（できるだけ多くのメンバーに合うようバランス良く配置してください。1人だけに偏らないように）：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`,
+      costSummaryTitle: '💰 概算費用',
+      costTotalLabel: '旅行全体の合計',
+      costPerPersonLabel: (count) => `${count}人で均等割り`,
+      costDisclaimer: '一般的な知識に基づくAIの概算であり、確認済みの実価格ではありません — 予算準備の目安として。航空券・宿泊費は含みません。'
     },
     group: {
       title: 'グループ全員向けにスポットを採点',
@@ -474,6 +488,8 @@ const I18N = {
       chooseBtn: 'このオプションを選ぶ',
       chosenLabel: '✓ 選択済み',
       needPlanFirst: 'グループ決定を使う前に、「旅程」タブで旅程を作成してください。',
+      costPerPerson: (perPerson) => `≈ ${perPerson}円/人`,
+      costTotal: (total, count) => `合計 ≈ ${total}円（${count}人分）`,
       whyTitle: (name) => `🧾 なぜ「${name}」を選んだのか？`,
       reasonPrefMatch: (count, total) => `${total}人中${count}人の好みがこのスポットと一致`,
       reasonBudget: (price) => `価格帯：${price}`,
@@ -739,7 +755,9 @@ const I18N = {
       plannerDisclaimer: '📍 Click "View map" to see the real address, opening hours, and phone number (if listed). ⚠️ This AI runs locally with no real-time data, so it <strong>cannot confirm whether a place is actually open at that time</strong>, and the ordering/distance between stops is just the AI\'s general guess — <strong>not based on real traffic or map data</strong>. Always double-check on Maps before you go.',
       unlimitedBudget: 'unlimited',
       soloTraveler: 'solo',
-      close: 'Close'
+      close: 'Close',
+      yen: 'JPY',
+      free: 'Free'
     },
     errors: {
       timeout: "The AI didn't respond within 60 seconds — the model might be loading for the first time (slower than usual), or the machine is under heavy load. Try again, or switch to a lighter model.",
@@ -763,8 +781,12 @@ const I18N = {
       runBtn: 'Create itinerary',
       shareBtn: '📤 Share',
       loading: 'Creating itinerary...',
-      systemPrompt: 'You are AI Travel Companion, a personalized trip-planning assistant. IMPORTANT ABOUT DAY COUNT: the "days" array MUST contain exactly as many elements as the number of days the user asked for — never collapse a multi-day trip down to just 1 day. Number "day" consecutively from 1 through the requested number of days, one array element per day. If a "Per-member preferences" list is given below, try to balance activities across as many members as possible — you can favor a different member on different days rather than optimizing for just one person. Every activity should name a specific place/venue that can be looked up on Google Maps (e.g. "Lunch at Yunangi Okinawan Cuisine" instead of just "Lunch"). You have NO real-time data, so you must NOT assert opening hours, addresses, phone numbers, or real traffic conditions/travel distances for any place — the order of activities should only reflect general reasonable judgment (e.g. beach in the afternoon, sunset viewing at the end of the day), and you must not claim the route is optimized or that you checked real traffic. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English), with no other text or markdown code fences. Example schema for a 2-day trip (the number of elements in "days" must match whatever number of days the user actually asked for, not this example\'s count):\n{"days":[{"day":1,"activities":["Naha Airport","Lunch at Yunangi Okinawan Cuisine","American Village","Sunset Beach","Dinner at Steak House 88"]},{"day":2,"activities":["Churaumi Aquarium","Lunch nearby","Cape Manzamo","Seafood dinner"]}],"summary":"1-2 sentences summarizing estimated cost and key notes, reminding the user to verify real opening hours before going"}',
-      userPrompt: (dest, days, startDate, budget, group, notes, members) => `Plan a trip to ${dest} starting on ${startDate || 'an unspecified date'} for EXACTLY ${days} days — the "days" array must contain ${days} elements, numbered day 1 through ${days}, with no day missing. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nConsider holidays, weekends, and the time of year represented by ${startDate || 'the chosen trip start date'} when ordering activities through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and group-friendly experiences. Since you do not have real-time data, you do not need to guarantee opening hours or exact travel distances. To be clear: the result must include all ${days} days.${(members && members.length) ? `\n\nPer-member preferences (balance activities to fit as many members as possible, don't optimize for just one person):\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`
+      systemPrompt: 'You are AI Travel Companion, a personalized trip-planning assistant. IMPORTANT ABOUT DAY COUNT: the "days" array MUST contain exactly as many elements as the number of days the user asked for — never collapse a multi-day trip down to just 1 day. Number "day" consecutively from 1 through the requested number of days, one array element per day. If a "Per-member preferences" list is given below, try to balance activities across as many members as possible — you can favor a different member on different days rather than optimizing for just one person. Every activity should be an object with "text" (a specific place/venue that can be looked up on Google Maps, e.g. "Lunch at Yunangi Okinawan Cuisine" instead of just "Lunch") and "price" (an integer — the rough per-person cost of that activity in JPY: entry ticket, meal, etc.; use 0 if it is free or has no cost, like travel between stops or free sightseeing). This is only a reasonable estimate from general knowledge, not a verified real price. You have NO real-time data, so you must NOT assert opening hours, addresses, phone numbers, or real traffic conditions/travel distances for any place — the order of activities should only reflect general reasonable judgment (e.g. beach in the afternoon, sunset viewing at the end of the day), and you must not claim the route is optimized or that you checked real traffic. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English), with no other text or markdown code fences. Example schema for a 2-day trip (the number of elements in "days" must match whatever number of days the user actually asked for, not this example\'s count):\n{"days":[{"day":1,"activities":[{"text":"Naha Airport","price":0},{"text":"Lunch at Yunangi Okinawan Cuisine","price":1500},{"text":"American Village","price":0},{"text":"Sunset Beach","price":0},{"text":"Dinner at Steak House 88","price":3000}]},{"day":2,"activities":[{"text":"Churaumi Aquarium","price":2180},{"text":"Lunch nearby","price":1200},{"text":"Cape Manzamo","price":0},{"text":"Seafood dinner","price":3500}]}],"summary":"1-2 sentences summarizing estimated cost and key notes, reminding the user to verify real opening hours before going"}',
+      userPrompt: (dest, days, startDate, budget, group, notes, members) => `Plan a trip to ${dest} starting on ${startDate || 'an unspecified date'} for EXACTLY ${days} days — the "days" array must contain ${days} elements, numbered day 1 through ${days}, with no day missing. Budget: ${budget} JPY. Group: ${group}. ${notes ? 'Notes: ' + notes : ''}\nConsider holidays, weekends, and the time of year represented by ${startDate || 'the chosen trip start date'} when ordering activities through the day (morning/midday/afternoon/evening), fitting the destination's general climate, cost, and group-friendly experiences. Since you do not have real-time data, you do not need to guarantee opening hours or exact travel distances. To be clear: the result must include all ${days} days.${(members && members.length) ? `\n\nPer-member preferences (balance activities to fit as many members as possible, don't optimize for just one person):\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}` : ''}`,
+      costSummaryTitle: '💰 Estimated cost',
+      costTotalLabel: 'Total for the trip',
+      costPerPersonLabel: (count) => `Split evenly across ${count} people`,
+      costDisclaimer: "AI estimate from general knowledge, not a verified real price — just to help you prepare a budget. Doesn't include flights or accommodation."
     },
     group: {
       title: 'Score a place for the whole group',
@@ -822,6 +844,8 @@ const I18N = {
       chooseBtn: 'Choose this option',
       chosenLabel: '✓ Chosen',
       needPlanFirst: 'Build an itinerary on the "Itinerary" tab before using Group Decision.',
+      costPerPerson: (perPerson) => `≈ ¥${perPerson}/person`,
+      costTotal: (total, count) => `≈ ¥${total} total for ${count} people`,
       whyTitle: (name) => `🧾 Why "${name}"?`,
       reasonPrefMatch: (count, total) => `${count} of ${total} members' preferences match this place`,
       reasonBudget: (price) => `Price range: ${price}`,
@@ -1445,6 +1469,40 @@ function plannerActivitySlot(activity) {
   return normalizeTimeSlot(activity.slot);
 }
 
+/** Per-person cost estimate (yen) the planner LLM attached to one activity — null for a plain-string activity (older/self-healed data, or a model that ignored the price field) rather than a false 0. */
+function plannerActivityPrice(activity) {
+  if (!activity || typeof activity !== 'object') return null;
+  const n = Number(activity.price);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+}
+
+/** Sums every activity's price estimate across the whole itinerary. `hasData` is false when nothing carried a price at all (older data, or a model that skipped the field) — callers use it to hide the cost summary instead of showing a misleading "0 yên". */
+function sumItineraryCost(planData) {
+  let total = 0;
+  let hasData = false;
+  (planData && planData.days || []).forEach(day => {
+    (day && day.activities || []).forEach(activity => {
+      const price = plannerActivityPrice(activity);
+      if (price != null) { total += price; hasData = true; }
+    });
+  });
+  return { total, hasData };
+}
+
+/** Renders the trip's total estimated cost, and — once there's more than 1 traveler — the even per-person split so the group can prepare their budget. Returns '' when the itinerary carries no price data at all. */
+function renderItineraryCostSummaryHtml(planData, memberCount, lang) {
+  const { total, hasData } = sumItineraryCost(planData);
+  if (!hasData) return '';
+  const count = Math.max(1, Number(memberCount) || 1);
+  let html = `<div class="cost-summary"><div class="cost-summary-title">${escapeHtml(tr(lang, 'planner.costSummaryTitle'))}</div>`;
+  html += `<div class="cost-summary-row"><span>${escapeHtml(tr(lang, 'planner.costTotalLabel'))}</span><strong>${formatYen(total)}</strong></div>`;
+  if (count > 1) {
+    html += `<div class="cost-summary-row"><span>${escapeHtml(tr(lang, 'planner.costPerPersonLabel', count))}</span><strong>${formatYen(Math.round(total / count))}</strong></div>`;
+  }
+  html += `<p class="cost-summary-note">${escapeHtml(tr(lang, 'planner.costDisclaimer'))}</p></div>`;
+  return html;
+}
+
 function renderPlannerHtml(data, dest, lang, requestedDays) {
   let dayHtml = '';
   let renderedDays = 0;
@@ -1455,7 +1513,9 @@ function renderPlannerHtml(data, dest, lang, requestedDays) {
       if (!text) return '';
       const slot = plannerActivitySlot(activity);
       const slotHtml = slot ? `<span class="slot-badge">${escapeHtml(formatSlotLabel(slot, lang))}</span>` : '';
-      return `<li>${slotHtml}${escapeHtml(text)} ${mapLink(text, dest, lang)}${venueWarning(text, lang)}</li>`;
+      const price = plannerActivityPrice(activity);
+      const priceHtml = price != null ? `<span class="activity-price">${price > 0 ? formatYen(price) + ' ' + tr(lang, 'common.yen') : tr(lang, 'common.free')}</span>` : '';
+      return `<li>${slotHtml}${escapeHtml(text)}${priceHtml} ${mapLink(text, dest, lang)}${venueWarning(text, lang)}</li>`;
     }).filter(Boolean);
     if (!entries.length) return;
     renderedDays++;
@@ -1558,6 +1618,17 @@ function parsePriceYen(value) {
   const nums = String(value || '').match(/\d[\d,]*/g);
   if (!nums) return null;
   return Math.max(...nums.map(n => parseInt(n.replace(/,/g, ''), 10)));
+}
+
+/** Comma-groups a number for display ("1,234") without depending on the runtime's locale (Intl/toLocaleString output isn't guaranteed the same across environments). */
+function formatYen(n) {
+  if (n == null || !Number.isFinite(n)) return '';
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
+/** Rough per-person cost (yen) for a knowledge entry, from its priceRange ("2000-3000 yên/người") or ticketPrice field — both already per-person in this app's data. Takes the high end of a range so it helps a group over-prepare rather than under-budget. Null when the entry has no parseable price (free entry, or price not listed). */
+function estimateEntryCostPerPerson(entry) {
+  return parsePriceYen(entry && (entry.priceRange || entry.ticketPrice));
 }
 
 /** Scores one knowledge entry (restaurant/attraction) against one member's tags. Returns {score 0-100, reasons[]}. */
@@ -1677,12 +1748,14 @@ function generateCompromiseOptions(candidates, members, lang) {
   ];
   const labels = ['A', 'B', 'C'];
   const used = new Set();
+  const memberCount = (members || []).filter(m => m && m.name).length || 1;
 
   const count = Math.min(3, named.length);
   return strategies.slice(0, count).map((strat, i) => {
     const ranked = [...scored].sort(strat.sort);
     const s = ranked.find(c => !used.has(c.entry.name)) || ranked[0];
     used.add(s.entry.name);
+    const costPerPerson = estimateEntryCostPerPerson(s.entry);
     return {
       label: labels[i],
       strategy: strat.key,
@@ -1693,7 +1766,11 @@ function generateCompromiseOptions(candidates, members, lang) {
       best: s.group.highest,
       worst: s.group.lowest,
       bland: s.maxScore < COMPROMISE_DELIGHT_THRESHOLD,
-      picked: strat.key === 'safest'
+      picked: strat.key === 'safest',
+      // Chuẩn bị chi phí (F: cost transparency) — null when the venue's price isn't listed.
+      costPerPerson,
+      totalCost: costPerPerson != null ? costPerPerson * memberCount : null,
+      memberCount
     };
   });
 }
@@ -1760,6 +1837,7 @@ function renderCompromiseOptionsHtml(options, lang, chosenName) {
         <span class="opt-score">${o.overall}%</span>
       </div>
       <div class="opt-name">${escapeHtml(o.name)}</div>
+      ${o.costPerPerson != null ? `<div class="opt-cost">💰 ${escapeHtml(tr(lang, 'group.costPerPerson', formatYen(o.costPerPerson)))}${o.memberCount > 1 ? ' · ' + escapeHtml(tr(lang, 'group.costTotal', formatYen(o.totalCost), o.memberCount)) : ''}</div>` : ''}
       <div class="opt-prosandcons">
         ${o.best ? `<span class="opt-pro">+ ${escapeHtml(tr(lang, 'group.optionPro', o.best.name, o.best.score))}</span>` : ''}
         ${o.worst ? `<span class="opt-con">− ${escapeHtml(tr(lang, 'group.optionCon', o.worst.name, o.worst.score))}</span>` : ''}
@@ -2726,6 +2804,8 @@ const AppCore = {
   buildForecastEventFromDaily,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
+  plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
+  formatYen, estimateEntryCostPerPerson,
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
   detectPreferenceConflicts, generateCompromiseOptions, buildReasoningReceipt, pickPrimaryKnowledgeEntry,
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
@@ -3400,6 +3480,7 @@ function initApp() {
   const pShare = document.getElementById('p-share');
   const pShareFeedback = document.getElementById('p-shareFeedback');
   const pSatisfaction = document.getElementById('p-satisfaction');
+  const pCostSummary = document.getElementById('p-costSummary');
   const pInvite = document.getElementById('p-invite');
   const pInviteList = document.getElementById('p-invite-list');
   const pInviteSendBtn = document.getElementById('p-invite-send');
@@ -3453,6 +3534,15 @@ function initApp() {
   /** Re-scores the last generated itinerary against whatever the group members currently say — instant, no re-plan needed, mirroring refreshGroupDecisionLive(). */
   function refreshPlannerSatisfactionLive() {
     renderPlannerSatisfaction(currentMembers(), flattenActivities(tripState.plannerData));
+  }
+
+  /** Total estimated cost + even per-person split for the actual generated itinerary — from the price the planner LLM attached to each activity, not a new AI call. */
+  function renderPlannerCostSummary(planData, memberCount) {
+    if (pCostSummary) pCostSummary.innerHTML = renderItineraryCostSummaryHtml(planData, memberCount, currentLang);
+  }
+  /** Re-splits the last generated itinerary's cost across however many members there are right now — instant, mirroring refreshPlannerSatisfactionLive(). */
+  function refreshPlannerCostSummaryLive() {
+    renderPlannerCostSummary(tripState.plannerData, currentMembers().length);
   }
 
   function updatePlannerShareState(data, dest) {
@@ -3538,7 +3628,9 @@ function initApp() {
       if (!day || !Array.isArray(day.activities)) return;
       const dayNumber = Number(day.day) || (idx + 1); // Number(...) first: the AI-generated JSON sometimes has "day" as a numeric string, which would break the strict-equality day match in replacePlaceInItinerary otherwise.
       day.activities.forEach(activity => {
-        const text = String(activity || '').trim();
+        // plannerActivityText, not a bare String(activity) — the planner LLM now returns each
+        // activity as an object ({text, price}), which would otherwise stringify to "[object Object]".
+        const text = plannerActivityText(activity);
         if (!text || isGenericPlaceholderActivity(text)) return;
         const key = `${dayNumber}::${text.toLowerCase()}`;
         if (seen.has(key)) return;
@@ -3691,6 +3783,7 @@ function initApp() {
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
       renderPlannerSatisfaction(members, flattenActivities(data));
+      renderPlannerCostSummary(data, members.length);
       const innerHtml = `${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
       pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
       updatePlannerShareState(data, dest);
@@ -3779,6 +3872,7 @@ function initApp() {
   /** Re-runs the deterministic Group Decision engine against the last RAG candidates — no LLM call, so this is instant. Lets a member's preference change re-score live without re-fetching anything. Also re-scores the already-generated itinerary in the Planner tab, since both read the same member list. */
   function refreshGroupDecisionLive() {
     refreshPlannerSatisfactionLive();
+    refreshPlannerCostSummaryLive();
     if (!lastRagCandidates.length) return;
     renderGroupDecision(lastRagCandidates, gPlace.value.trim(), currentMembers());
   }
@@ -4181,7 +4275,8 @@ function initApp() {
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
       const satisfactionHtml = computePlannerSatisfactionHtml(members, flattenActivities(data));
-      const innerHtml = `${satisfactionHtml}${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
+      const costSummaryHtml = renderItineraryCostSummaryHtml(data, members.length, currentLang);
+      const innerHtml = `${satisfactionHtml}${costSummaryHtml}${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
       vItinResult.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
 
       // Mirror into the Itinerary tab too, so it's there to review/edit/share, not stranded in the chat
@@ -4189,6 +4284,7 @@ function initApp() {
       // defaults), so the Itinerary tab's fields always match what's actually in the rendered plan.
       pDest.value = dest; pDays.value = days; pStart.value = startDate; pBudget.value = finalSlots.budget; pGroup.value = finalSlots.group; pNotes.value = notes;
       renderPlannerSatisfaction(members, flattenActivities(data));
+      renderPlannerCostSummary(data, members.length);
       const plannerInnerHtml = `${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
       pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(plannerInnerHtml)}</div>`;
       updatePlannerShareState(data, dest);
@@ -4603,6 +4699,7 @@ function initApp() {
   // Members restore (TAB 2) runs before this line, so this picks up any cached itinerary
   // (TAB 1's own restore ran earlier, before members existed yet) with the correct group.
   refreshPlannerSatisfactionLive();
+  refreshPlannerCostSummaryLive();
   // Locks/unlocks Group Decision based on whether an itinerary exists — already set as a side
   // effect of updateTripStateFromPlannerData() when there IS one; this covers the fresh-session
   // case where that function is never called at all.
