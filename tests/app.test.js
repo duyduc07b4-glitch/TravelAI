@@ -5,6 +5,7 @@ const {
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   formatYen, estimateEntryCostPerPerson, plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
+  looksLikeFoodOrDrinkActivity, correctedActivityPrice,
   classifyIncident, buildSelfHealingPlan,
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
   detectPreferenceConflicts, generateCompromiseOptions, pickPrimaryKnowledgeEntry, buildReasoningReceipt,
@@ -275,6 +276,14 @@ describe('renderPlannerHtml', () => {
     const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Naha Airport'] }] }, 'Okinawa', 'vi');
     assert.doesNotMatch(html, /activity-price/);
   });
+  test('shows a corrected "~" price for a food/drink activity the AI marked free', () => {
+    const html = renderPlannerHtml({
+      days: [{ day: 1, activities: [{ text: 'Tiếng vang tại Orion Beer Hall', price: 0 }] }]
+    }, 'Okinawa', 'vi');
+    assert.match(html, /activity-price inferred/);
+    assert.match(html, /~800 yên/);
+    assert.doesNotMatch(html, /Miễn phí/);
+  });
 });
 
 describe('formatYen', () => {
@@ -317,6 +326,42 @@ describe('plannerActivityPrice', () => {
   });
 });
 
+describe('looksLikeFoodOrDrinkActivity', () => {
+  test('recognizes meals and named restaurants/bars in Vietnamese, Japanese, and English', () => {
+    assert.equal(looksLikeFoodOrDrinkActivity('Ăn sáng tại nhà hàng Okinawan'), true);
+    assert.equal(looksLikeFoodOrDrinkActivity('Tiếng vang tại Orion Beer Hall'), true); // regression case: a real bug report
+    assert.equal(looksLikeFoodOrDrinkActivity('Lunch at Yunangi Okinawan Cuisine'), true);
+    assert.equal(looksLikeFoodOrDrinkActivity('那覇空港でランチ'), true);
+  });
+  test('does not flag non-food activities', () => {
+    assert.equal(looksLikeFoodOrDrinkActivity('Sunset Beach'), false);
+    assert.equal(looksLikeFoodOrDrinkActivity('Naha Airport'), false);
+    assert.equal(looksLikeFoodOrDrinkActivity(''), false);
+  });
+});
+
+describe('correctedActivityPrice', () => {
+  test('substitutes a floor price when a food/drink activity was marked free', () => {
+    const result = correctedActivityPrice({ text: 'Tiếng vang tại Orion Beer Hall', price: 0 });
+    assert.equal(result.price, 800);
+    assert.equal(result.inferred, true);
+  });
+  test('leaves a genuinely free non-food activity untouched', () => {
+    const result = correctedActivityPrice({ text: 'Sunset Beach', price: 0 });
+    assert.equal(result.price, 0);
+    assert.equal(result.inferred, false);
+  });
+  test('leaves a real non-zero price untouched, food or not', () => {
+    const result = correctedActivityPrice({ text: 'Lunch at Yunangi', price: 1500 });
+    assert.equal(result.price, 1500);
+    assert.equal(result.inferred, false);
+  });
+  test('passes through a plain-string or unpriced activity as null (no data to correct)', () => {
+    assert.deepEqual(correctedActivityPrice('Naha Airport'), { price: null, inferred: false });
+    assert.deepEqual(correctedActivityPrice({ text: 'Ăn trưa' }), { price: null, inferred: false });
+  });
+});
+
 describe('sumItineraryCost', () => {
   test('sums every priced activity across all days', () => {
     const planData = {
@@ -326,6 +371,13 @@ describe('sumItineraryCost', () => {
       ]
     };
     assert.deepEqual(sumItineraryCost(planData), { total: 3500, hasData: true });
+  });
+  test('applies the food-floor correction when totaling, not just when displaying', () => {
+    // Regression case: this exact scenario made a real 2-day Naha trip look implausibly cheap.
+    const planData = {
+      days: [{ day: 1, activities: [{ text: 'Ăn sáng tại nhà hàng Okinawan', price: 0 }, { text: 'Tiếng vang tại Orion Beer Hall', price: 0 }, { text: 'Sunset Beach', price: 0 }] }]
+    };
+    assert.deepEqual(sumItineraryCost(planData), { total: 1600, hasData: true }); // 800 + 800 + 0 (beach genuinely free)
   });
   test('reports hasData: false when nothing in the itinerary carries a price at all', () => {
     const planData = { days: [{ day: 1, activities: ['Naha Airport', 'Lunch'] }] };
