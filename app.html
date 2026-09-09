@@ -61,6 +61,17 @@
   </div>
 </div>
 
+<!-- Lịch sử lịch trình đã tạo, riêng cho từng tài khoản đăng nhập -->
+<div class="login-overlay" id="history-panel" style="display:none;">
+  <div class="login-card invites-card">
+    <div class="invites-head">
+      <div class="login-brand" data-i18n="history.panelTitle"></div>
+      <button type="button" class="secondary small" id="history-close" data-i18n="common.close"></button>
+    </div>
+    <div id="history-panel-list"></div>
+  </div>
+</div>
+
 <div class="hero-banner">
   <div class="hero-copy">
     <div class="eyebrow">Okinawa island planner</div>
@@ -120,6 +131,7 @@
       </div>
       <button id="p-run" data-i18n="planner.runBtn"></button>
       <button id="p-share" class="secondary" style="display:none;" data-i18n="planner.shareBtn"></button>
+      <button id="p-history-btn" class="secondary" style="display:none;" data-i18n="history.openBtn"></button>
       <div class="hint" id="p-shareFeedback"></div>
       <div class="group-decision" id="p-satisfaction"></div>
       <div id="p-costSummary"></div>

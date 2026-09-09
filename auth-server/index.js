@@ -45,7 +45,7 @@ function requireAdmin(req, res, next) {
 
 app.get('/health', (req, res) => {
   const data = loadData();
-  res.json({ ok: true, users: data.users.length, invites: data.invites.length });
+  res.json({ ok: true, users: data.users.length, invites: data.invites.length, history: data.history.length });
 });
 
 app.post('/login', (req, res) => {
@@ -161,6 +161,50 @@ app.delete('/invites/:id', requireAuth, (req, res) => {
   if (!invite) return res.status(404).json({ error: 'Không tìm thấy lời mời' });
   if (invite.toUsername !== req.user.username) return res.status(403).json({ error: 'Không phải lời mời của bạn' });
   data.invites = data.invites.filter((i) => i.id !== req.params.id);
+  saveData(data);
+  res.json({ ok: true });
+});
+
+// ---------- Lịch sử lịch trình (mỗi tài khoản chỉ thấy của chính mình) ----------
+// Số lượng lịch trình lưu tối đa cho mỗi user — cắt bớt bản cũ nhất khi vượt quá, để file dữ liệu
+// không phình to vô hạn nếu ai đó bấm "Tạo lịch trình" rất nhiều lần.
+const MAX_HISTORY_PER_USER = 30;
+
+app.post('/history', requireAuth, (req, res) => {
+  const { trip } = req.body || {};
+  if (!trip || typeof trip !== 'object') return res.status(400).json({ error: 'Thiếu "trip"' });
+  const data = req.data;
+  const entry = {
+    id: crypto.randomBytes(8).toString('hex'),
+    username: req.user.username,
+    trip,
+    createdAt: new Date().toISOString()
+  };
+  data.history.push(entry);
+  // Giữ lại MAX_HISTORY_PER_USER bản gần nhất của riêng user này — không đụng tới lịch sử của
+  // người khác trong cùng file.
+  const mine = data.history.filter((h) => h.username === req.user.username);
+  if (mine.length > MAX_HISTORY_PER_USER) {
+    const toDropIds = new Set(
+      mine.sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1)).slice(0, mine.length - MAX_HISTORY_PER_USER).map((h) => h.id)
+    );
+    data.history = data.history.filter((h) => !toDropIds.has(h.id));
+  }
+  saveData(data);
+  res.status(201).json({ entry });
+});
+
+app.get('/history', requireAuth, (req, res) => {
+  const mine = req.data.history.filter((h) => h.username === req.user.username);
+  res.json({ history: mine.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1)) });
+});
+
+app.delete('/history/:id', requireAuth, (req, res) => {
+  const data = req.data;
+  const entry = data.history.find((h) => h.id === req.params.id);
+  if (!entry) return res.status(404).json({ error: 'Không tìm thấy lịch trình' });
+  if (entry.username !== req.user.username) return res.status(403).json({ error: 'Không phải lịch trình của bạn' });
+  data.history = data.history.filter((h) => h.id !== req.params.id);
   saveData(data);
   res.json({ ok: true });
 });

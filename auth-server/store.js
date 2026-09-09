@@ -29,7 +29,8 @@ function verifyPassword(password, stored) {
 function seedData() {
   return {
     users: SEED_USERS.map((u) => ({ username: u.username, role: u.role, passwordHash: hashPassword(SEED_PASSWORD) })),
-    invites: []
+    invites: [],
+    history: []
   };
 }
 
@@ -43,6 +44,7 @@ function loadData() {
     const raw = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
     if (!Array.isArray(raw.users)) raw.users = seedData().users;
     if (!Array.isArray(raw.invites)) raw.invites = [];
+    if (!Array.isArray(raw.history)) raw.history = [];
     return raw;
   } catch (e) {
     // File hỏng/không đọc được — seed lại thay vì crash cả server.

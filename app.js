@@ -22,6 +22,7 @@ const I18N = {
     },
     tabs: { planner: '🗺️ Lịch trình', group: '👥 Quyết định nhóm', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Vì sao TravelAI' },
     common: {
+      loadingGeneric: 'Đang tải...',
       mapLink: '📍 Xem bản đồ',
       dayRouteLink: '🗺️ Xem lộ trình cả ngày',
       venueWarning: '⚠️ chưa xác minh giờ mở cửa',
@@ -337,6 +338,17 @@ const I18N = {
       loadError: 'Không tải được lời mời — kiểm tra auth server đã chạy chưa.',
       usedSuccess: '✅ Đã áp dụng lịch trình từ lời mời vào tab Lịch trình.'
     },
+    history: {
+      openBtn: '📜 Lịch sử',
+      panelTitle: '📜 Lịch sử lịch trình của bạn',
+      empty: 'Chưa có lịch trình nào được lưu. Mỗi lần bạn tạo lịch trình (khi đã đăng nhập), nó sẽ tự động lưu vào đây.',
+      tripLine: (dest, days) => `${dest} — ${days} ngày`,
+      savedAt: (when) => `Tạo lúc: ${when}`,
+      useBtn: 'Dùng lại để chỉnh sửa',
+      deleteBtn: 'Xoá',
+      loadError: 'Không tải được lịch sử — kiểm tra auth server đã chạy chưa.',
+      usedSuccess: '✅ Đã tải lại lịch trình từ lịch sử vào tab Lịch trình.'
+    },
     risk: {
       title: '🚦 Kiểm tra rủi ro chuyến đi',
       level: { low: 'Thấp', medium: 'Vừa', high: 'Cao' },
@@ -376,6 +388,7 @@ const I18N = {
     },
     tabs: { planner: '🗺️ 旅程', group: '👥 グループ決定', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラAI', diff: '🆚 TravelAIの違い' },
     common: {
+      loadingGeneric: '読み込み中...',
       mapLink: '📍 地図を見る',
       dayRouteLink: '🗺️ 1日のルートを見る',
       venueWarning: '⚠️ 営業時間未確認',
@@ -691,6 +704,17 @@ const I18N = {
       loadError: '招待を取得できません — auth server が起動しているか確認してください。',
       usedSuccess: '✅ 招待の旅程を「旅程」タブに反映しました。'
     },
+    history: {
+      openBtn: '📜 履歴',
+      panelTitle: '📜 あなたの旅程履歴',
+      empty: 'まだ保存された旅程がありません。ログイン中に旅程を作成すると、自動的にここに保存されます。',
+      tripLine: (dest, days) => `${dest} — ${days}日間`,
+      savedAt: (when) => `作成日時：${when}`,
+      useBtn: '再利用して編集',
+      deleteBtn: '削除',
+      loadError: '履歴を読み込めませんでした — 認証サーバーが起動しているか確認してください。',
+      usedSuccess: '✅ 履歴の旅程を「旅程」タブに反映しました。'
+    },
     risk: {
       title: '🚦 旅程のリスクチェック',
       level: { low: '低い', medium: '中程度', high: '高い' },
@@ -730,6 +754,7 @@ const I18N = {
     },
     tabs: { planner: '🗺️ Itinerary', group: '👥 Group Decision', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Why TravelAI' },
     common: {
+      loadingGeneric: 'Loading...',
       mapLink: '📍 View map',
       dayRouteLink: '🗺️ View full-day route',
       venueWarning: '⚠️ hours not verified',
@@ -1044,6 +1069,17 @@ const I18N = {
       dismissBtn: 'Dismiss',
       loadError: "Couldn't load invites — check that the auth server is running.",
       usedSuccess: '✅ Applied the itinerary from that invite to the Itinerary tab.'
+    },
+    history: {
+      openBtn: '📜 History',
+      panelTitle: '📜 Your trip history',
+      empty: 'No saved trips yet. Every itinerary you generate while logged in is saved here automatically.',
+      tripLine: (dest, days) => `${dest} — ${days} days`,
+      savedAt: (when) => `Created: ${when}`,
+      useBtn: 'Reuse to edit',
+      deleteBtn: 'Delete',
+      loadError: "Couldn't load history — check that the auth server is running.",
+      usedSuccess: '✅ Applied that itinerary from history to the Itinerary tab.'
     },
     risk: {
       title: '🚦 Travel risk check',
@@ -3345,11 +3381,20 @@ function initApp() {
       refreshInvitesBadge();
       unlockLastPlannerResult();
       updateTabLockUI();
+      // History is per-account (see the "Trip history" section) — looked up fresh via
+      // getElementById, not a closed-over const, since applyAuthUI() can run (via the
+      // session-expiry path) before that section of initApp() has executed yet.
+      const historyBtnEl = document.getElementById('p-history-btn');
+      if (historyBtnEl) historyBtnEl.style.display = '';
     } else {
       userInfoEl.style.display = 'none';
       headerLoginBtn.style.display = '';
       adminTabBtn.style.display = 'none';
       invitesPanel.style.display = 'none';
+      const historyPanelEl = document.getElementById('history-panel');
+      if (historyPanelEl) historyPanelEl.style.display = 'none';
+      const historyBtnEl = document.getElementById('p-history-btn');
+      if (historyBtnEl) historyBtnEl.style.display = 'none';
       updateTabLockUI();
       // Logging out relocks every tab past Lịch trình — bounce back to it if one of those was open,
       // same as the admin-panel redirect above, rather than leaving a now-locked panel on screen.
@@ -3459,9 +3504,15 @@ function initApp() {
   });
   invitesCloseBtn.addEventListener('click', () => { invitesPanel.style.display = 'none'; });
 
-  /** Loads an invited itinerary straight into the Itinerary tab — looked up fresh via getElementById (not closed-over consts) since this can be triggered before TAB 1's own script section has necessarily run, same TDZ concern as elsewhere in this file. */
-  function applyInviteToPlanner(invite) {
-    const trip = invite.trip || {};
+  /**
+   * Loads a saved trip {destination, days, startDate, budget, group, notes, data} straight into
+   * the Itinerary tab — shared by "use this invited itinerary" and "reuse from history" (both hand
+   * this exactly the same trip shape). Looked up fresh via getElementById (not closed-over consts)
+   * since this can be triggered before TAB 1's own script section has necessarily run, same TDZ
+   * concern as elsewhere in this file.
+   */
+  function applyTripToPlanner(trip, successMessage) {
+    trip = trip || {};
     const dest = trip.destination || '';
     const days = trip.days || '';
     const fields = { 'p-dest': dest, 'p-days': days, 'p-start': trip.startDate || '', 'p-budget': trip.budget || '', 'p-group': trip.group || '', 'p-notes': trip.notes || '' };
@@ -3481,7 +3532,7 @@ function initApp() {
     const plannerTabBtn = document.querySelector('.tab-btn[data-tab="planner"]');
     if (plannerTabBtn) plannerTabBtn.click();
     const feedbackEl = document.getElementById('p-shareFeedback');
-    if (feedbackEl) feedbackEl.textContent = T('invite.usedSuccess');
+    if (feedbackEl) feedbackEl.textContent = successMessage;
   }
 
   invitesPanelList.addEventListener('click', async (e) => {
@@ -3490,7 +3541,7 @@ function initApp() {
     if (useBtn) {
       const invite = lastFetchedInvites.find((i) => i.id === useBtn.dataset.inviteId);
       if (!invite) return;
-      applyInviteToPlanner(invite);
+      applyTripToPlanner(invite.trip, T('invite.usedSuccess'));
       invitesPanel.style.display = 'none';
     } else if (dismissBtn) {
       const id = dismissBtn.dataset.inviteId;
@@ -3500,6 +3551,83 @@ function initApp() {
       renderInvitesPanel();
     }
   });
+
+  // ---------- Trip history (per logged-in account, backed by auth-server) ----------
+  const historyBtn = document.getElementById('p-history-btn');
+  const historyPanel = document.getElementById('history-panel');
+  const historyPanelList = document.getElementById('history-panel-list');
+  const historyCloseBtn = document.getElementById('history-close');
+  let lastFetchedHistory = [];
+
+  function formatHistoryDate(iso) {
+    const locale = currentLang === 'ja' ? 'ja-JP' : currentLang === 'en' ? 'en-US' : 'vi-VN';
+    try { return new Date(iso).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' }); }
+    catch (e) { return iso; }
+  }
+
+  function renderHistoryPanel(entries) {
+    if (!entries.length) {
+      historyPanelList.innerHTML = `<div class="invite-empty">${escapeHtml(T('history.empty'))}</div>`;
+      return;
+    }
+    historyPanelList.innerHTML = entries.map((h) => {
+      const trip = h.trip || {};
+      return `
+      <div class="invite-item">
+        <div class="invite-item-top">${escapeHtml(tr(currentLang, 'history.tripLine', trip.destination || '', trip.days || ''))}</div>
+        <div class="invite-item-meta">${escapeHtml(tr(currentLang, 'history.savedAt', formatHistoryDate(h.createdAt)))}</div>
+        <div class="invite-item-actions">
+          <button type="button" class="history-use-btn" data-history-id="${escapeHtml(h.id)}">${escapeHtml(T('history.useBtn'))}</button>
+          <button type="button" class="secondary history-delete-btn" data-history-id="${escapeHtml(h.id)}">${escapeHtml(T('history.deleteBtn'))}</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function loadHistoryList() {
+    historyPanelList.innerHTML = `<div class="loading"><div class="spinner"></div>${escapeHtml(T('common.loadingGeneric'))}</div>`;
+    try {
+      const data = await authApi('/history');
+      lastFetchedHistory = data.history || [];
+      renderHistoryPanel(lastFetchedHistory);
+    } catch (err) {
+      historyPanelList.innerHTML = `<div class="error-box">⚠️ ${escapeHtml(T('history.loadError'))}</div>`;
+    }
+  }
+
+  /** Silently saves the just-generated trip to the logged-in user's history — a no-op when nobody's
+   * logged in (history is per-account) or if auth-server is unreachable; this is a nice-to-have
+   * layered on top of itinerary generation, never something that should interrupt or fail it. */
+  async function saveTripToHistory(trip) {
+    if (!currentUser) return;
+    try { await authApi('/history', { method: 'POST', body: { trip } }); } catch (err) { /* non-critical, ignore */ }
+  }
+
+  if (historyBtn) {
+    historyBtn.addEventListener('click', () => {
+      historyPanel.style.display = 'flex';
+      loadHistoryList();
+    });
+  }
+  if (historyCloseBtn) historyCloseBtn.addEventListener('click', () => { historyPanel.style.display = 'none'; });
+
+  if (historyPanelList) {
+    historyPanelList.addEventListener('click', async (e) => {
+      const useBtn = e.target.closest('.history-use-btn');
+      const deleteBtn = e.target.closest('.history-delete-btn');
+      if (useBtn) {
+        const entry = lastFetchedHistory.find((h) => h.id === useBtn.dataset.historyId);
+        if (!entry) return;
+        applyTripToPlanner(entry.trip, T('history.usedSuccess'));
+        historyPanel.style.display = 'none';
+      } else if (deleteBtn) {
+        const id = deleteBtn.dataset.historyId;
+        try { await authApi(`/history/${id}`, { method: 'DELETE' }); } catch (err) { /* still remove locally */ }
+        lastFetchedHistory = lastFetchedHistory.filter((h) => h.id !== id);
+        renderHistoryPanel(lastFetchedHistory);
+      }
+    });
+  }
 
   // ---------- Admin: manage users ----------
   const adminUsersList = document.getElementById('admin-users-list');
@@ -4237,6 +4365,7 @@ function initApp() {
       updatePlannerShareState(data, dest);
       savePlannerState({ data, risks });
       showInviteBox({ destination: dest, days, startDate, budget, group, notes, data });
+      saveTripToHistory({ destination: dest, days, startDate, budget, group, notes, data });
     } catch (err) { showError(pResult, err); pShare.style.display = 'none'; }
   });
 
@@ -4741,6 +4870,7 @@ function initApp() {
       updatePlannerShareState(data, dest);
       savePlannerState({ data, risks });
       showInviteBox({ destination: dest, days, startDate, budget: finalSlots.budget, group: finalSlots.group, notes, data });
+      saveTripToHistory({ destination: dest, days, startDate, budget: finalSlots.budget, group: finalSlots.group, notes, data });
 
       const readyMsg = tr(currentLang, 'voice.itineraryReady', dest, days);
       thinking.textContent = readyMsg;
