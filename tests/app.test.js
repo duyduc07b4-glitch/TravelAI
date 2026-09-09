@@ -13,6 +13,7 @@ const {
   buildForecastEventFromDaily, parseSelfHealingInput,
   canonicalHealedActivities, buildPlannerDataFromHealedData, normalizeSelfHealingAiResult, relocalizeHealedData, normalizeMemberImpactAi,
   buildConversationTranscript, normalizeExtractedSlots, missingTripSlots, buildVoiceFollowUpQuestion, detectItineraryIntent,
+  computeChecklistStatus, renderTripChecklistHtml, fillMissingSlotsWithDefaults,
   I18N, tr, normalizeLang, SUPPORTED_LANGS
 } = require('../app.js');
 
@@ -1010,5 +1011,46 @@ describe('detectItineraryIntent', () => {
     assert.equal(detectItineraryIntent('', ['tạo lịch trình']), false);
     assert.equal(detectItineraryIntent('tạo lịch trình đi', []), false);
     assert.equal(detectItineraryIntent('tạo lịch trình đi', undefined), false);
+  });
+});
+
+describe('computeChecklistStatus', () => {
+  test('flags only the slots that actually have a value', () => {
+    const status = computeChecklistStatus({ destination: 'Đà Nẵng', days: '3', startDate: '', budget: '', group: '', notes: '' });
+    assert.deepEqual(status, { destination: true, days: true, startDate: false, budget: false, group: false, notes: false });
+  });
+  test('treats a zero/invalid day count as not captured', () => {
+    assert.equal(computeChecklistStatus({ days: 0 }).days, false);
+    assert.equal(computeChecklistStatus({ days: 'chưa biết' }).days, false);
+  });
+  test('handles missing/undefined slots without throwing', () => {
+    assert.deepEqual(computeChecklistStatus(null), { destination: false, days: false, startDate: false, budget: false, group: false, notes: false });
+  });
+});
+
+describe('renderTripChecklistHtml', () => {
+  test('shows a checkmark only for captured slots and the right count', () => {
+    const html = renderTripChecklistHtml({ destination: 'Đà Nẵng', days: 3 }, 'vi');
+    assert.match(html, /2\/6/);
+    assert.equal((html.match(/checklist-item done/g) || []).length, 2);
+  });
+  test('shows 0/6 when nothing has been captured yet', () => {
+    const html = renderTripChecklistHtml({}, 'vi');
+    assert.match(html, /0\/6/);
+    assert.doesNotMatch(html, /checklist-item done/);
+  });
+});
+
+describe('fillMissingSlotsWithDefaults', () => {
+  test('keeps whatever the user actually said', () => {
+    const filled = fillMissingSlotsWithDefaults({ destination: 'Đà Nẵng', days: '5', budget: '3 triệu' }, 'vi');
+    assert.equal(filled.destination, 'Đà Nẵng');
+    assert.equal(filled.days, 5);
+    assert.equal(filled.budget, '3 triệu');
+  });
+  test('fills a missing destination and day count with clearly-labeled defaults', () => {
+    const filled = fillMissingSlotsWithDefaults({}, 'vi');
+    assert.equal(filled.destination, tr('vi', 'voice.autoDestinationFallback'));
+    assert.equal(filled.days, 3);
   });
 });

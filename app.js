@@ -171,7 +171,17 @@ const I18N = {
       askBoth: 'Để lên được lịch trình, bạn cho mình biết thêm: bạn muốn đi đâu và đi mấy ngày nhé?',
       extractSystemPrompt: 'Bạn là bộ trích xuất thông tin lên kế hoạch du lịch từ hội thoại. Đọc đoạn hội thoại bên dưới (User = người dùng, Assistant = trợ lý), rồi trích xuất thông tin cần để tạo lịch trình. CHỈ điền giá trị khi người dùng đã nói rõ ràng, KHÔNG suy đoán hay bịa thêm — nếu chưa nhắc tới thì để chuỗi rỗng "" (hoặc null với "days"). Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh) theo đúng schema:\n{"destination":"","days":null,"startDate":"","budget":"","group":"","notes":""}',
       extractUserPrompt: (transcript) => `Hội thoại:\n${transcript}\n\nHãy trích xuất thông tin theo đúng schema JSON.`,
-      buildTriggers: ['tạo lịch trình', 'lên lịch trình', 'lập lịch trình', 'chốt lịch trình', 'xây lịch trình', 'làm lịch trình', 'plan giúp tôi']
+      buildTriggers: ['tạo lịch trình', 'lên lịch trình', 'lập lịch trình', 'chốt lịch trình', 'xây lịch trình', 'làm lịch trình', 'plan giúp tôi'],
+      checklistTitle: 'Thông tin đã ghi nhận',
+      checklistCaptured: (n, total) => `${n}/${total}`,
+      checklistDest: 'Điểm đến',
+      checklistDays: 'Số ngày',
+      checklistStart: 'Ngày bắt đầu',
+      checklistBudget: 'Ngân sách',
+      checklistGroup: 'Nhóm đi cùng',
+      checklistNotes: 'Ghi chú/sở thích',
+      forceBuildBtn: 'Tạo lịch trình luôn (AI tự điền phần còn thiếu)',
+      autoDestinationFallback: 'một điểm đến du lịch nổi tiếng do AI tự chọn phù hợp'
     },
     heal: {
       title: 'Lịch trình tự thay đổi',
@@ -509,7 +519,17 @@ const I18N = {
       askBoth: '旅程を作るために、行き先と日数を教えてください。',
       extractSystemPrompt: 'あなたは会話から旅行計画に必要な情報を抽出するツールです。以下の会話（User=ユーザー、Assistant=アシスタント）を読み、旅程作成に必要な情報を抽出してください。ユーザーが明確に述べた内容のみを埋め、推測や創作はしないでください — まだ触れられていない項目は空文字""（"days"はnull）にしてください。必ずJSONのみで回答してください（フィールド名は英語のまま）。スキーマ：\n{"destination":"","days":null,"startDate":"","budget":"","group":"","notes":""}',
       extractUserPrompt: (transcript) => `会話：\n${transcript}\n\n上記のスキーマ通りにJSONで情報を抽出してください。`,
-      buildTriggers: ['旅程を作って', 'スケジュールを作って', 'プランを作って', '旅程作成', '旅程を作成']
+      buildTriggers: ['旅程を作って', 'スケジュールを作って', 'プランを作って', '旅程作成', '旅程を作成'],
+      checklistTitle: '取得済みの情報',
+      checklistCaptured: (n, total) => `${n}/${total}`,
+      checklistDest: '目的地',
+      checklistDays: '日数',
+      checklistStart: '開始日',
+      checklistBudget: '予算',
+      checklistGroup: '同行者',
+      checklistNotes: 'メモ・好み',
+      forceBuildBtn: 'このまま旅程を作成する（足りない部分はAIが補います）',
+      autoDestinationFallback: 'AIが選ぶ人気の旅行先'
     },
     heal: {
       title: '旅程の自動リカバリー',
@@ -847,7 +867,17 @@ const I18N = {
       askBoth: 'To build an itinerary, tell me: where do you want to go, and for how many days?',
       extractSystemPrompt: 'You extract trip-planning details from a conversation. Read the conversation below (User = the traveler, Assistant = the assistant), then extract the information needed to build an itinerary. ONLY fill in a value when the user has clearly stated it — do NOT guess or invent anything; leave unmentioned fields as an empty string "" (or null for "days"). Reply with ONLY valid JSON (keep the English field names) matching this schema:\n{"destination":"","days":null,"startDate":"","budget":"","group":"","notes":""}',
       extractUserPrompt: (transcript) => `Conversation:\n${transcript}\n\nExtract the information as JSON matching the schema.`,
-      buildTriggers: ['build the itinerary', 'create the itinerary', 'make an itinerary', 'plan my trip', 'generate itinerary', 'build my itinerary']
+      buildTriggers: ['build the itinerary', 'create the itinerary', 'make an itinerary', 'plan my trip', 'generate itinerary', 'build my itinerary'],
+      checklistTitle: 'Captured so far',
+      checklistCaptured: (n, total) => `${n}/${total}`,
+      checklistDest: 'Destination',
+      checklistDays: 'Days',
+      checklistStart: 'Start date',
+      checklistBudget: 'Budget',
+      checklistGroup: 'Travel group',
+      checklistNotes: 'Notes/preferences',
+      forceBuildBtn: "Build it anyway (AI fills in what's missing)",
+      autoDestinationFallback: "a popular destination of the AI's choosing"
     },
     heal: {
       title: 'Self-healing itinerary',
@@ -1809,6 +1839,51 @@ function detectItineraryIntent(text, triggers) {
   return (Array.isArray(triggers) ? triggers : []).some(t => t && lower.includes(String(t).toLowerCase()));
 }
 
+/** Which of the 6 trip-planning slots have actually been captured from the conversation so far — feeds the visible progress checklist (Layla-style "3/6 captured" instead of a silent black box). */
+function computeChecklistStatus(slots) {
+  const s = slots || {};
+  const days = parseInt(s.days, 10);
+  return {
+    destination: !!(s.destination && String(s.destination).trim()),
+    days: Number.isFinite(days) && days > 0,
+    startDate: !!(s.startDate && String(s.startDate).trim()),
+    budget: !!(s.budget && String(s.budget).trim()),
+    group: !!(s.group && String(s.group).trim()),
+    notes: !!(s.notes && String(s.notes).trim())
+  };
+}
+
+const CHECKLIST_FIELDS = [
+  ['destination', 'voice.checklistDest'],
+  ['days', 'voice.checklistDays'],
+  ['startDate', 'voice.checklistStart'],
+  ['budget', 'voice.checklistBudget'],
+  ['group', 'voice.checklistGroup'],
+  ['notes', 'voice.checklistNotes']
+];
+
+/** Renders the trip-planning checklist — which slots are captured vs. still open — as a small always-visible progress panel rather than only a one-shot follow-up question. */
+function renderTripChecklistHtml(slots, lang) {
+  const status = computeChecklistStatus(slots);
+  const doneCount = CHECKLIST_FIELDS.filter(([key]) => status[key]).length;
+  const rows = CHECKLIST_FIELDS.map(([key, labelKey]) => `<div class="checklist-item${status[key] ? ' done' : ''}"><span class="checklist-mark">${status[key] ? '✓' : '—'}</span><span>${escapeHtml(tr(lang, labelKey))}</span></div>`).join('');
+  return `<div class="voice-checklist"><div class="checklist-head"><span>${escapeHtml(tr(lang, 'voice.checklistTitle'))}</span><span class="checklist-count">${tr(lang, 'voice.checklistCaptured', doneCount, CHECKLIST_FIELDS.length)}</span></div><div class="checklist-body">${rows}</div></div>`;
+}
+
+/** Fills whatever's still missing with a sensible, clearly-labeled default instead of blocking — mirrors Layla's "generate now, fill the gaps" button rather than a hard wall waiting on every slot. */
+function fillMissingSlotsWithDefaults(slots, lang) {
+  const s = slots || {};
+  const days = parseInt(s.days, 10);
+  return {
+    destination: (s.destination && String(s.destination).trim()) || tr(lang, 'voice.autoDestinationFallback'),
+    days: Number.isFinite(days) && days > 0 ? days : 3,
+    startDate: s.startDate || '',
+    budget: s.budget || '',
+    group: s.group || '',
+    notes: s.notes || ''
+  };
+}
+
 function flattenActivities(planData) {
   if (!planData || !Array.isArray(planData.days)) return [];
   const flat = [];
@@ -2657,6 +2732,7 @@ const AppCore = {
   dedupePlanItems, flattenActivities, normalizeHealedText,
   normalizeTimeSlot, formatSlotLabel, parseSelfHealingInput, buildSelfHealingPromptLines,
   buildConversationTranscript, normalizeExtractedSlots, missingTripSlots, buildVoiceFollowUpQuestion, detectItineraryIntent,
+  computeChecklistStatus, renderTripChecklistHtml, fillMissingSlotsWithDefaults,
   classifyIncident, isSevereWeatherIncident, classifyActivity,
   buildCameraFallback,
   parseBudgetNumber, buildPlannerContextSummary, buildSelfHealingPlan,
@@ -4035,6 +4111,8 @@ function initApp() {
 
   // ---------- Voice Assistant: "Build itinerary from this conversation" ----------
   const vBuildBtn = document.getElementById('v-build');
+  const vForceBuildBtn = document.getElementById('v-force-build');
+  const vChecklist = document.getElementById('v-checklist');
   const vItinResult = document.getElementById('v-itinResult');
 
   function collectVoiceMessages() {
@@ -4053,11 +4131,14 @@ function initApp() {
 
   /**
    * Turns the Voice Assistant conversation into an actual itinerary: extracts what's been said
-   * so far, and if destination/day-count are still missing, asks exactly for that instead of
-   * failing silently — then re-runs once the user answers. Once complete, it calls the same
-   * planner prompt as TAB 1 and mirrors the result into the Itinerary tab too.
+   * so far and shows a live checklist of what's captured (destination/days/start date/budget/
+   * group/notes), Layla-style, instead of a silent black box. If destination/day-count are still
+   * missing, it asks exactly for that AND reveals a "Build it anyway" button — the follow-up
+   * question is never a hard wall, since `forceGenerate` (or that button) proceeds regardless,
+   * filling any gaps with a clearly-labeled default. Once complete, it calls the same planner
+   * prompt as TAB 1 and mirrors the result into the Itinerary tab too.
    */
-  async function buildItineraryFromConversation() {
+  async function buildItineraryFromConversation(forceGenerate = false) {
     if (!collectVoiceMessages().some(m => m.role === 'user')) {
       const msg = T('voice.needConversation');
       addMsg('ai', msg);
@@ -4065,25 +4146,30 @@ function initApp() {
       return;
     }
     vBuildBtn.disabled = true;
+    vForceBuildBtn.disabled = true;
     const thinking = addMsg('ai', T('voice.extracting'));
     try {
       const slots = await extractTripSlotsFromConversation();
+      if (vChecklist) vChecklist.innerHTML = renderTripChecklistHtml(slots, currentLang);
       const missing = missingTripSlots(slots);
-      if (missing.length) {
+      if (missing.length && !forceGenerate) {
         const question = buildVoiceFollowUpQuestion(missing, currentLang);
         thinking.textContent = question;
         speak(question);
+        vForceBuildBtn.style.display = '';
         saveVoiceLog();
         return;
       }
+      vForceBuildBtn.style.display = 'none';
 
       thinking.textContent = T('voice.buildingItinerary');
-      const dest = slots.destination;
-      const days = slots.days;
-      const startDate = slots.startDate || '';
-      const budget = slots.budget || T('common.unlimitedBudget');
-      const group = slots.group || T('common.soloTraveler');
-      const notes = slots.notes || '';
+      const finalSlots = missing.length ? fillMissingSlotsWithDefaults(slots, currentLang) : slots;
+      const dest = finalSlots.destination;
+      const days = finalSlots.days;
+      const startDate = finalSlots.startDate || '';
+      const budget = finalSlots.budget || T('common.unlimitedBudget');
+      const group = finalSlots.group || T('common.soloTraveler');
+      const notes = finalSlots.notes || '';
       // Shares whatever member list is already set up in the Group Decision / Itinerary tabs,
       // same as a normal "Tạo lịch trình" click — the voice flow doesn't collect its own.
       const members = currentMembers();
@@ -4098,16 +4184,16 @@ function initApp() {
       const innerHtml = `${satisfactionHtml}${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
       vItinResult.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
 
-      // Mirror into the Itinerary tab too, so it's there to review/edit/share, not stranded in the chat log.
-      // Fields the user never actually mentioned stay blank here (matching how an untouched Itinerary
-      // field behaves) — `budget`/`group` above already carry the applied default for the prompt/context.
-      pDest.value = dest; pDays.value = days; pStart.value = slots.startDate; pBudget.value = slots.budget; pGroup.value = slots.group; pNotes.value = slots.notes;
+      // Mirror into the Itinerary tab too, so it's there to review/edit/share, not stranded in the chat
+      // log — using the same finalSlots the generation itself ran on (including any auto-filled
+      // defaults), so the Itinerary tab's fields always match what's actually in the rendered plan.
+      pDest.value = dest; pDays.value = days; pStart.value = startDate; pBudget.value = finalSlots.budget; pGroup.value = finalSlots.group; pNotes.value = notes;
       renderPlannerSatisfaction(members, flattenActivities(data));
       const plannerInnerHtml = `${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
       pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(plannerInnerHtml)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
-      showInviteBox({ destination: dest, days, startDate: slots.startDate, budget: slots.budget, group: slots.group, notes: slots.notes, data });
+      showInviteBox({ destination: dest, days, startDate, budget: finalSlots.budget, group: finalSlots.group, notes, data });
 
       const readyMsg = tr(currentLang, 'voice.itineraryReady', dest, days);
       thinking.textContent = readyMsg;
@@ -4118,10 +4204,16 @@ function initApp() {
       saveVoiceLog();
     } finally {
       vBuildBtn.disabled = false;
+      vForceBuildBtn.disabled = false;
     }
   }
 
-  vBuildBtn.addEventListener('click', buildItineraryFromConversation);
+  vForceBuildBtn.addEventListener('click', () => buildItineraryFromConversation(true));
+
+  // Wrapped in an arrow function, not passed directly — addEventListener would otherwise hand the
+  // click Event itself as the first argument, which is truthy and would silently force-generate
+  // (skip the missing-info follow-up) on every ordinary click.
+  vBuildBtn.addEventListener('click', () => buildItineraryFromConversation());
 
   function addMsg(role, text, persist = true) {
     const div = document.createElement('div');
