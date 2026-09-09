@@ -2,6 +2,7 @@ const { test, describe } = require('node:test');
 const assert = require('node:assert/strict');
 const {
   escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity, weatherDescription,
+  buildDayRouteMapUrl, detectMealType, isVagueVenueMention, buildVenueActivityText, resolvePlannerVenues,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   formatYen, estimateEntryCostPerPerson, isFoodKnowledgeEntry, plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
@@ -147,6 +148,112 @@ describe('isGenericPlaceholderActivity', () => {
   test('treats blank input as a placeholder', () => {
     assert.equal(isGenericPlaceholderActivity(''), true);
     assert.equal(isGenericPlaceholderActivity(null), true);
+  });
+});
+
+describe('detectMealType', () => {
+  test('recognizes breakfast/lunch/dinner in Vietnamese, Japanese, and English', () => {
+    assert.equal(detectMealType('Ăn sáng tại khách sạn'), 'breakfast');
+    assert.equal(detectMealType('Ăn trưa tại nhà hàng gần đó'), 'lunch');
+    assert.equal(detectMealType('Dinner nearby'), 'dinner');
+    assert.equal(detectMealType('近くで昼食'), 'lunch');
+  });
+  test('falls back to the generic "meal" type', () => {
+    assert.equal(detectMealType('American Village'), 'meal');
+  });
+});
+
+describe('isVagueVenueMention', () => {
+  test('flags a bare meal mention (delegates to isGenericPlaceholderActivity)', () => {
+    assert.equal(isVagueVenueMention('ăn trưa'), true);
+  });
+  test('flags a meal + vague-location qualifier with no real venue name', () => {
+    assert.equal(isVagueVenueMention('Ăn trưa tại nhà hàng gần đó'), true);
+    assert.equal(isVagueVenueMention('Ăn tối tại một nhà hàng nào đó'), true);
+    assert.equal(isVagueVenueMention('Lunch nearby'), true);
+    assert.equal(isVagueVenueMention('近くで昼食'), true);
+  });
+  test('does not flag a meal activity that already names a real venue', () => {
+    assert.equal(isVagueVenueMention('Ăn trưa tại nhà hàng Yunangi'), false);
+    assert.equal(isVagueVenueMention('Yunangi Okinawan Cuisineで昼食'), false);
+  });
+  test('does not mistake "món địa phương" (a cuisine style, not a vague location) for a vague mention', () => {
+    assert.equal(isVagueVenueMention('Ăn trưa món địa phương tại Yunangi'), false);
+  });
+  test('does not flag a non-meal activity', () => {
+    assert.equal(isVagueVenueMention('American Village'), false);
+  });
+});
+
+describe('buildVenueActivityText', () => {
+  test('composes natural phrasing per language', () => {
+    assert.equal(buildVenueActivityText('lunch', 'Yunangi', 'vi'), 'Ăn trưa tại Yunangi');
+    assert.equal(buildVenueActivityText('dinner', 'Yunangi', 'en'), 'Dinner at Yunangi');
+    assert.equal(buildVenueActivityText('breakfast', 'カフェ88', 'ja'), 'カフェ88で朝食');
+  });
+});
+
+describe('resolvePlannerVenues', () => {
+  const members = [{ name: 'A', pref: 'hải sản' }];
+  const foodCandidates = [
+    { name: 'Seafood House', cuisine: 'Hải sản', priceRange: '3000-5000 yên/người', rating: '4.5' },
+    { name: 'Kokusai Ramen', cuisine: 'Ramen', priceRange: '800-1200 yên/người', rating: '4.3' },
+    { name: 'Churaumi Aquarium', type: 'Thủy cung', ticketPrice: '2180 yên' } // not food — must never be picked
+  ];
+  test('fills in a real venue name + price for a vague meal mention', () => {
+    const plan = { days: [{ day: 1, activities: [{ text: 'Ăn trưa tại nhà hàng gần đó', slot: 'midday' }] }] };
+    const resolved = resolvePlannerVenues(plan, foodCandidates, members, 'vi');
+    const activity = resolved.days[0].activities[0];
+    assert.match(activity.text, /^Ăn trưa tại (Seafood House|Kokusai Ramen)$/);
+    assert.ok(activity.price > 0);
+    assert.equal(activity.slot, 'midday');
+  });
+  test('leaves an already-specific activity untouched', () => {
+    const plan = { days: [{ day: 1, activities: [{ text: 'Ăn trưa tại nhà hàng Yunangi', price: 1500 }] }] };
+    const resolved = resolvePlannerVenues(plan, foodCandidates, members, 'vi');
+    assert.equal(resolved.days[0].activities[0].text, 'Ăn trưa tại nhà hàng Yunangi');
+    assert.equal(resolved.days[0].activities[0].price, 1500);
+  });
+  test('never picks a non-food candidate (e.g. an attraction) for a meal slot', () => {
+    const onlyAttraction = [{ name: 'Churaumi Aquarium', type: 'Thủy cung', ticketPrice: '2180 yên' }];
+    const plan = { days: [{ day: 1, activities: [{ text: 'Ăn trưa gần đó' }] }] };
+    const resolved = resolvePlannerVenues(plan, onlyAttraction, members, 'vi');
+    assert.equal(resolved.days[0].activities[0].text, 'Ăn trưa gần đó'); // unchanged: no food candidate to draw from
+  });
+  test('avoids naming the same restaurant twice when a different one is available', () => {
+    const plan = {
+      days: [{ day: 1, activities: [
+        { text: 'Ăn trưa gần đó' },
+        { text: 'Ăn tối gần đó' }
+      ] }]
+    };
+    const resolved = resolvePlannerVenues(plan, foodCandidates, members, 'vi');
+    const [lunch, dinner] = resolved.days[0].activities;
+    assert.notEqual(lunch.text, dinner.text);
+  });
+  test('is a no-op when there are no food candidates at all', () => {
+    const plan = { days: [{ day: 1, activities: [{ text: 'Ăn trưa gần đó' }] }] };
+    const resolved = resolvePlannerVenues(plan, [], members, 'vi');
+    assert.equal(resolved.days[0].activities[0].text, 'Ăn trưa gần đó');
+  });
+});
+
+describe('buildDayRouteMapUrl', () => {
+  test('builds a directions URL chaining every stop in order', () => {
+    const url = buildDayRouteMapUrl([{ text: 'Naha Airport' }, { text: 'American Village' }, { text: 'Sunset Beach' }], 'Okinawa');
+    assert.ok(url.startsWith('https://www.google.com/maps/dir/?api=1&origin='));
+    assert.match(url, /origin=Naha%20Airport%2C%20Okinawa/);
+    assert.match(url, /destination=Sunset%20Beach%2C%20Okinawa/);
+    assert.match(url, /waypoints=American%20Village%2C%20Okinawa/);
+  });
+  test('returns null for a day with 0 or 1 stops (no meaningful route)', () => {
+    assert.equal(buildDayRouteMapUrl([], 'Okinawa'), null);
+    assert.equal(buildDayRouteMapUrl([{ text: 'Naha Airport' }], 'Okinawa'), null);
+  });
+  test('drops empty/blank activities before building the route', () => {
+    const url = buildDayRouteMapUrl([{ text: 'Naha Airport' }, { text: '' }, { text: 'Sunset Beach' }], 'Okinawa');
+    assert.ok(url.includes('origin=Naha%20Airport'));
+    assert.ok(!url.includes('waypoints='));
   });
 });
 
