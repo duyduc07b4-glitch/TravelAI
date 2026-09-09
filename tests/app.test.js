@@ -393,16 +393,18 @@ describe('renderItineraryCostSummaryHtml', () => {
   const planData = {
     days: [{ day: 1, activities: [{ text: 'Aquarium', price: 2180 }, { text: 'Lunch', price: 1500 }] }]
   };
-  test('shows the total and an even per-person split for more than 1 traveler', () => {
+  test('shows the per-person cost, and multiplies (not divides!) by headcount for the group total', () => {
+    // Regression test: a real bug report said the total looked far too cheap. Root cause was
+    // treating the summed per-activity prices (already per-person) as a shared total to divide,
+    // instead of a per-person figure to multiply by headcount.
     const html = renderItineraryCostSummaryHtml(planData, 3, 'vi');
-    assert.match(html, /3,680/); // total
-    assert.match(html, /1,227/); // 3680 / 3 rounded
-    assert.match(html, /3 người/);
+    assert.match(html, /Mỗi người[\s\S]*3,680/); // per person = the raw sum, unchanged
+    assert.match(html, /Tổng cho 3 người[\s\S]*11,040/); // group total = 3,680 × 3, not ÷ 3
   });
-  test('omits the per-person line for a solo traveler (it would just repeat the total)', () => {
+  test('omits the group-total line for a solo traveler (it would just repeat the per-person figure)', () => {
     const html = renderItineraryCostSummaryHtml(planData, 1, 'vi');
-    assert.match(html, /3,680/);
-    assert.doesNotMatch(html, /costPerPersonLabel|Chia đều/);
+    assert.match(html, /Mỗi người[\s\S]*3,680/);
+    assert.doesNotMatch(html, /Tổng cho/);
   });
   test('returns an empty string when the itinerary has no price data at all', () => {
     const noPriceData = { days: [{ day: 1, activities: ['Naha Airport'] }] };
