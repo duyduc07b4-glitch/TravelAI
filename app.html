@@ -31,13 +31,15 @@
         <button type="button" class="secondary small" id="invites-btn">✉️ <span id="invites-count"></span></button>
         <button type="button" class="secondary small" id="logout-btn" data-i18n="auth.logoutBtn"></button>
       </div>
+      <button type="button" class="secondary small" id="header-login-btn" data-i18n="auth.loginBtn"></button>
     </div>
   </div>
 </header>
 
-<!-- Màn đăng nhập — che toàn bộ app cho tới khi đăng nhập thành công -->
-<div class="login-overlay" id="login-overlay">
+<!-- Màn đăng nhập — mở khi bấm "Đăng nhập" ở header, hoặc tự mở lại khi phiên hết hạn -->
+<div class="login-overlay" id="login-overlay" style="display:none;">
   <div class="login-card">
+    <button type="button" class="login-close" id="login-close" aria-label="Close">✕</button>
     <div class="login-brand">TravelAI</div>
     <p class="hint" data-i18n="auth.subtitle"></p>
     <div class="field"><label data-i18n="auth.usernameLabel"></label><input type="text" id="login-username" placeholder="admin1 / user1 / user2" autocomplete="username"></div>

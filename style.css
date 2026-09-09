@@ -332,9 +332,19 @@ table.score-table th{background:var(--panel2); color:var(--muted); font-weight:5
 .user-info{display:flex; align-items:center; gap:8px;}
 .user-badge{font-size:12.5px; font-weight:700; color:var(--accent-deep); background:var(--panel-strong); border:1px solid var(--border); border-radius:8px; padding:5px 10px;}
 .login-overlay{position:fixed; inset:0; background:rgba(15,50,63,0.55); display:flex; align-items:center; justify-content:center; z-index:1000; padding:20px;}
-.login-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:26px; width:100%; max-width:360px;}
+.login-card{position:relative; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:26px; width:100%; max-width:360px;}
 .login-brand{font-family:inherit; font-size:20px; font-weight:800; color:var(--accent-deep); margin-bottom:4px;}
 .login-card button{width:100%; margin-top:6px;}
+.login-close{position:absolute; top:10px; right:10px; width:auto !important; margin:0 !important; background:none; box-shadow:none; color:var(--muted); font-size:14px; padding:4px 8px; border-radius:8px;}
+.login-close:hover{background:var(--panel-strong);}
+/* Blurred itinerary teaser shown to a logged-out visitor: content is real (not a placeholder),
+   just obscured, with a lock overlay prompting login instead of a hard wall up front. */
+.blur-wrap{position:relative;}
+.blur-content{filter:blur(6px); pointer-events:none; user-select:none;}
+.blur-lock{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; padding:20px; background:rgba(255,253,248,0.6); border-radius:14px;}
+.blur-lock-icon{font-size:26px;}
+.blur-lock p{margin:0; font-weight:700; color:var(--text); max-width:260px; font-size:13.5px;}
+.blur-lock button{width:auto !important; margin:0 !important;}
 .invites-card{max-width:440px; max-height:80vh; overflow-y:auto;}
 .invites-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;}
 .invites-head .secondary{width:auto;}

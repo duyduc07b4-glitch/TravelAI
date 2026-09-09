@@ -288,7 +288,8 @@ const I18N = {
       logoutBtn: 'Đăng xuất',
       sessionExpired: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
       missingFields: 'Nhập đủ tên đăng nhập và mật khẩu.',
-      connectError: (base) => `Không kết nối được tới auth server tại ${base}. Kiểm tra đã chạy "npm start" trong thư mục auth-server chưa.`
+      connectError: (base) => `Không kết nối được tới auth server tại ${base}. Kiểm tra đã chạy "npm start" trong thư mục auth-server chưa.`,
+      resultLocked: 'Đăng nhập để xem lịch trình đầy đủ và mời người khác cùng xem.'
     },
     admin: {
       tabLabel: '🛡️ Quản trị',
@@ -625,7 +626,8 @@ const I18N = {
       logoutBtn: 'ログアウト',
       sessionExpired: 'セッションの有効期限が切れました。もう一度ログインしてください。',
       missingFields: 'ユーザー名とパスワードを入力してください。',
-      connectError: (base) => `認証サーバー（${base}）に接続できません。auth-server フォルダで "npm start" を実行したか確認してください。`
+      connectError: (base) => `認証サーバー（${base}）に接続できません。auth-server フォルダで "npm start" を実行したか確認してください。`,
+      resultLocked: '旅程を全部見る、他の人を招待するにはログインしてください。'
     },
     admin: {
       tabLabel: '🛡️ 管理',
@@ -962,7 +964,8 @@ const I18N = {
       logoutBtn: 'Log out',
       sessionExpired: 'Your session has expired — please log in again.',
       missingFields: 'Enter both a username and a password.',
-      connectError: (base) => `Could not reach the auth server at ${base}. Check that you ran "npm start" in the auth-server folder.`
+      connectError: (base) => `Could not reach the auth server at ${base}. Check that you ran "npm start" in the auth-server folder.`,
+      resultLocked: 'Log in to see the full itinerary and invite others to view it.'
     },
     admin: {
       tabLabel: '🛡️ Admin',
@@ -2739,6 +2742,8 @@ function initApp() {
   const loginPassword = document.getElementById('login-password');
   const loginSubmitBtn = document.getElementById('login-submit');
   const loginErrorEl = document.getElementById('login-error');
+  const loginCloseBtn = document.getElementById('login-close');
+  const headerLoginBtn = document.getElementById('header-login-btn');
   const userInfoEl = document.getElementById('user-info');
   const userNameBadge = document.getElementById('user-name-badge');
   const logoutBtn = document.getElementById('logout-btn');
@@ -2749,11 +2754,49 @@ function initApp() {
   const invitesPanelList = document.getElementById('invites-panel-list');
   const invitesCloseBtn = document.getElementById('invites-close');
 
-  /** Shows/hides the login overlay and the logged-in header bits based on current auth state. Pass a message to surface an error (e.g. session expired) on the login form. */
+  /**
+   * Wraps a generated itinerary's inner HTML in a blur + lock overlay when nobody is logged in,
+   * instead of blocking the whole app up front. The content is real (already generated), just
+   * obscured — a "there's something here, log in to see it" nudge rather than a hard wall.
+   */
+  function withLoginGateHtml(innerHtml) {
+    if (currentUser) return innerHtml;
+    return `<div class="blur-wrap"><div class="blur-content">${innerHtml}</div><div class="blur-lock"><div class="blur-lock-icon">🔒</div><p>${escapeHtml(T('auth.resultLocked'))}</p><button type="button" class="result-login-btn">${escapeHtml(T('auth.loginBtn'))}</button></div></div>`;
+  }
+  // Clicking the lock button inside any blurred result opens the login modal — delegated on
+  // <body> since these buttons are injected dynamically into different tabs' result areas.
+  document.body.addEventListener('click', (e) => {
+    if (e.target.closest('.result-login-btn')) openLoginModal();
+  });
+
+  function openLoginModal() {
+    loginErrorEl.style.display = 'none';
+    loginOverlay.style.display = 'flex';
+    loginUsername.focus();
+  }
+  function closeLoginModal() {
+    loginOverlay.style.display = 'none';
+  }
+  headerLoginBtn.addEventListener('click', openLoginModal);
+  loginCloseBtn.addEventListener('click', closeLoginModal);
+  loginOverlay.addEventListener('click', (e) => { if (e.target === loginOverlay) closeLoginModal(); });
+
+  /** Re-renders the last generated itinerary without the blur, now that we're logged in — the content itself never changed, only whether it's obscured. */
+  function unlockLastPlannerResult() {
+    if (!lastGeneratedTrip || !lastGeneratedTrip.data) return;
+    const { destination, days, data } = lastGeneratedTrip;
+    const risks = detectTravelRisks(flattenActivities(data), lastGeneratedTrip, null, currentLang);
+    const pResultEl = document.getElementById('p-result');
+    if (pResultEl) pResultEl.innerHTML = `<div class="result-box">${renderPlannerHtml(data, destination, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+    showInviteBox(lastGeneratedTrip);
+  }
+
+  /** Shows/hides the logged-in header bits based on current auth state; the login modal itself is opened on demand (header button, a blurred result's lock button, or a forced session-expired prompt) rather than blocking the app up front. Pass a message to force the modal open with that error (e.g. session expired). */
   function applyAuthUI(loginMessage) {
     if (currentUser) {
-      loginOverlay.style.display = 'none';
+      closeLoginModal();
       userInfoEl.style.display = 'flex';
+      headerLoginBtn.style.display = 'none';
       userNameBadge.textContent = currentUser.username + (currentUser.role === 'admin' ? ' · admin' : '');
       adminTabBtn.style.display = currentUser.role === 'admin' ? '' : 'none';
       if (currentUser.role !== 'admin') {
@@ -2764,11 +2807,26 @@ function initApp() {
         }
       }
       refreshInvitesBadge();
+      unlockLastPlannerResult();
     } else {
-      loginOverlay.style.display = 'flex';
       userInfoEl.style.display = 'none';
+      headerLoginBtn.style.display = '';
       adminTabBtn.style.display = 'none';
       invitesPanel.style.display = 'none';
+      // Inviting others requires being someone yourself — hide the send-invite box on logout
+      // rather than leave it showing checkboxes for a session that can no longer send anything.
+      const pInviteEl = document.getElementById('p-invite');
+      if (pInviteEl) pInviteEl.style.display = 'none';
+      // Re-blur whatever itinerary was on screen — logging out should put the gate back, not
+      // leave a previously-unlocked result visible after the session that unlocked it is gone.
+      if (lastGeneratedTrip && lastGeneratedTrip.data) {
+        const { destination, days, data } = lastGeneratedTrip;
+        const risks = detectTravelRisks(flattenActivities(data), lastGeneratedTrip, null, currentLang);
+        const innerHtml = `${renderPlannerHtml(data, destination, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
+        const pResultEl = document.getElementById('p-result');
+        if (pResultEl) pResultEl.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
+      }
+      if (loginMessage) openLoginModal();
       if (loginMessage) { loginErrorEl.textContent = loginMessage; loginErrorEl.style.display = 'block'; }
     }
   }
@@ -3531,7 +3589,9 @@ function initApp() {
         notes: saved.notes || ''
       });
       const savedRisks = detectTravelRisks(flattenActivities(saved.data), { budget: saved.budget, days: saved.days, group: saved.group, notes: saved.notes }, null, currentLang);
-      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(saved.data, saved.dest || '', currentLang, saved.days)}${renderRiskPanelHtml(savedRisks, currentLang)}</div>`;
+      const savedInnerHtml = `${renderPlannerHtml(saved.data, saved.dest || '', currentLang, saved.days)}${renderRiskPanelHtml(savedRisks, currentLang)}`;
+      lastGeneratedTrip = { destination: saved.dest || '', days: saved.days || '', startDate: saved.startDate || '', budget: saved.budget || '', group: saved.group || '', notes: saved.notes || '', data: saved.data };
+      pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(savedInnerHtml)}</div>`;
       updatePlannerShareState(saved.data, saved.dest || '');
     }
   })();
@@ -3555,7 +3615,8 @@ function initApp() {
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
       renderPlannerSatisfaction(members, flattenActivities(data));
-      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+      const innerHtml = `${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
+      pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
       showInviteBox({ destination: dest, days, startDate, budget, group, notes, data });
@@ -4034,17 +4095,19 @@ function initApp() {
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang);
       const satisfactionHtml = computePlannerSatisfactionHtml(members, flattenActivities(data));
-      const html = `<div class="result-box">${satisfactionHtml}${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
-      vItinResult.innerHTML = html;
+      const innerHtml = `${satisfactionHtml}${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
+      vItinResult.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
 
       // Mirror into the Itinerary tab too, so it's there to review/edit/share, not stranded in the chat log.
       // Fields the user never actually mentioned stay blank here (matching how an untouched Itinerary
       // field behaves) — `budget`/`group` above already carry the applied default for the prompt/context.
       pDest.value = dest; pDays.value = days; pStart.value = slots.startDate; pBudget.value = slots.budget; pGroup.value = slots.group; pNotes.value = slots.notes;
       renderPlannerSatisfaction(members, flattenActivities(data));
-      pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+      const plannerInnerHtml = `${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
+      pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(plannerInnerHtml)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
+      showInviteBox({ destination: dest, days, startDate: slots.startDate, budget: slots.budget, group: slots.group, notes: slots.notes, data });
 
       const readyMsg = tr(currentLang, 'voice.itineraryReady', dest, days);
       thinking.textContent = readyMsg;

@@ -11,18 +11,19 @@ Xem hướng dẫn đầy đủ (macOS + Windows) tại [`setup-guide.html`](./s
 Tóm tắt nhanh:
 
 1. Cài [Ollama](https://ollama.com/download), chạy `ollama pull llama3.2`
-2. **Bắt buộc** — chạy auth server (không chạy thì app chỉ đứng ở màn đăng nhập):
+2. macOS: double-click `start-mac.command` · Windows: double-click `start-windows.bat`
+3. Trình duyệt tự mở `app.html`, bấm "Kiểm tra kết nối" — dùng được ngay, không cần đăng nhập
+4. (Tuỳ chọn nhưng nên chạy) — để xem lịch trình rõ (không bị mờ) và dùng được tính năng mời/quản trị user, chạy thêm auth server:
    ```bash
    cd auth-server
    npm install
    npm start        # chạy tại http://localhost:8900
    ```
-3. macOS: double-click `start-mac.command` · Windows: double-click `start-windows.bat`
-4. Trình duyệt tự mở `app.html` → đăng nhập bằng `admin1` / `user1` / `user2`, mật khẩu `123123` → bấm "Kiểm tra kết nối"
+   Rồi bấm "Đăng nhập" ở góc trên bằng `admin1` / `user1` / `user2`, mật khẩu `123123`.
 
 ## Tính năng
 
-- 🔐 **Đăng nhập & mời thành viên** — 3 tài khoản demo có sẵn: `admin1` / `user1` / `user2`, mật khẩu `123123`. Mỗi lần tạo lịch trình xong, có thể chọn người khác trong nhóm và bấm "Gửi lời mời" — người được mời đăng nhập vào sẽ thấy huy hiệu ✉️ ở góc trên, mở ra xem và bấm "Dùng lịch trình này" để áp ngay vào tab của họ. Tài khoản `admin1` có thêm tab "Quản trị" để thêm/xoá người dùng. Chạy qua `auth-server/` (Express + file JSON, xem bên dưới) — đăng nhập demo, không phải hệ thống bảo mật thật.
+- 🔐 **Đăng nhập & mời thành viên** — 3 tài khoản demo có sẵn: `admin1` / `user1` / `user2`, mật khẩu `123123`. App không bắt đăng nhập ngay từ đầu — cứ điền form và bấm "Tạo lịch trình" bình thường; nếu chưa đăng nhập, lịch trình vẫn được tạo thật nhưng hiện **mờ kèm khoá 🔒 và nút "Đăng nhập"** thay vì hiện rõ ngay, mời chào đăng nhập thay vì chặn cứng từ đầu. Đăng nhập xong là hiện rõ ngay, không cần tạo lại. Đã đăng nhập thì mỗi lần tạo lịch trình xong có thể chọn người khác và bấm "Gửi lời mời" — người được mời thấy huy hiệu ✉️ ở góc trên, mở ra xem và bấm "Dùng lịch trình này" để áp ngay vào tab của họ. Tài khoản `admin1` có thêm tab "Quản trị" để thêm/xoá người dùng. Chạy qua `auth-server/` (Express + file JSON, xem bên dưới) — đăng nhập demo, không phải hệ thống bảo mật thật.
 - 🗺️ **Dynamic Trip Planning** — tạo lịch trình theo ngày, có link Google Maps cho từng địa điểm. Có thể khai sở thích riêng từng thành viên (mục "Thành viên & sở thích" ngay trong tab này) — AI sẽ cố cân bằng hoạt động cho nhiều người nhất có thể thay vì chỉ tối ưu chung chung, và **📊 Điểm hài lòng của nhóm** hiện ngay sau khi tạo lịch trình (tính cục bộ, không qua LLM) — sửa sở thích một thành viên là điểm cập nhật tức thì, không cần tạo lại lịch trình.
 - 👥 **Group Decision Engine** — không chỉ chấm điểm, mà còn:
   - 📊 **Điểm hài lòng theo từng thành viên** (không chỉ điểm trung bình chung)
@@ -60,13 +61,13 @@ Tóm tắt nhanh:
 | `tests/app.test.js` | Unit test cho các hàm thuần trong `app.js` |
 | `rag-server/` | (Tùy chọn) server RAG local — index tài liệu trong `knowledge/` và trả về đoạn liên quan cho tab Group Matching |
 | `knowledge/` | Dữ liệu tham khảo (nhà hàng, điểm tham quan, ghi chú) dùng để index cho `rag-server` |
-| `auth-server/` | **Bắt buộc** — server đăng nhập/quản lý user/lời mời (Express + file JSON, xem bên dưới) |
+| `auth-server/` | (Tuỳ chọn nhưng nên chạy) server đăng nhập/quản lý user/lời mời (Express + file JSON, xem bên dưới) |
 
 Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang. Dữ liệu này chỉ nằm trên máy bạn, không gửi đi đâu. Trừ lời mời chuyến đi — thứ duy nhất được gửi qua `auth-server` để người khác đọc được.
 
-## Chạy Auth server (bắt buộc — app không dùng được nếu thiếu)
+## Chạy Auth server cho đăng nhập/mời/quản trị
 
-Toàn bộ app bị che sau màn đăng nhập cho tới khi kết nối được `auth-server` tại `http://localhost:8900`. Server này seed sẵn 3 tài khoản (`admin1`/`user1`/`user2`, mật khẩu `123123`) vào `auth-server/data.json` (tự tạo ở lần chạy đầu, mật khẩu được hash chứ không lưu thô).
+App **không bắt đăng nhập ngay từ đầu** — mọi tab dùng được bình thường kể cả khi chưa đăng nhập và kể cả khi `auth-server` chưa chạy. Khác biệt duy nhất: nếu bấm "Tạo lịch trình" mà chưa đăng nhập, lịch trình vẫn được tạo thật nhưng hiển thị **mờ kèm khoá 🔒** thay vì hiện rõ ngay — bấm "Đăng nhập" trong đó (hoặc nút "Đăng nhập" ở header) để mở form đăng nhập, xong là hiện rõ ngay lập tức, không cần tạo lại. Server này seed sẵn 3 tài khoản (`admin1`/`user1`/`user2`, mật khẩu `123123`) vào `auth-server/data.json` (tự tạo ở lần chạy đầu, mật khẩu được hash chứ không lưu thô).
 
 ```bash
 cd auth-server
@@ -75,9 +76,10 @@ npm start        # chạy tại http://localhost:8900
 ```
 
 - `admin1` có quyền admin → thấy thêm tab "Quản trị" để thêm/xoá tài khoản.
-- Sau khi tạo lịch trình ở tab Lịch trình, một khung "✉️ Mời người khác" hiện ra để chọn người gửi lời mời.
+- Đã đăng nhập, sau khi tạo lịch trình ở tab Lịch trình, một khung "✉️ Mời người khác" hiện ra để chọn người gửi lời mời.
 - Người được mời đăng nhập vào sẽ thấy số lời mời ở nút ✉️ trên header, bấm vào để xem và áp lịch trình đó vào tab của họ bằng 1 click.
 - Nếu nhiều người demo trên các máy khác nhau, mỗi máy cần tự chạy `auth-server` riêng (dữ liệu không đồng bộ qua mạng) — phù hợp để demo trên 1 máy với nhiều tài khoản, chưa phải giải pháp multi-device thật.
+- Nếu `auth-server` không chạy hoặc mất kết nối, đăng nhập/mời/quản trị chỉ đơn giản là không dùng được (có thông báo lỗi rõ ràng) — không ảnh hưởng tới các tính năng AI khác.
 
 ## (Tùy chọn) Chạy RAG server cho Group Decision
 
