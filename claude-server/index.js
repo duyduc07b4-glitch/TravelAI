@@ -1,13 +1,20 @@
-// Local proxy for TravelAI's AI calls (chat + vision), sitting between the browser and the
-// Anthropic API. The whole point: app.js runs entirely in the browser (no backend of its own),
-// so if it called Anthropic directly the API key would have to live in client-side JS/localStorage
-// — visible to anyone who opens DevTools, or anyone on the same LAN who loads the app (this app is
+// Local proxy for TravelAI's AI calls (chat + vision), sitting between the browser and the AI
+// provider. The whole point: app.js runs entirely in the browser (no backend of its own), so if it
+// called the provider directly the API key would have to live in client-side JS/localStorage —
+// visible to anyone who opens DevTools, or anyone on the same LAN who loads the app (this app is
 // explicitly designed to be reachable from a phone over LAN, see README). This server keeps the
 // key here instead: it reads config.json (gitignored, never committed) and the browser only ever
-// talks to this proxy, never to Anthropic directly.
+// talks to this proxy, never to the provider directly.
 //
-// Setup: copy config.example.json to config.json and paste a real Anthropic API key into it, then
-// `npm install && npm start`.
+// Speaks the OpenAI-compatible Chat Completions API (POST {baseUrl}/v1/chat/completions,
+// `Authorization: Bearer <key>`) rather than Anthropic's own Messages API — this is what actually
+// works against an internal AI gateway (e.g. a company LiteLLM/Azure APIM proxy issuing a
+// restricted key for a specific model alias), and real OpenAI-compatible endpoints (OpenAI itself,
+// most gateways/routers) all speak this same shape, so it's also the more broadly useful default.
+//
+// Setup: copy config.example.json to config.json, set "baseUrl" to your provider/gateway's API
+// base, "apiKey" to your key, and "model" to whatever model name/alias that key is allowed to use,
+// then `npm install && npm start`.
 
 const fs = require('fs');
 const path = require('path');
@@ -15,19 +22,27 @@ const express = require('express');
 
 const configPath = path.join(__dirname, 'config.json');
 if (!fs.existsSync(configPath)) {
-  console.error('Thiếu claude-server/config.json — copy config.example.json thành config.json rồi dán API key Anthropic vào field "apiKey".');
+  console.error('Thiếu claude-server/config.json — copy config.example.json thành config.json rồi điền baseUrl/apiKey/model.');
   process.exit(1);
 }
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
-const ANTHROPIC_VERSION = '2023-06-01';
+function chatCompletionsUrl() {
+  return (config.baseUrl || 'https://api.openai.com').replace(/\/+$/, '') + '/v1/chat/completions';
+}
+function authHeaders() {
+  return {
+    'content-type': 'application/json',
+    'authorization': `Bearer ${config.apiKey}`,
+    ...(config.extraHeaders || {})
+  };
+}
 
 function hasRealKey() {
-  return !!(config.apiKey && config.apiKey.trim() && config.apiKey !== 'YOUR_ANTHROPIC_API_KEY_HERE');
+  return !!(config.apiKey && config.apiKey.trim() && config.apiKey !== 'YOUR_ANTHROPIC_API_KEY_HERE' && config.apiKey !== 'YOUR_API_KEY_HERE');
 }
 function noKeyError(res) {
-  return res.status(500).json({ error: 'claude-server/config.json chưa có API key Anthropic thật — mở file đó và dán key vào field "apiKey", rồi khởi động lại server.' });
+  return res.status(500).json({ error: 'claude-server/config.json chưa có API key thật — mở file đó và dán key vào field "apiKey", rồi khởi động lại server.' });
 }
 
 const app = express();
@@ -44,43 +59,44 @@ app.get('/health', (req, res) => {
   res.json({ ok: hasRealKey(), model: config.model || 'claude-sonnet-5' });
 });
 
-/** Parses one SSE frame (the text between two blank lines) into its `data:` JSON payload, or null for a frame with no/unparseable data line (e.g. a bare "event: ping"). */
+/** Parses one SSE frame (the text between two blank lines) into its `data:` JSON payload, or null for a frame with no/unparseable/`[DONE]` data line. */
 function parseSseFrame(frame) {
   const dataLine = frame.split('\n').find(l => l.startsWith('data:'));
   if (!dataLine) return null;
-  try { return JSON.parse(dataLine.slice(5).trim()); } catch (e) { return null; }
+  const payload = dataLine.slice(5).trim();
+  if (payload === '[DONE]') return null;
+  try { return JSON.parse(payload); } catch (e) { return null; }
 }
 
 /**
  * Streams a chat completion. Request: {system, user}. Response: newline-delimited JSON, one
  * `{"message":{"content":"<incremental text>"}}` line per delta — deliberately shaped to match
- * what Ollama's own /api/chat streaming used to send, so app.js's existing chunk-accumulation
- * logic (extractChunkContent) needed no changes, only a new URL to call.
+ * what Ollama's own /api/chat streaming used to send (this proxy's predecessor), so app.js's
+ * existing chunk-accumulation logic (extractChunkContent) needed no changes, only a new URL to call.
  */
 app.post('/chat', async (req, res) => {
   if (!hasRealKey()) return noKeyError(res);
   const { system, user } = req.body || {};
   if (!user) return res.status(400).json({ error: 'Thiếu "user" trong request body.' });
 
+  const messages = [];
+  if (system) messages.push({ role: 'system', content: system });
+  messages.push({ role: 'user', content: user });
+
   let upstream;
   try {
-    upstream = await fetch(ANTHROPIC_API_URL, {
+    upstream = await fetch(chatCompletionsUrl(), {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': config.apiKey,
-        'anthropic-version': ANTHROPIC_VERSION
-      },
+      headers: authHeaders(),
       body: JSON.stringify({
         model: config.model || 'claude-sonnet-5',
         max_tokens: config.maxTokens || 4096,
-        ...(system ? { system } : {}),
-        messages: [{ role: 'user', content: user }],
+        messages,
         stream: true
       })
     });
   } catch (err) {
-    return res.status(502).json({ error: `Không gọi được Anthropic API: ${err.message}` });
+    return res.status(502).json({ error: `Không gọi được AI provider: ${err.message}` });
   }
 
   if (!upstream.ok || !upstream.body) {
@@ -104,10 +120,9 @@ app.post('/chat', async (req, res) => {
       buffer = frames.pop(); // the last piece may be an incomplete frame — keep it for the next read
       for (const frame of frames) {
         const evt = parseSseFrame(frame);
-        if (evt && evt.type === 'content_block_delta' && evt.delta && evt.delta.type === 'text_delta') {
-          res.write(JSON.stringify({ message: { content: evt.delta.text } }) + '\n');
-        } else if (evt && evt.type === 'error') {
-          res.write(JSON.stringify({ message: { content: '' }, error: (evt.error && evt.error.message) || 'Anthropic stream error' }) + '\n');
+        const delta = evt && evt.choices && evt.choices[0] && evt.choices[0].delta;
+        if (delta && delta.content) {
+          res.write(JSON.stringify({ message: { content: delta.content } }) + '\n');
         }
       }
     }
@@ -130,27 +145,23 @@ app.post('/vision', async (req, res) => {
 
   let upstream;
   try {
-    upstream = await fetch(ANTHROPIC_API_URL, {
+    upstream = await fetch(chatCompletionsUrl(), {
       method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': config.apiKey,
-        'anthropic-version': ANTHROPIC_VERSION
-      },
+      headers: authHeaders(),
       body: JSON.stringify({
         model: config.model || 'claude-sonnet-5',
         max_tokens: 1024,
         messages: [{
           role: 'user',
           content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType || 'image/jpeg', data: imageBase64 } },
-            { type: 'text', text: prompt || 'Describe this image in detail, mentioning any text you can see.' }
+            { type: 'text', text: prompt || 'Describe this image in detail, mentioning any text you can see.' },
+            { type: 'image_url', image_url: { url: `data:${mediaType || 'image/jpeg'};base64,${imageBase64}` } }
           ]
         }]
       })
     });
   } catch (err) {
-    return res.status(502).json({ error: `Không gọi được Anthropic API: ${err.message}` });
+    return res.status(502).json({ error: `Không gọi được AI provider: ${err.message}` });
   }
 
   const data = await upstream.json().catch(() => null);
@@ -159,14 +170,14 @@ app.post('/vision', async (req, res) => {
     return res.status(upstream.status || 502).json({ error: msg });
   }
 
-  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('\n');
+  const text = data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
   res.json({ message: { content: text || '(no response)' } });
 });
 
 const port = config.port || 8901;
 app.listen(port, () => {
-  console.log(`claude-server đang chạy tại http://localhost:${port}`);
+  console.log(`claude-server đang chạy tại http://localhost:${port} (model: ${config.model || 'claude-sonnet-5'}, base: ${config.baseUrl || 'https://api.openai.com'})`);
   if (!hasRealKey()) {
-    console.warn('⚠️  config.json chưa có API key Anthropic thật — /chat và /vision sẽ báo lỗi cho tới khi bạn dán key vào.');
+    console.warn('⚠️  config.json chưa có API key thật — /chat và /vision sẽ báo lỗi cho tới khi bạn dán key vào.');
   }
 });

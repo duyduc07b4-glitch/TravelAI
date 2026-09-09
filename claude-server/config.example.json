@@ -1,6 +1,7 @@
 {
-  "apiKey": "YOUR_ANTHROPIC_API_KEY_HERE",
+  "apiKey": "YOUR_API_KEY_HERE",
   "model": "claude-sonnet-5",
   "port": 8901,
-  "maxTokens": 4096
+  "maxTokens": 4096,
+  "baseUrl": "https://api.openai.com"
 }
