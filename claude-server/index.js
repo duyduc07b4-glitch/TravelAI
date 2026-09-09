@@ -90,7 +90,7 @@ app.post('/chat', async (req, res) => {
       headers: authHeaders(),
       body: JSON.stringify({
         model: config.model || 'claude-sonnet-5',
-        max_tokens: config.maxTokens || 4096,
+        max_tokens: config.maxTokens || 8192,
         messages,
         stream: true
       })

@@ -14,9 +14,7 @@ const SUPPORTED_LANGS = ['vi', 'ja', 'en'];
 const I18N = {
   vi: {
     appSubtitle: 'AI giúp cả nhóm quyết định cùng nhau · chạy bằng Claude API qua proxy riêng · dùng được cả từ điện thoại trong cùng mạng',
-    checkConnBtn: 'Kiểm tra kết nối',
     connect: {
-      defaultHint: 'Cần chạy <code>claude-server</code> trước (xem README): copy <code>claude-server/config.example.json</code> thành <code>config.json</code>, dán API key Anthropic vào, rồi <code>npm install && npm start</code> trong thư mục đó. Xong thì bấm "Kiểm tra kết nối". Muốn dùng từ điện thoại: điện thoại phải cùng Wi-Fi với máy này, thay <code>localhost</code> ở ô Server bằng địa chỉ IP LAN của máy (VD: <code>http://192.168.3.23:8901</code>), và mở trang này trên điện thoại qua <code>http://192.168.3.23:8765/app.html</code>.',
       connecting: 'Đang kết nối tới claude-server...',
       noApiKey: '⚠️ Kết nối được tới claude-server nhưng chưa có API key — mở <code>claude-server/config.json</code>, dán API key Anthropic vào field "apiKey", rồi khởi động lại server.',
       ready: (model) => `✅ Đã kết nối, model "${model}" sẵn sàng qua Claude API.`,
@@ -370,9 +368,7 @@ const I18N = {
   },
   ja: {
     appSubtitle: 'グループ全員で決める旅行をAIがサポート · 専用プロキシ経由でClaude APIを使用 · 同じネットワーク内ならスマホからも利用可',
-    checkConnBtn: '接続確認',
     connect: {
-      defaultHint: '先に <code>claude-server</code> を起動してください（README参照）：<code>claude-server/config.example.json</code> を <code>config.json</code> にコピーし、Anthropicの APIキーを貼り付けてから、そのフォルダで <code>npm install && npm start</code>。起動後「接続確認」を押してください。スマホから使う場合：スマホは同じWi-Fiに接続し、Server欄の <code>localhost</code> をこの端末のLAN IPアドレスに置き換え（例：<code>http://192.168.3.23:8901</code>）、スマホでは <code>http://192.168.3.23:8765/app.html</code> を開いてください。',
       connecting: 'claude-serverに接続中...',
       noApiKey: '⚠️ claude-serverには接続できましたが、APIキーが未設定です。<code>claude-server/config.json</code> を開き、「apiKey」欄にAnthropicのAPIキーを貼り付けてからサーバーを再起動してください。',
       ready: (model) => `✅ 接続済み、モデル「${model}」がClaude API経由で使用可能です。`,
@@ -726,9 +722,7 @@ const I18N = {
   },
   en: {
     appSubtitle: 'The AI that helps your group decide together · runs on Claude API via a local proxy · usable from your phone on the same network',
-    checkConnBtn: 'Check connection',
     connect: {
-      defaultHint: 'You need <code>claude-server</code> running first (see README): copy <code>claude-server/config.example.json</code> to <code>config.json</code>, paste in an Anthropic API key, then run <code>npm install && npm start</code> in that folder. Then click "Check connection". To use it from your phone: your phone must be on the same Wi-Fi, replace <code>localhost</code> in the Server field with this machine\'s LAN IP address (e.g. <code>http://192.168.3.23:8901</code>), and open this page on your phone via <code>http://192.168.3.23:8765/app.html</code>.',
       connecting: 'Connecting to claude-server...',
       noApiKey: '⚠️ Connected to claude-server, but no API key is set yet — open <code>claude-server/config.json</code>, paste an Anthropic API key into the "apiKey" field, then restart the server.',
       ready: (model) => `✅ Connected, model "${model}" is ready via the Claude API.`,
@@ -3127,7 +3121,6 @@ function buildCameraFallback(mode, caption, model, lang = DEFAULT_LANG) {
 // ---------- localStorage persistence (guarded — private mode can throw) ----------
 
 const STORAGE_KEYS = {
-  url: 'claude_proxy_url',
   ragUrl: 'rag_url',
   voiceName: 'voice_name',
   lang: 'app_lang',
@@ -3560,7 +3553,6 @@ function initApp() {
     document.querySelectorAll('.lang-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.lang === currentLang);
     });
-    loadProgress.innerHTML = T('connect.defaultHint');
     updateVoiceSupportLabel();
     updateMicHintIdle();
     populateVoices();
@@ -3596,17 +3588,22 @@ function initApp() {
     if (usList) usList.innerHTML = T('diff.usItems').map(item => `<li>${escapeHtml(item)}</li>`).join('');
   }
 
-  // ---------- Claude proxy connection (see claude-server/ — holds the Anthropic API key
+  // ---------- Claude proxy connection (see claude-server/ — holds the AI provider's API key
   // server-side, the browser never sees it) ----------
-  const serverUrlInput = document.getElementById('serverUrl');
+  // No visible URL field: the proxy always runs on the same machine as this page (claude-server
+  // and the static file server are started together, see start-mac.command/start-windows.bat), on
+  // AI_PROXY_PORT — so deriving the address from the page's own hostname works automatically,
+  // including from a phone on the same LAN (which already reaches this page via that machine's
+  // LAN IP) with no manual "Server" field to edit. `?server=...` in the URL is kept as an escape
+  // hatch for the rare case the proxy runs somewhere else, without needing a visible control for it.
+  const AI_PROXY_PORT = 8901; // must match claude-server/config.json's "port"
   const statusDot = document.getElementById('statusDot');
   const loadProgress = document.getElementById('loadProgress');
-  const loadModelBtn = document.getElementById('loadModelBtn');
-
-  serverUrlInput.value = safeLoadString(STORAGE_KEYS.url) || 'http://localhost:8901';
 
   function aiProxyBase() {
-    return (serverUrlInput.value.trim() || 'http://localhost:8901').replace(/\/+$/, '');
+    const override = new URLSearchParams(window.location.search).get('server');
+    if (override) return override.trim().replace(/\/+$/, '');
+    return `http://${window.location.hostname}:${AI_PROXY_PORT}`;
   }
 
   // ---------- RAG server (reads indexed docs from knowledge/, see rag-server/) ----------
@@ -3662,26 +3659,27 @@ function initApp() {
     return { candidates, context };
   }
 
+  // Only surfaces a message when something's actually wrong (no API key, can't reach the proxy) —
+  // when everything's fine there's nothing the user needs to read, so loadProgress stays empty
+  // rather than showing a "connected!" confirmation no one asked to see.
   function setStatus(state, html) {
     statusDot.className = 'status-dot ' + (state === 'ready' ? 'status-ok' : state === 'loading' ? 'status-warn' : 'status-off');
-    loadProgress.innerHTML = html != null ? html : T('connect.defaultHint');
+    loadProgress.innerHTML = state === 'ready' ? '' : (html || '');
   }
-
-  loadModelBtn.addEventListener('click', checkConnection);
 
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if (btn.dataset.lang === currentLang) return;
       currentLang = normalizeLang(btn.dataset.lang);
       safeSaveString(STORAGE_KEYS.lang, currentLang);
+      checkConnection(); // re-runs so any visible status message (if one is showing) switches language too
       if (recognition) recognition.lang = T('speechLang');
       applyStaticTranslations();
     });
   });
 
+  /** Runs automatically on load (see the bottom of initApp()) — no button to click, nothing to configure; just quietly reports a problem via the status dot + a hint message if there is one. */
   async function checkConnection() {
-    safeSaveString(STORAGE_KEYS.url, serverUrlInput.value.trim());
-    loadModelBtn.disabled = true;
     setStatus('loading', T('connect.connecting'));
     try {
       const res = await fetch(`${aiProxyBase()}/health`);
@@ -3694,8 +3692,6 @@ function initApp() {
       }
     } catch (err) {
       setStatus('off', T('connect.failed', aiProxyBase(), err.message));
-    } finally {
-      loadModelBtn.disabled = false;
     }
   }
 
@@ -5125,6 +5121,7 @@ function initApp() {
   // case where that function is never called at all.
   updateGroupDecisionGate();
   applyAuthUI();
+  checkConnection();
 }
 
 })(typeof globalThis !== 'undefined' ? globalThis : this);
