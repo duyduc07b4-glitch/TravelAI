@@ -1,6 +1,6 @@
 # TravelAI — AI-Powered Group Travel Decision Platform
 
-Không chỉ lên lịch trình — TravelAI giúp cả nhóm ra quyết định du lịch cùng nhau, và cho thấy rõ vì sao AI đề xuất mỗi lựa chọn. Chạy AI hoàn toàn trên máy — không cloud, không tài khoản, không thể phát sinh chi phí — qua [Ollama](https://ollama.com).
+Không chỉ lên lịch trình — TravelAI giúp cả nhóm ra quyết định du lịch cùng nhau, và cho thấy rõ vì sao AI đề xuất mỗi lựa chọn. AI chạy hoàn toàn trên máy — không cloud, không thể phát sinh chi phí — qua [Ollama](https://ollama.com). Có đăng nhập (demo) để mỗi thành viên trong nhóm có tài khoản riêng và gửi lời mời chuyến đi cho nhau.
 
 Ý tưởng gốc: [`AI Voice Travel Assistant.pdf`](./AI%20Voice%20Travel%20Assistant.pdf) (Product Vision).
 
@@ -11,11 +11,18 @@ Xem hướng dẫn đầy đủ (macOS + Windows) tại [`setup-guide.html`](./s
 Tóm tắt nhanh:
 
 1. Cài [Ollama](https://ollama.com/download), chạy `ollama pull llama3.2`
-2. macOS: double-click `start-mac.command` · Windows: double-click `start-windows.bat`
-3. Trình duyệt tự mở `app.html`, bấm "Kiểm tra kết nối"
+2. **Bắt buộc** — chạy auth server (không chạy thì app chỉ đứng ở màn đăng nhập):
+   ```bash
+   cd auth-server
+   npm install
+   npm start        # chạy tại http://localhost:8900
+   ```
+3. macOS: double-click `start-mac.command` · Windows: double-click `start-windows.bat`
+4. Trình duyệt tự mở `app.html` → đăng nhập bằng `admin1` / `user1` / `user2`, mật khẩu `123123` → bấm "Kiểm tra kết nối"
 
 ## Tính năng
 
+- 🔐 **Đăng nhập & mời thành viên** — 3 tài khoản demo có sẵn: `admin1` / `user1` / `user2`, mật khẩu `123123`. Mỗi lần tạo lịch trình xong, có thể chọn người khác trong nhóm và bấm "Gửi lời mời" — người được mời đăng nhập vào sẽ thấy huy hiệu ✉️ ở góc trên, mở ra xem và bấm "Dùng lịch trình này" để áp ngay vào tab của họ. Tài khoản `admin1` có thêm tab "Quản trị" để thêm/xoá người dùng. Chạy qua `auth-server/` (Express + file JSON, xem bên dưới) — đăng nhập demo, không phải hệ thống bảo mật thật.
 - 🗺️ **Dynamic Trip Planning** — tạo lịch trình theo ngày, có link Google Maps cho từng địa điểm. Có thể khai sở thích riêng từng thành viên (mục "Thành viên & sở thích" ngay trong tab này) — AI sẽ cố cân bằng hoạt động cho nhiều người nhất có thể thay vì chỉ tối ưu chung chung, và **📊 Điểm hài lòng của nhóm** hiện ngay sau khi tạo lịch trình (tính cục bộ, không qua LLM) — sửa sở thích một thành viên là điểm cập nhật tức thì, không cần tạo lại lịch trình.
 - 👥 **Group Decision Engine** — không chỉ chấm điểm, mà còn:
   - 📊 **Điểm hài lòng theo từng thành viên** (không chỉ điểm trung bình chung)
@@ -37,6 +44,7 @@ Tóm tắt nhanh:
 - AI chạy local (llama3.2 qua Ollama) không có dữ liệu thời gian thực — giờ mở cửa, số điện thoại, địa chỉ do AI gợi ý **chưa được xác minh**, luôn kiểm tra qua nút "Xem bản đồ" trước khi đi.
 - Chất lượng phụ thuộc vào model đã pull và cấu hình máy chạy.
 - Chất lượng tiếng Nhật/Anh do AI sinh ra phụ thuộc vào model — `llama3.2` trả lời khá tốt nhưng không hoàn hảo, nên kiểm tra kỹ trước khi demo.
+- Đăng nhập chỉ là **demo cho hackathon**, không phải hệ thống bảo mật thật — mật khẩu chung ai cũng biết (`123123`), phiên đăng nhập lưu trong bộ nhớ server nên mất khi restart `auth-server`, và dữ liệu người dùng/lời mời chỉ nằm trên máy đang chạy `auth-server` (không đồng bộ giữa các máy).
 
 ## Cấu trúc file
 
@@ -52,8 +60,24 @@ Tóm tắt nhanh:
 | `tests/app.test.js` | Unit test cho các hàm thuần trong `app.js` |
 | `rag-server/` | (Tùy chọn) server RAG local — index tài liệu trong `knowledge/` và trả về đoạn liên quan cho tab Group Matching |
 | `knowledge/` | Dữ liệu tham khảo (nhà hàng, điểm tham quan, ghi chú) dùng để index cho `rag-server` |
+| `auth-server/` | **Bắt buộc** — server đăng nhập/quản lý user/lời mời (Express + file JSON, xem bên dưới) |
 
-Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang. Dữ liệu này chỉ nằm trên máy bạn, không gửi đi đâu.
+Dữ liệu bạn nhập (lịch trình, thành viên nhóm, lịch sử chat giọng nói...) được tự động lưu vào `localStorage` của trình duyệt nên sẽ không mất khi reload trang. Dữ liệu này chỉ nằm trên máy bạn, không gửi đi đâu. Trừ lời mời chuyến đi — thứ duy nhất được gửi qua `auth-server` để người khác đọc được.
+
+## Chạy Auth server (bắt buộc — app không dùng được nếu thiếu)
+
+Toàn bộ app bị che sau màn đăng nhập cho tới khi kết nối được `auth-server` tại `http://localhost:8900`. Server này seed sẵn 3 tài khoản (`admin1`/`user1`/`user2`, mật khẩu `123123`) vào `auth-server/data.json` (tự tạo ở lần chạy đầu, mật khẩu được hash chứ không lưu thô).
+
+```bash
+cd auth-server
+npm install
+npm start        # chạy tại http://localhost:8900
+```
+
+- `admin1` có quyền admin → thấy thêm tab "Quản trị" để thêm/xoá tài khoản.
+- Sau khi tạo lịch trình ở tab Lịch trình, một khung "✉️ Mời người khác" hiện ra để chọn người gửi lời mời.
+- Người được mời đăng nhập vào sẽ thấy số lời mời ở nút ✉️ trên header, bấm vào để xem và áp lịch trình đó vào tab của họ bằng 1 click.
+- Nếu nhiều người demo trên các máy khác nhau, mỗi máy cần tự chạy `auth-server` riêng (dữ liệu không đồng bộ qua mạng) — phù hợp để demo trên 1 máy với nhiều tài khoản, chưa phải giải pháp multi-device thật.
 
 ## (Tùy chọn) Chạy RAG server cho Group Decision
 

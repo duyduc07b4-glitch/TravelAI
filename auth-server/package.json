@@ -1,0 +1,13 @@
+{
+  "name": "auth-server",
+  "version": "1.0.0",
+  "description": "Local auth server đơn giản cho TravelAI: login, quản lý user (admin), gửi lời mời chuyến đi. Lưu file JSON, không cần database ngoài.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

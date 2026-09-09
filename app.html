@@ -26,9 +26,38 @@
         <button type="button" class="lang-btn" data-lang="ja">JA</button>
         <button type="button" class="lang-btn" data-lang="en">EN</button>
       </div>
+      <div class="user-info" id="user-info" style="display:none;">
+        <span class="user-badge" id="user-name-badge"></span>
+        <button type="button" class="secondary small" id="invites-btn">✉️ <span id="invites-count"></span></button>
+        <button type="button" class="secondary small" id="logout-btn" data-i18n="auth.logoutBtn"></button>
+      </div>
     </div>
   </div>
 </header>
+
+<!-- Màn đăng nhập — che toàn bộ app cho tới khi đăng nhập thành công -->
+<div class="login-overlay" id="login-overlay">
+  <div class="login-card">
+    <div class="login-brand">TravelAI</div>
+    <p class="hint" data-i18n="auth.subtitle"></p>
+    <div class="field"><label data-i18n="auth.usernameLabel"></label><input type="text" id="login-username" placeholder="admin1 / user1 / user2" autocomplete="username"></div>
+    <div class="field"><label data-i18n="auth.passwordLabel"></label><input type="password" id="login-password" placeholder="123123" autocomplete="current-password"></div>
+    <button type="button" id="login-submit" data-i18n="auth.loginBtn"></button>
+    <div class="error-box" id="login-error" style="display:none;"></div>
+    <p class="hint" data-i18n="auth.demoHint"></p>
+  </div>
+</div>
+
+<!-- Bảng lời mời chuyến đi gửi tới người đang đăng nhập -->
+<div class="login-overlay" id="invites-panel" style="display:none;">
+  <div class="login-card invites-card">
+    <div class="invites-head">
+      <div class="login-brand" data-i18n="invite.panelTitle"></div>
+      <button type="button" class="secondary small" id="invites-close" data-i18n="common.close"></button>
+    </div>
+    <div id="invites-panel-list"></div>
+  </div>
+</div>
 
 <div class="hero-banner">
   <div class="hero-copy">
@@ -64,6 +93,7 @@
     <button class="tab-btn" data-tab="heal" data-i18n="tabs.heal"></button>
     <button class="tab-btn" data-tab="camera" data-i18n="tabs.camera"></button>
     <button class="tab-btn" data-tab="diff" data-i18n="tabs.diff"></button>
+    <button class="tab-btn" data-tab="admin" data-i18n="admin.tabLabel" id="admin-tab-btn" style="display:none;"></button>
   </nav>
 
   <!-- TAB 1: Dynamic Trip Planning -->
@@ -91,6 +121,12 @@
       <div class="hint" id="p-shareFeedback"></div>
       <div class="group-decision" id="p-satisfaction"></div>
       <div class="result" id="p-result"></div>
+      <div class="invite-box" id="p-invite" style="display:none;">
+        <div class="invite-title" data-i18n="invite.sectionTitle"></div>
+        <div class="invite-checklist" id="p-invite-list"></div>
+        <button type="button" class="secondary small" id="p-invite-send" data-i18n="invite.sendBtn"></button>
+        <div class="hint" id="p-invite-feedback"></div>
+      </div>
     </div>
   </section>
 
@@ -210,6 +246,27 @@
         </div>
       </div>
       <p class="diff-mission" data-i18n="diff.mission"></p>
+    </div>
+  </section>
+
+  <!-- TAB 7: Admin — chỉ hiện với tài khoản role "admin" -->
+  <section class="panel" id="panel-admin">
+    <div class="card">
+      <h3 data-i18n="admin.title"></h3>
+      <div id="admin-users-list"></div>
+      <h4 class="admin-subheading" data-i18n="admin.addUserTitle"></h4>
+      <div class="row2">
+        <div class="field"><label data-i18n="admin.usernameLabel"></label><input type="text" id="admin-new-username"></div>
+        <div class="field"><label data-i18n="admin.passwordLabel"></label><input type="text" id="admin-new-password"></div>
+      </div>
+      <div class="field"><label data-i18n="admin.roleLabel"></label>
+        <select id="admin-new-role">
+          <option value="user" data-i18n="admin.roleUser"></option>
+          <option value="admin" data-i18n="admin.roleAdmin"></option>
+        </select>
+      </div>
+      <button type="button" id="admin-add-user-btn" data-i18n="admin.addUserBtn"></button>
+      <div class="hint" id="admin-feedback"></div>
     </div>
   </section>
 </main>

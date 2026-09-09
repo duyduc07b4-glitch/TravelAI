@@ -42,7 +42,8 @@ const I18N = {
       newItineraryHeader: 'Lịch trình mới',
       plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI chạy local không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.',
       unlimitedBudget: 'không giới hạn',
-      soloTraveler: 'một mình'
+      soloTraveler: 'một mình',
+      close: 'Đóng'
     },
     errors: {
       timeout: 'AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.',
@@ -278,6 +279,49 @@ const I18N = {
       exampleNewTag: 'TravelAI',
       exampleNewText: 'Cùng dữ liệu đó, TravelAI tìm ra phương án khiến người thích hải sản đạt 78% hài lòng — đồng thời hiện rõ người ăn chay chỉ đạt 35% để nhóm tự cân nhắc đánh đổi, thay vì AI âm thầm quyết định thay cả nhóm.'
     },
+    auth: {
+      subtitle: 'Đăng nhập để tiếp tục',
+      usernameLabel: 'Tên đăng nhập',
+      passwordLabel: 'Mật khẩu',
+      loginBtn: 'Đăng nhập',
+      demoHint: 'Tài khoản demo: admin1 / user1 / user2 — mật khẩu 123123',
+      logoutBtn: 'Đăng xuất',
+      sessionExpired: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
+      missingFields: 'Nhập đủ tên đăng nhập và mật khẩu.',
+      connectError: (base) => `Không kết nối được tới auth server tại ${base}. Kiểm tra đã chạy "npm start" trong thư mục auth-server chưa.`
+    },
+    admin: {
+      tabLabel: '🛡️ Quản trị',
+      title: '🛡️ Quản lý người dùng',
+      addUserTitle: 'Thêm người dùng mới',
+      usernameLabel: 'Tên đăng nhập',
+      passwordLabel: 'Mật khẩu',
+      roleLabel: 'Vai trò',
+      roleUser: 'Người dùng',
+      roleAdmin: 'Quản trị viên',
+      addUserBtn: 'Thêm người dùng',
+      deleteBtn: 'Xoá',
+      confirmDelete: (name) => `Xoá tài khoản "${name}"? Không thể hoàn tác.`,
+      addSuccess: (name) => `✅ Đã thêm "${name}".`,
+      deleteSuccess: (name) => `✅ Đã xoá "${name}".`,
+      missingFields: 'Nhập đủ tên đăng nhập và mật khẩu.',
+      loadError: 'Không tải được danh sách người dùng — kiểm tra auth server đã chạy chưa.'
+    },
+    invite: {
+      sectionTitle: '✉️ Mời người khác cùng xem lịch trình này',
+      noOthers: 'Chưa có tài khoản nào khác để mời.',
+      sendBtn: 'Gửi lời mời',
+      sentSuccess: (names) => `✅ Đã gửi lời mời tới: ${names}.`,
+      selectAtLeastOne: 'Chọn ít nhất 1 người để mời.',
+      panelTitle: '✉️ Lời mời của bạn',
+      empty: 'Chưa có lời mời nào.',
+      from: (name) => `Từ: ${name}`,
+      tripLine: (dest, days) => `${dest} — ${days} ngày`,
+      useBtn: 'Dùng lịch trình này',
+      dismissBtn: 'Bỏ qua',
+      loadError: 'Không tải được lời mời — kiểm tra auth server đã chạy chưa.',
+      usedSuccess: '✅ Đã áp dụng lịch trình từ lời mời vào tab Lịch trình.'
+    },
     risk: {
       title: '🚦 Kiểm tra rủi ro chuyến đi',
       level: { low: 'Thấp', medium: 'Vừa', high: 'Cao' },
@@ -335,7 +379,8 @@ const I18N = {
       newItineraryHeader: '新しい旅程',
       plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ このAIはローカル動作でリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離はAIの一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。',
       unlimitedBudget: '無制限',
-      soloTraveler: '一人旅'
+      soloTraveler: '一人旅',
+      close: '閉じる'
     },
     errors: {
       timeout: 'AIが60秒以内に応答しませんでした — モデルの初回読み込みに時間がかかっているか、端末の負荷が高い可能性があります。再試行するか、より軽量なモデルに変更してください。',
@@ -571,6 +616,49 @@ const I18N = {
       exampleNewTag: 'TravelAI',
       exampleNewText: '同じデータでTravelAIは、海鮮好きのメンバーが78%の満足度を得られる選択肢を見つけ出し、同時にベジタリアンのメンバーは35%であることも明示する — AIが勝手にグループの代わりに決めるのではなく、グループ自身がトレードオフを判断できるようにする。'
     },
+    auth: {
+      subtitle: '続けるにはログインしてください',
+      usernameLabel: 'ユーザー名',
+      passwordLabel: 'パスワード',
+      loginBtn: 'ログイン',
+      demoHint: 'デモ用アカウント：admin1 / user1 / user2 — パスワード 123123',
+      logoutBtn: 'ログアウト',
+      sessionExpired: 'セッションの有効期限が切れました。もう一度ログインしてください。',
+      missingFields: 'ユーザー名とパスワードを入力してください。',
+      connectError: (base) => `認証サーバー（${base}）に接続できません。auth-server フォルダで "npm start" を実行したか確認してください。`
+    },
+    admin: {
+      tabLabel: '🛡️ 管理',
+      title: '🛡️ ユーザー管理',
+      addUserTitle: '新しいユーザーを追加',
+      usernameLabel: 'ユーザー名',
+      passwordLabel: 'パスワード',
+      roleLabel: '権限',
+      roleUser: '一般ユーザー',
+      roleAdmin: '管理者',
+      addUserBtn: 'ユーザーを追加',
+      deleteBtn: '削除',
+      confirmDelete: (name) => `アカウント「${name}」を削除しますか？元に戻せません。`,
+      addSuccess: (name) => `✅「${name}」を追加しました。`,
+      deleteSuccess: (name) => `✅「${name}」を削除しました。`,
+      missingFields: 'ユーザー名とパスワードを入力してください。',
+      loadError: 'ユーザー一覧を取得できません — auth server が起動しているか確認してください。'
+    },
+    invite: {
+      sectionTitle: '✉️ この旅程を他の人にも見てもらう',
+      noOthers: '招待できる他のアカウントがまだありません。',
+      sendBtn: '招待を送る',
+      sentSuccess: (names) => `✅ 招待を送りました：${names}`,
+      selectAtLeastOne: '招待する相手を1人以上選んでください。',
+      panelTitle: '✉️ あなた宛ての招待',
+      empty: '招待はまだありません。',
+      from: (name) => `送信者：${name}`,
+      tripLine: (dest, days) => `${dest} — ${days}日間`,
+      useBtn: 'この旅程を使う',
+      dismissBtn: '無視する',
+      loadError: '招待を取得できません — auth server が起動しているか確認してください。',
+      usedSuccess: '✅ 招待の旅程を「旅程」タブに反映しました。'
+    },
     risk: {
       title: '🚦 旅程のリスクチェック',
       level: { low: '低い', medium: '中程度', high: '高い' },
@@ -628,7 +716,8 @@ const I18N = {
       newItineraryHeader: 'Updated itinerary',
       plannerDisclaimer: '📍 Click "View map" to see the real address, opening hours, and phone number (if listed). ⚠️ This AI runs locally with no real-time data, so it <strong>cannot confirm whether a place is actually open at that time</strong>, and the ordering/distance between stops is just the AI\'s general guess — <strong>not based on real traffic or map data</strong>. Always double-check on Maps before you go.',
       unlimitedBudget: 'unlimited',
-      soloTraveler: 'solo'
+      soloTraveler: 'solo',
+      close: 'Close'
     },
     errors: {
       timeout: "The AI didn't respond within 60 seconds — the model might be loading for the first time (slower than usual), or the machine is under heavy load. Try again, or switch to a lighter model.",
@@ -863,6 +952,49 @@ const I18N = {
       exampleOldText: "3 people looking for a place to eat in Naha (a seafood lover / a vegetarian / no strong preference) — a typical AI picks the \"safe average\": all 3 land at just 60% satisfaction. Nobody's unhappy, but nobody's genuinely happy either.",
       exampleNewTag: 'TravelAI',
       exampleNewText: "With the same data, TravelAI surfaces an option where the seafood lover reaches 78% satisfaction — while clearly showing the vegetarian member only reaches 35%, so the group decides the trade-off themselves instead of the AI quietly deciding for them."
+    },
+    auth: {
+      subtitle: 'Log in to continue',
+      usernameLabel: 'Username',
+      passwordLabel: 'Password',
+      loginBtn: 'Log in',
+      demoHint: 'Demo accounts: admin1 / user1 / user2 — password 123123',
+      logoutBtn: 'Log out',
+      sessionExpired: 'Your session has expired — please log in again.',
+      missingFields: 'Enter both a username and a password.',
+      connectError: (base) => `Could not reach the auth server at ${base}. Check that you ran "npm start" in the auth-server folder.`
+    },
+    admin: {
+      tabLabel: '🛡️ Admin',
+      title: '🛡️ Manage users',
+      addUserTitle: 'Add a new user',
+      usernameLabel: 'Username',
+      passwordLabel: 'Password',
+      roleLabel: 'Role',
+      roleUser: 'User',
+      roleAdmin: 'Admin',
+      addUserBtn: 'Add user',
+      deleteBtn: 'Delete',
+      confirmDelete: (name) => `Delete account "${name}"? This can't be undone.`,
+      addSuccess: (name) => `✅ Added "${name}".`,
+      deleteSuccess: (name) => `✅ Deleted "${name}".`,
+      missingFields: 'Enter both a username and a password.',
+      loadError: "Couldn't load the user list — check that the auth server is running."
+    },
+    invite: {
+      sectionTitle: '✉️ Invite others to see this itinerary',
+      noOthers: 'No other accounts to invite yet.',
+      sendBtn: 'Send invite',
+      sentSuccess: (names) => `✅ Invite sent to: ${names}.`,
+      selectAtLeastOne: 'Pick at least one person to invite.',
+      panelTitle: '✉️ Your invites',
+      empty: 'No invites yet.',
+      from: (name) => `From: ${name}`,
+      tripLine: (dest, days) => `${dest} — ${days} days`,
+      useBtn: 'Use this itinerary',
+      dismissBtn: 'Dismiss',
+      loadError: "Couldn't load invites — check that the auth server is running.",
+      usedSuccess: '✅ Applied the itinerary from that invite to the Itinerary tab.'
     },
     risk: {
       title: '🚦 Travel risk check',
@@ -2477,7 +2609,9 @@ const STORAGE_KEYS = {
   planner: 'planner_state_v1',
   group: 'group_state_v1',
   heal: 'heal_state_v1',
-  voiceLog: 'voice_log_v1'
+  voiceLog: 'voice_log_v1',
+  auth: 'auth_session_v1',
+  authUrl: 'auth_url'
 };
 const VOICE_LOG_MAX = 40;
 
@@ -2552,6 +2686,268 @@ function initApp() {
     // anything else — the itinerary itself is the prerequisite (see updateGroupDecisionGate()).
     groupDecision: null
   };
+
+  // ---------- Auth (login, admin user management, trip invites) ----------
+  // Talks to auth-server/ (Express + JSON file, see that folder) — a separate optional local
+  // server, same pattern as the RAG server. Session token kept in memory + localStorage only;
+  // there is no real security here (plaintext-in-transit over local HTTP, server-side hashing
+  // only) — this is a demo login for a hackathon prototype, not a production auth system.
+  function authBase() {
+    return (safeLoadString(STORAGE_KEYS.authUrl) || 'http://localhost:8900').replace(/\/+$/, '');
+  }
+
+  let authToken = null;
+  let currentUser = null; // { username, role }
+
+  function loadAuthFromStorage() {
+    const saved = safeLoad(STORAGE_KEYS.auth);
+    if (saved && saved.token && saved.user) {
+      authToken = saved.token;
+      currentUser = saved.user;
+    }
+  }
+  function persistAuth() {
+    if (authToken && currentUser) safeSave(STORAGE_KEYS.auth, { token: authToken, user: currentUser });
+    else { try { localStorage.removeItem(STORAGE_KEYS.auth); } catch (e) { /* ignore */ } }
+  }
+  loadAuthFromStorage();
+
+  /** Thin fetch wrapper for auth-server: adds the bearer token, throws with the server's own error message, and forces re-login on a 401 (session expired or server restarted since). */
+  async function authApi(path, { method = 'GET', body } = {}) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (authToken) headers.Authorization = 'Bearer ' + authToken;
+    let res;
+    try {
+      res = await fetch(`${authBase()}${path}`, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    } catch (err) {
+      throw new Error(T('auth.connectError', authBase()));
+    }
+    let data = null;
+    try { data = await res.json(); } catch (e) { /* empty body, e.g. some 204s */ }
+    if (res.status === 401 && path !== '/login') {
+      authToken = null;
+      currentUser = null;
+      persistAuth();
+      applyAuthUI(T('auth.sessionExpired'));
+    }
+    if (!res.ok) throw new Error((data && data.error) || (res.status + ' ' + res.statusText));
+    return data;
+  }
+
+  const loginOverlay = document.getElementById('login-overlay');
+  const loginUsername = document.getElementById('login-username');
+  const loginPassword = document.getElementById('login-password');
+  const loginSubmitBtn = document.getElementById('login-submit');
+  const loginErrorEl = document.getElementById('login-error');
+  const userInfoEl = document.getElementById('user-info');
+  const userNameBadge = document.getElementById('user-name-badge');
+  const logoutBtn = document.getElementById('logout-btn');
+  const adminTabBtn = document.getElementById('admin-tab-btn');
+  const invitesBtn = document.getElementById('invites-btn');
+  const invitesCountEl = document.getElementById('invites-count');
+  const invitesPanel = document.getElementById('invites-panel');
+  const invitesPanelList = document.getElementById('invites-panel-list');
+  const invitesCloseBtn = document.getElementById('invites-close');
+
+  /** Shows/hides the login overlay and the logged-in header bits based on current auth state. Pass a message to surface an error (e.g. session expired) on the login form. */
+  function applyAuthUI(loginMessage) {
+    if (currentUser) {
+      loginOverlay.style.display = 'none';
+      userInfoEl.style.display = 'flex';
+      userNameBadge.textContent = currentUser.username + (currentUser.role === 'admin' ? ' · admin' : '');
+      adminTabBtn.style.display = currentUser.role === 'admin' ? '' : 'none';
+      if (currentUser.role !== 'admin') {
+        const adminPanel = document.getElementById('panel-admin');
+        if (adminPanel && adminPanel.classList.contains('active')) {
+          const plannerTabBtn = document.querySelector('.tab-btn[data-tab="planner"]');
+          if (plannerTabBtn) plannerTabBtn.click();
+        }
+      }
+      refreshInvitesBadge();
+    } else {
+      loginOverlay.style.display = 'flex';
+      userInfoEl.style.display = 'none';
+      adminTabBtn.style.display = 'none';
+      invitesPanel.style.display = 'none';
+      if (loginMessage) { loginErrorEl.textContent = loginMessage; loginErrorEl.style.display = 'block'; }
+    }
+  }
+
+  async function handleLogin() {
+    const username = loginUsername.value.trim();
+    const password = loginPassword.value;
+    loginErrorEl.style.display = 'none';
+    if (!username || !password) {
+      loginErrorEl.textContent = T('auth.missingFields');
+      loginErrorEl.style.display = 'block';
+      return;
+    }
+    loginSubmitBtn.disabled = true;
+    try {
+      const data = await authApi('/login', { method: 'POST', body: { username, password } });
+      authToken = data.token;
+      currentUser = data.user;
+      persistAuth();
+      loginPassword.value = '';
+      applyAuthUI();
+    } catch (err) {
+      loginErrorEl.textContent = err.message;
+      loginErrorEl.style.display = 'block';
+    } finally {
+      loginSubmitBtn.disabled = false;
+    }
+  }
+  loginSubmitBtn.addEventListener('click', handleLogin);
+  [loginUsername, loginPassword].forEach((el) => el.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleLogin(); }));
+
+  logoutBtn.addEventListener('click', async () => {
+    try { await authApi('/logout', { method: 'POST' }); } catch (e) { /* logging out locally regardless */ }
+    authToken = null;
+    currentUser = null;
+    persistAuth();
+    applyAuthUI();
+  });
+
+  // ---------- Invites received ----------
+  let lastFetchedInvites = [];
+
+  async function refreshInvitesBadge() {
+    if (!currentUser) return;
+    try {
+      const data = await authApi('/invites');
+      lastFetchedInvites = data.invites || [];
+      invitesCountEl.textContent = lastFetchedInvites.length ? String(lastFetchedInvites.length) : '';
+    } catch (e) { /* auth server optional/offline — invites just silently stay unavailable */ }
+  }
+
+  function renderInvitesPanel() {
+    if (!lastFetchedInvites.length) {
+      invitesPanelList.innerHTML = `<div class="invite-empty">${escapeHtml(T('invite.empty'))}</div>`;
+      return;
+    }
+    invitesPanelList.innerHTML = lastFetchedInvites.map((inv) => `
+      <div class="invite-item">
+        <div class="invite-item-top">${escapeHtml(tr(currentLang, 'invite.tripLine', (inv.trip && inv.trip.destination) || '', (inv.trip && inv.trip.days) || ''))}</div>
+        <div class="invite-item-meta">${escapeHtml(tr(currentLang, 'invite.from', inv.from))}</div>
+        <div class="invite-item-actions">
+          <button type="button" class="invite-use-btn" data-invite-id="${escapeHtml(inv.id)}">${escapeHtml(T('invite.useBtn'))}</button>
+          <button type="button" class="secondary invite-dismiss-btn" data-invite-id="${escapeHtml(inv.id)}">${escapeHtml(T('invite.dismissBtn'))}</button>
+        </div>
+      </div>`).join('');
+  }
+
+  invitesBtn.addEventListener('click', async () => {
+    invitesPanel.style.display = 'flex';
+    await refreshInvitesBadge();
+    renderInvitesPanel();
+  });
+  invitesCloseBtn.addEventListener('click', () => { invitesPanel.style.display = 'none'; });
+
+  /** Loads an invited itinerary straight into the Itinerary tab — looked up fresh via getElementById (not closed-over consts) since this can be triggered before TAB 1's own script section has necessarily run, same TDZ concern as elsewhere in this file. */
+  function applyInviteToPlanner(invite) {
+    const trip = invite.trip || {};
+    const dest = trip.destination || '';
+    const days = trip.days || '';
+    const fields = { 'p-dest': dest, 'p-days': days, 'p-start': trip.startDate || '', 'p-budget': trip.budget || '', 'p-group': trip.group || '', 'p-notes': trip.notes || '' };
+    Object.entries(fields).forEach(([id, value]) => { const el = document.getElementById(id); if (el) el.value = value; });
+    if (trip.data) {
+      const context = { destination: dest, days, startDate: trip.startDate || '', budget: trip.budget || '', group: trip.group || '', notes: trip.notes || '' };
+      updateTripStateFromPlannerData(trip.data, context);
+      const members = currentMembers();
+      const risks = detectTravelRisks(flattenActivities(trip.data), context, null, currentLang);
+      renderPlannerSatisfaction(members, flattenActivities(trip.data));
+      const pResultEl = document.getElementById('p-result');
+      if (pResultEl) pResultEl.innerHTML = `<div class="result-box">${renderPlannerHtml(trip.data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+      updatePlannerShareState(trip.data, dest);
+      savePlannerState({ data: trip.data });
+    }
+    const plannerTabBtn = document.querySelector('.tab-btn[data-tab="planner"]');
+    if (plannerTabBtn) plannerTabBtn.click();
+    const feedbackEl = document.getElementById('p-shareFeedback');
+    if (feedbackEl) feedbackEl.textContent = T('invite.usedSuccess');
+  }
+
+  invitesPanelList.addEventListener('click', async (e) => {
+    const useBtn = e.target.closest('.invite-use-btn');
+    const dismissBtn = e.target.closest('.invite-dismiss-btn');
+    if (useBtn) {
+      const invite = lastFetchedInvites.find((i) => i.id === useBtn.dataset.inviteId);
+      if (!invite) return;
+      applyInviteToPlanner(invite);
+      invitesPanel.style.display = 'none';
+    } else if (dismissBtn) {
+      const id = dismissBtn.dataset.inviteId;
+      try { await authApi(`/invites/${id}`, { method: 'DELETE' }); } catch (err) { /* still remove locally */ }
+      lastFetchedInvites = lastFetchedInvites.filter((i) => i.id !== id);
+      invitesCountEl.textContent = lastFetchedInvites.length ? String(lastFetchedInvites.length) : '';
+      renderInvitesPanel();
+    }
+  });
+
+  // ---------- Admin: manage users ----------
+  const adminUsersList = document.getElementById('admin-users-list');
+  const adminNewUsername = document.getElementById('admin-new-username');
+  const adminNewPassword = document.getElementById('admin-new-password');
+  const adminNewRole = document.getElementById('admin-new-role');
+  const adminAddUserBtn = document.getElementById('admin-add-user-btn');
+  const adminFeedback = document.getElementById('admin-feedback');
+
+  // Doesn't touch adminFeedback on success — callers set their own success/error message
+  // *after* this resolves (add/delete), so a refresh never wipes out the message it was
+  // just asked to show. Only clobbers it on a genuine load failure.
+  async function loadAdminUsers() {
+    try {
+      const data = await authApi('/users');
+      renderAdminUsers(data.users || []);
+    } catch (err) {
+      adminUsersList.innerHTML = '';
+      adminFeedback.textContent = '⚠️ ' + (err.message || T('admin.loadError'));
+    }
+  }
+
+  function renderAdminUsers(users) {
+    adminUsersList.innerHTML = users.map((u) => `
+      <div class="admin-user-row">
+        <span><span class="admin-user-name">${escapeHtml(u.username)}</span><span class="admin-user-role">${escapeHtml(u.role === 'admin' ? T('admin.roleAdmin') : T('admin.roleUser'))}</span></span>
+        ${u.username === (currentUser && currentUser.username) ? '' : `<button type="button" class="secondary admin-delete-btn" data-username="${escapeHtml(u.username)}">${escapeHtml(T('admin.deleteBtn'))}</button>`}
+      </div>`).join('');
+  }
+
+  adminUsersList.addEventListener('click', async (e) => {
+    const btn = e.target.closest('.admin-delete-btn');
+    if (!btn) return;
+    const username = btn.dataset.username;
+    if (!window.confirm(T('admin.confirmDelete', username))) return;
+    try {
+      await authApi(`/users/${encodeURIComponent(username)}`, { method: 'DELETE' });
+      adminFeedback.textContent = T('admin.deleteSuccess', username);
+      loadAdminUsers();
+    } catch (err) {
+      adminFeedback.textContent = '⚠️ ' + err.message;
+    }
+  });
+
+  adminAddUserBtn.addEventListener('click', async () => {
+    const username = adminNewUsername.value.trim();
+    const password = adminNewPassword.value;
+    const role = adminNewRole.value;
+    if (!username || !password) { adminFeedback.textContent = T('admin.missingFields'); return; }
+    try {
+      await authApi('/users', { method: 'POST', body: { username, password, role } });
+      adminFeedback.textContent = T('admin.addSuccess', username);
+      adminNewUsername.value = '';
+      adminNewPassword.value = '';
+      loadAdminUsers();
+    } catch (err) {
+      adminFeedback.textContent = '⚠️ ' + err.message;
+    }
+  });
+
+  // Load the Admin tab's user list right when it's opened, not on every app load — it's admin-only and rarely visited.
+  document.querySelector('.tab-btn[data-tab="admin"]').addEventListener('click', () => {
+    adminFeedback.textContent = '';
+    loadAdminUsers();
+  });
 
   // Tracks fields still showing the built-in example content (not user-typed/saved),
   // so switching language can re-translate them instead of leaving stale text behind.
@@ -2870,7 +3266,45 @@ function initApp() {
   const pShare = document.getElementById('p-share');
   const pShareFeedback = document.getElementById('p-shareFeedback');
   const pSatisfaction = document.getElementById('p-satisfaction');
+  const pInvite = document.getElementById('p-invite');
+  const pInviteList = document.getElementById('p-invite-list');
+  const pInviteSendBtn = document.getElementById('p-invite-send');
+  const pInviteFeedback = document.getElementById('p-invite-feedback');
   let lastPlannerShare = null;
+  let lastGeneratedTrip = null;
+
+  /** Fetches who's available to invite and shows the invite box under the just-generated itinerary. Silently hides it if the auth server is offline or nobody else to invite — inviting is a bonus on top of the itinerary, not something that should block it. */
+  async function showInviteBox(trip) {
+    lastGeneratedTrip = trip;
+    if (!pInvite || !currentUser) return;
+    pInviteFeedback.textContent = '';
+    try {
+      const dir = await authApi('/directory');
+      const others = dir.users || [];
+      if (!others.length) { pInvite.style.display = 'none'; return; }
+      pInviteList.innerHTML = others.map((u) => `<label><input type="checkbox" class="invite-checkbox" value="${escapeHtml(u.username)}"> ${escapeHtml(u.username)}</label>`).join('');
+      pInvite.style.display = 'block';
+    } catch (e) {
+      pInvite.style.display = 'none';
+    }
+  }
+
+  if (pInviteSendBtn) {
+    pInviteSendBtn.addEventListener('click', async () => {
+      const checked = [...pInviteList.querySelectorAll('.invite-checkbox:checked')].map((cb) => cb.value);
+      if (!checked.length) { pInviteFeedback.textContent = T('invite.selectAtLeastOne'); return; }
+      if (!lastGeneratedTrip) return;
+      pInviteSendBtn.disabled = true;
+      try {
+        await authApi('/invites', { method: 'POST', body: { trip: lastGeneratedTrip, invitees: checked } });
+        pInviteFeedback.textContent = T('invite.sentSuccess', checked.join(', '));
+      } catch (err) {
+        pInviteFeedback.textContent = '⚠️ ' + err.message;
+      } finally {
+        pInviteSendBtn.disabled = false;
+      }
+    });
+  }
 
   /** Group Satisfaction Score for the actual generated itinerary (not just one venue) — reuses the same deterministic engine as the Group Decision tab, no LLM call. */
   function computePlannerSatisfactionHtml(members, activities) {
@@ -3124,6 +3558,7 @@ function initApp() {
       pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
       updatePlannerShareState(data, dest);
       savePlannerState({ data });
+      showInviteBox({ destination: dest, days, startDate, budget, group, notes, data });
     } catch (err) { showError(pResult, err); pShare.style.display = 'none'; }
   });
 
@@ -4017,6 +4452,7 @@ function initApp() {
   // effect of updateTripStateFromPlannerData() when there IS one; this covers the fresh-session
   // case where that function is never called at all.
   updateGroupDecisionGate();
+  applyAuthUI();
 }
 
 })(typeof globalThis !== 'undefined' ? globalThis : this);
