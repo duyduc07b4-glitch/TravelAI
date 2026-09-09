@@ -608,6 +608,27 @@ describe('normalizeSelfHealingAiResult', () => {
     assert.deepEqual(normalized.replacements, base.replacements);
   });
 
+  test('refuses an updated_days response that drops a day, falling through to updated_itinerary instead', () => {
+    // Regression test: updated_days used to be trusted verbatim with no count check, unlike the
+    // sibling updated_itinerary branch — a truncated/drifted AI response covering only Day 1 would
+    // silently delete Day 2's activities from the healed plan with no warning.
+    const base = buildSelfHealingPlan(
+      { days: [
+        { day: 1, activities: ['Beach', 'Lunch'] },
+        { day: 2, activities: ['Museum', 'Dinner'] }
+      ] },
+      ['Beach', 'Lunch', 'Museum', 'Dinner'],
+      'Bão lớn kèm gió mạnh',
+      { days: 2, budget: '90000', group: '2 người', notes: '' }
+    );
+    const normalized = normalizeSelfHealingAiResult(base, {
+      updated_days: [{ day: 1, activities: [{ text: 'Beach' }, { text: 'Food Hall' }] }], // Day 2 missing
+      updated_itinerary: ['Beach', 'Food Hall', 'Museum', 'Dinner'] // correct count, used as fallback
+    });
+    assert.equal(normalized.updated_days.length, 2);
+    assert.equal(normalized.updated_itinerary.length, 4);
+  });
+
   test('rebuilds day-structure from AI flat itinerary and keeps canonical consistency', () => {
     const base = buildSelfHealingPlan(
       {
@@ -1057,6 +1078,15 @@ describe('detectTravelRisks', () => {
     const walking = risks.find(r => r.type === 'walking');
     assert.ok(walking);
     assert.equal(walking.level, 'high');
+  });
+  test('counts an outdoor activity that also matches the food regex (e.g. a beach BBQ) as outdoor, not just food', () => {
+    // Regression test: classifyActivity's `category` is mutually exclusive (food checked before
+    // outdoor), so "Beach BBQ lunch" and "Garden BBQ" used to be dropped from the walking count
+    // entirely (bucketed as 'food'), understating a 5-activity, all-outdoor day as only 3.
+    const risks = detectTravelRisks(['Beach BBQ lunch', 'Garden BBQ', 'Beach walk', 'Park hike', 'Sunset viewing'], {}, null, 'vi');
+    const walking = risks.find(r => r.type === 'walking');
+    assert.ok(walking);
+    assert.equal(walking.level, 'high'); // all 5 are outdoor — must cross the >=4 "high" threshold
   });
   test('flags a tight budget for the number of days', () => {
     const risks = detectTravelRisks(['Museum'], { budget: '10000', days: 4 }, null, 'vi');

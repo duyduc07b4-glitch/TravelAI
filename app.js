@@ -2542,10 +2542,19 @@ function normalizeSelfHealingAiResult(baseData, aiData) {
   let updatedDays = [];
   const baselineCount = flattenSelfHealingActivitiesFromDays(fallback.updated_days).length;
   if (Array.isArray(aiData.updated_days) && aiData.updated_days.length) {
-    updatedDays = cloneSelfHealingDays(aiData.updated_days);
-  } else if (Array.isArray(aiData.replacements) && aiData.replacements.length) {
+    const candidateDays = cloneSelfHealingDays(aiData.updated_days);
+    const candidateCount = flattenSelfHealingActivitiesFromDays(candidateDays).length;
+    // Same safeguard the updated_itinerary branch below already has — don't silently accept a
+    // day-structured response covering a different number of activities than the original
+    // itinerary (e.g. the model dropped a whole day), which would otherwise delete part of the
+    // trip with no warning. If it doesn't match, fall through to try replacements/updated_itinerary
+    // instead of trusting this one.
+    if (baselineCount === 0 || candidateCount === baselineCount) updatedDays = candidateDays;
+  }
+  if (!updatedDays.length && Array.isArray(aiData.replacements) && aiData.replacements.length) {
     updatedDays = applyReplacementHintsToDays(fallback.updated_days, aiData.replacements);
-  } else if (Array.isArray(aiData.updated_itinerary) && aiData.updated_itinerary.length) {
+  }
+  if (!updatedDays.length && Array.isArray(aiData.updated_itinerary) && aiData.updated_itinerary.length) {
     const normalizedList = dedupePlanItems(aiData.updated_itinerary.map(cleanSelfHealingActivityText).filter(Boolean));
     // Keep day mapping stable: only map by position when the LLM keeps the exact activity count.
     if (baselineCount > 0 && normalizedList.length === baselineCount) {
@@ -2716,7 +2725,11 @@ function detectTravelRisks(activities, context, weatherIncident, lang) {
   const list = (activities || []).filter(Boolean);
   const risks = [];
 
-  const outdoorCount = list.filter(a => classifyActivity(a).category === 'outdoor').length;
+  // The `.outdoor` boolean, not `.category === 'outdoor'` — classifyActivity's category is
+  // mutually exclusive (food is checked before outdoor), so a beach BBQ or garden BBQ becomes
+  // category:'food' and would be silently dropped from the walking/fatigue count even though
+  // it's genuinely an outdoor activity. `.outdoor` is a separate, non-exclusive flag for exactly this.
+  const outdoorCount = list.filter(a => classifyActivity(a).outdoor).length;
   if (outdoorCount >= 4) risks.push({ type: 'walking', level: 'high', detail: tr(lang, 'risk.walkingHigh', outdoorCount) });
   else if (outdoorCount >= 2) risks.push({ type: 'walking', level: 'medium', detail: tr(lang, 'risk.walkingMedium', outdoorCount) });
 
@@ -3110,6 +3123,7 @@ function initApp() {
       const members = currentMembers();
       const risks = detectTravelRisks(flattenActivities(trip.data), context, null, currentLang);
       renderPlannerSatisfaction(members, flattenActivities(trip.data));
+      renderPlannerCostSummary(trip.data, members.length);
       const pResultEl = document.getElementById('p-result');
       if (pResultEl) pResultEl.innerHTML = `<div class="result-box">${renderPlannerHtml(trip.data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
       updatePlannerShareState(trip.data, dest);
@@ -3749,23 +3763,42 @@ function initApp() {
     const notes = pNotes.value.trim();
     const activities = flattenActivities(data);
     const risks = detectTravelRisks(activities, { budget, days, group, notes }, null, currentLang);
-    renderPlannerSatisfaction(currentMembers(), activities);
+    const members = currentMembers();
+    renderPlannerSatisfaction(members, activities);
+    renderPlannerCostSummary(data, members.length);
     pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(data, dest, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
     updatePlannerShareState(data, dest);
     savePlannerState({ data });
   }
 
-  /** Replaces one activity's text in tripState.plannerData in place (matched by day number when known, else by exact text) and keeps tripState.itinerary in sync. Returns false if no match was found. */
-  function replacePlaceInItinerary(oldText, newText, dayNumber) {
+  /**
+   * Replaces one activity's text in tripState.plannerData in place (matched by day number when
+   * known, else by exact text) and keeps tripState.itinerary in sync. Returns false if no match
+   * was found.
+   *
+   * `oldText` is always a plain string (it comes from gPlace.value, itself populated via
+   * plannerActivityText() in populateGroupPlaceOptions), but day.activities holds {text, price}
+   * objects since the planner schema change — comparing with indexOf()/includes() (strict
+   * equality) against a string can never match an object, so this used to always return false
+   * and silently break the "Đổi địa điểm" swap feature entirely. Matching now goes through
+   * plannerActivityText() so it works for either shape.
+   */
+  function replacePlaceInItinerary(oldText, newText, dayNumber, newPrice) {
     const data = tripState.plannerData;
     if (!data || !Array.isArray(data.days)) return false;
+    const matchesOld = (activity) => plannerActivityText(activity) === oldText;
     const day = dayNumber != null
       ? data.days.find((d, idx) => d && (Number(d.day) || (idx + 1)) === Number(dayNumber))
-      : data.days.find(d => d && Array.isArray(d.activities) && d.activities.includes(oldText));
+      : data.days.find(d => d && Array.isArray(d.activities) && d.activities.some(matchesOld));
     if (!day || !Array.isArray(day.activities)) return false;
-    const idx = day.activities.indexOf(oldText);
+    const idx = day.activities.findIndex(matchesOld);
     if (idx === -1) return false;
-    day.activities[idx] = newText;
+    const original = day.activities[idx];
+    const slot = plannerActivitySlot(original);
+    // Keep the {text, slot, price} object shape rather than collapsing to a bare string — but only
+    // carry a price over when the caller actually knows the NEW venue's cost (newPrice); otherwise
+    // leaving it unpriced is more honest than silently keeping the old venue's price on a new name.
+    day.activities[idx] = { text: newText, slot, ...(Number.isFinite(newPrice) ? { price: newPrice } : {}) };
     tripState.itinerary = flattenActivities(data);
     return true;
   }
@@ -4083,7 +4116,7 @@ function initApp() {
 
     const selectedOpt = gPlace.selectedOptions && gPlace.selectedOptions[0];
     const dayNumber = selectedOpt && selectedOpt.dataset.day ? parseInt(selectedOpt.dataset.day, 10) : null;
-    if (!replacePlaceInItinerary(place, alternative.name, dayNumber)) {
+    if (!replacePlaceInItinerary(place, alternative.name, dayNumber, alternative.costPerPerson)) {
       showError(gResult, new Error(T('group.swapNoAlternative')));
       return;
     }
@@ -4525,9 +4558,14 @@ function initApp() {
 
     const weatherIncident = classifyIncident((data.meta && data.meta.rawIncidentText) || hEvent.value.trim());
     const risks = detectTravelRisks(flattenActivities(nextPlannerData), { budget, days, group, notes }, weatherIncident, currentLang);
-    pResult.innerHTML = `<div class="result-box">${renderPlannerHtml(nextPlannerData, destination, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
+    const members = currentMembers();
+    renderPlannerSatisfaction(members, flattenActivities(nextPlannerData));
+    renderPlannerCostSummary(nextPlannerData, members.length);
+    const innerHtml = `${renderPlannerHtml(nextPlannerData, destination, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
+    pResult.innerHTML = `<div class="result-box">${withLoginGateHtml(innerHtml)}</div>`;
     updatePlannerShareState(nextPlannerData, destination);
     savePlannerState({ data: nextPlannerData });
+    lastGeneratedTrip = { destination, days, startDate, budget, group, notes, data: nextPlannerData };
     saveHealState({ acceptedSignature: signature });
 
     hAccept.disabled = true;
