@@ -14,6 +14,17 @@ const SUPPORTED_LANGS = ['vi', 'ja', 'en'];
 const I18N = {
   vi: {
     appSubtitle: 'AI giúp cả nhóm quyết định cùng nhau · chạy bằng Claude API qua proxy riêng · dùng được cả từ điện thoại trong cùng mạng',
+    hero: {
+      eyebrow: 'Cẩm nang du lịch Okinawa',
+      heading: 'Lên kế hoạch chuyến đi Okinawa dễ dàng hơn',
+      subtitle: 'Từ bãi biển, ẩm thực đến lịch trình từng ngày — AI giúp bạn lên kế hoạch phù hợp với sở thích của cả nhóm.',
+      sunriseLabel: 'Giờ mặt trời mọc',
+      sunriseValue: '6:30 sáng',
+      seasonLabel: 'Mùa đẹp nhất',
+      seasonValue: 'Tháng 4 – Tháng 10',
+      themeLabel: 'Không khí chuyến đi',
+      themeValue: 'Vui vẻ, thoải mái'
+    },
     connect: {
       connecting: 'Đang kết nối tới claude-server...',
       noApiKey: '⚠️ Kết nối được tới claude-server nhưng chưa có API key — mở <code>claude-server/config.json</code>, dán API key Anthropic vào field "apiKey", rồi khởi động lại server.',
@@ -380,6 +391,17 @@ const I18N = {
   },
   ja: {
     appSubtitle: 'グループ全員で決める旅行をAIがサポート · 専用プロキシ経由でClaude APIを使用 · 同じネットワーク内ならスマホからも利用可',
+    hero: {
+      eyebrow: '沖縄旅行ガイド',
+      heading: '沖縄旅行を、もっと簡単に計画しよう',
+      subtitle: 'ビーチ、グルメ、毎日の予定まで —— AIがグループ全員に合った旅行プランを提案します。',
+      sunriseLabel: '日の出時刻',
+      sunriseValue: '6:30',
+      seasonLabel: 'おすすめの季節',
+      seasonValue: '4月〜10月',
+      themeLabel: '旅の雰囲気',
+      themeValue: 'リラックス&南国気分'
+    },
     connect: {
       connecting: 'claude-serverに接続中...',
       noApiKey: '⚠️ claude-serverには接続できましたが、APIキーが未設定です。<code>claude-server/config.json</code> を開き、「apiKey」欄にAnthropicのAPIキーを貼り付けてからサーバーを再起動してください。',
@@ -746,6 +768,17 @@ const I18N = {
   },
   en: {
     appSubtitle: 'The AI that helps your group decide together · runs on Claude API via a local proxy · usable from your phone on the same network',
+    hero: {
+      eyebrow: 'Okinawa Travel Guide',
+      heading: 'Plan your Okinawa trip, made simple',
+      subtitle: 'From beaches and food to a day-by-day schedule — AI helps you build a trip that fits your whole group.',
+      sunriseLabel: 'Sunrise time',
+      sunriseValue: '6:30 AM',
+      seasonLabel: 'Best season',
+      seasonValue: 'April – October',
+      themeLabel: 'Trip vibe',
+      themeValue: 'Relaxed & easygoing'
+    },
     connect: {
       connecting: 'Connecting to claude-server...',
       noApiKey: '⚠️ Connected to claude-server, but no API key is set yet — open <code>claude-server/config.json</code>, paste an Anthropic API key into the "apiKey" field, then restart the server.',
