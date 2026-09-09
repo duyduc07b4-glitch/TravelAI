@@ -4,7 +4,7 @@ const {
   escapeHtml, mapLink, venueWarning, isGenericPlaceholderActivity, weatherDescription,
   findFirstJsonObject, extractJson, extractChunkContent,
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
-  formatYen, estimateEntryCostPerPerson, plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
+  formatYen, estimateEntryCostPerPerson, isFoodKnowledgeEntry, plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
   looksLikeFoodOrDrinkActivity, correctedActivityPrice,
   classifyIncident, buildSelfHealingPlan,
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
@@ -310,6 +310,19 @@ describe('estimateEntryCostPerPerson', () => {
     assert.equal(estimateEntryCostPerPerson({ ticketPrice: 'Miễn phí' }), null);
     assert.equal(estimateEntryCostPerPerson({}), null);
     assert.equal(estimateEntryCostPerPerson(null), null);
+  });
+});
+
+describe('isFoodKnowledgeEntry', () => {
+  test('true for a restaurants.json-shaped entry (has cuisine)', () => {
+    assert.equal(isFoodKnowledgeEntry({ name: 'Seafood House', cuisine: 'Hải sản' }), true);
+  });
+  test('false for an attractions.json-shaped entry (has type, no cuisine)', () => {
+    assert.equal(isFoodKnowledgeEntry({ name: 'Churaumi Aquarium', type: 'Thủy cung' }), false);
+  });
+  test('false for empty/missing entries', () => {
+    assert.equal(isFoodKnowledgeEntry({}), false);
+    assert.equal(isFoodKnowledgeEntry(null), false);
   });
 });
 
@@ -921,6 +934,35 @@ describe('generateCompromiseOptions', () => {
     assert.equal(seafood.totalCost, 6000);
     assert.equal(park.costPerPerson, null);
     assert.equal(park.totalCost, null);
+  });
+});
+
+describe('generateCompromiseOptions — same-category alternatives only', () => {
+  const members = [{ name: 'A', pref: 'Hải sản' }];
+  const candidates = [
+    { name: 'Seafood House', cuisine: 'Hải sản' },
+    { name: 'BBQ Grill', cuisine: 'Đồ nướng' },
+    { name: 'Ocean Expo Park', type: 'Công viên' },
+    { name: 'Churaumi Aquarium', type: 'Thủy cung' }
+  ];
+  test('never offers a restaurant as an alternative to a non-meal activity', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi', 'Tham quan công viên Ocean Expo');
+    assert.ok(options.length > 0);
+    assert.ok(options.every(o => o.name === 'Ocean Expo Park' || o.name === 'Churaumi Aquarium'));
+  });
+  test('never offers an attraction as an alternative to a meal activity', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi', 'Ăn trưa tại nhà hàng hải sản');
+    assert.ok(options.length > 0);
+    assert.ok(options.every(o => o.name === 'Seafood House' || o.name === 'BBQ Grill'));
+  });
+  test('returns no options (rather than a cross-category one) when nothing matches the activity\'s category', () => {
+    const foodOnly = [{ name: 'Seafood House', cuisine: 'Hải sản' }];
+    const options = generateCompromiseOptions(foodOnly, members, 'vi', 'Tham quan công viên Ocean Expo');
+    assert.deepEqual(options, []);
+  });
+  test('keeps old behavior (no filtering) when place is not given', () => {
+    const options = generateCompromiseOptions(candidates, members, 'vi');
+    assert.equal(options.length, 3);
   });
 });
 

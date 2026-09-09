@@ -1670,6 +1670,11 @@ function estimateEntryCostPerPerson(entry) {
   return parsePriceYen(entry && (entry.priceRange || entry.ticketPrice));
 }
 
+/** True when a RAG knowledge entry is a restaurant/food venue rather than an attraction — restaurants.json entries always carry a `cuisine` field, attractions.json entries never do (they have `type`/`ticketPrice` instead). Used to keep "alternative place" suggestions in the same category as what they're replacing (never swap a park visit for a restaurant just because it scores well on a preference tag). */
+function isFoodKnowledgeEntry(entry) {
+  return !!(entry && entry.cuisine);
+}
+
 /** Scores one knowledge entry (restaurant/attraction) against one member's tags. Returns {score 0-100, reasons[]}. */
 function scoreEntryForMember(entry, tags, lang) {
   let score = 60;
@@ -1768,10 +1773,26 @@ const COMPROMISE_DELIGHT_THRESHOLD = 75;
  * If the resulting pool of named candidates is too small for 3 distinct picks, the same venue
  * can appear more than once under different strategies — genuinely winning on multiple axes is
  * itself a signal worth showing, not a bug to hide.
+ *
+ * `place` (optional) is the activity text currently being evaluated/replaced. When given, options
+ * are restricted to RAG candidates of the same category (food vs. attraction) as `place` — without
+ * this, a restaurant that happens to match a member's preference tag (e.g. "seafood") could win a
+ * ranking slot as an "alternative" to a leisure activity that isn't a meal at all, which isn't a
+ * real choice between two ways to spend that moment and reads as nonsensical ("swap this park
+ * visit for lunch, scored 92%"). When nothing in the RAG results matches the category, this
+ * returns no options at all — a missing "3 options" panel (or a declined swap) is honest; a
+ * cross-category one scored as if it were a real alternative is not, and this is the deliberate
+ * fix for exactly that complaint, so don't reintroduce a same-category fallback here. Skipped
+ * entirely when `place` isn't given (backward-compatible).
  */
-function generateCompromiseOptions(candidates, members, lang) {
-  const named = (candidates || []).filter(c => c && c.name);
+function generateCompromiseOptions(candidates, members, lang, place) {
+  let named = (candidates || []).filter(c => c && c.name);
   if (!named.length) return [];
+  if (place) {
+    const wantFood = classifyActivity(place).category === 'food';
+    named = named.filter(c => isFoodKnowledgeEntry(c) === wantFood);
+    if (!named.length) return [];
+  }
   const scored = named.map(entry => {
     const group = computeGroupSatisfaction(members, entry, lang);
     const scores = group.perMember.map(m => m.score);
@@ -2858,7 +2879,7 @@ const AppCore = {
   renderPlannerHtml, renderGroupScoreTableHtml, renderHealHtml, formatPlannerShareText,
   plannerActivityPrice, sumItineraryCost, renderItineraryCostSummaryHtml,
   looksLikeFoodOrDrinkActivity, correctedActivityPrice,
-  formatYen, estimateEntryCostPerPerson,
+  formatYen, estimateEntryCostPerPerson, isFoodKnowledgeEntry,
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
   detectPreferenceConflicts, generateCompromiseOptions, buildReasoningReceipt, pickPrimaryKnowledgeEntry,
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
@@ -3915,7 +3936,7 @@ function initApp() {
     const entry = pickPrimaryKnowledgeEntry(candidates, place);
     const group = computeGroupSatisfaction(members, entry, currentLang);
     const conflicts = detectPreferenceConflicts(members, entry, currentLang);
-    const options = generateCompromiseOptions(candidates, members, currentLang);
+    const options = generateCompromiseOptions(candidates, members, currentLang, place);
     lastCompromiseOptions = options;
     // If place/members changed enough that the group's earlier pick no longer appears among the
     // freshly generated options, the decision no longer applies to what's on screen — clear it
@@ -4107,7 +4128,7 @@ function initApp() {
     const members = currentMembers();
     const entry = pickPrimaryKnowledgeEntry(lastRagCandidates, place);
     const currentName = String((entry && entry.name) || place).trim().toLowerCase();
-    const options = generateCompromiseOptions(lastRagCandidates, members, currentLang);
+    const options = generateCompromiseOptions(lastRagCandidates, members, currentLang, place);
     const alternative = options.find(o => o.name && o.name.trim().toLowerCase() !== currentName);
     if (!alternative) {
       showError(gResult, new Error(T('group.swapNoAlternative')));
