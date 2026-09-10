@@ -125,13 +125,16 @@ button.small{padding:5px 10px; font-size:12px;}
 
 main{max-width:1120px; margin:0 auto; padding:20px 24px 80px;}
 nav.tabs{
-  display:flex; gap:2px; margin-bottom:20px; flex-wrap:wrap; justify-content:center;
+  display:flex; margin-bottom:20px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; cursor:grab;
   background:rgba(255,255,255,0.8); backdrop-filter:blur(6px); box-shadow:var(--shadow-sm);
   border:1px solid var(--border); border-bottom:2px solid var(--border); border-radius:14px; padding:6px 6px 0;
 }
+nav.tabs::-webkit-scrollbar{display:none;}
+nav.tabs.dragging{cursor:grabbing; user-select:none;}
+.tabs-track{display:flex; gap:2px; flex-wrap:nowrap; margin:0 auto;}
 nav.tabs button{
   background:transparent; color:var(--muted); border:none; border-bottom:2px solid transparent; margin-bottom:-2px;
-  border-radius:10px 10px 0 0; padding:11px 15px 14px; font-weight:700; font-size:13.5px; box-shadow:none;
+  border-radius:10px 10px 0 0; padding:11px 15px 14px; font-weight:700; font-size:13.5px; box-shadow:none; flex:0 0 auto;
   transition:color .15s ease, background .15s ease, border-color .15s ease;
 }
 nav.tabs button:hover:not(.active):not(:disabled){color:var(--accent-deep); background:rgba(0,169,157,0.08); transform:none; box-shadow:none;}
@@ -446,9 +449,9 @@ table.score-table th{background:var(--panel2); color:var(--muted); font-weight:5
   .lang-btn{flex:1; min-width:0;}
   main{padding:16px 16px 60px;}
   .row2, .row3{grid-template-columns:1fr;}
-  nav.tabs{gap:6px; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; padding-bottom:2px;}
-  nav.tabs::-webkit-scrollbar{display:none;}
-  nav.tabs button{padding:8px 10px 11px; font-size:13px; flex:0 0 auto;}
+  nav.tabs{padding-bottom:2px;}
+  .tabs-track{gap:6px;}
+  nav.tabs button{padding:8px 10px 11px; font-size:13px;}
   .btn-row{gap:8px;}
   .btn-row button{flex:1 1 auto;}
   .msg{max-width:92%;}
