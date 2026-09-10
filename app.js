@@ -3919,13 +3919,21 @@ function initApp() {
     tabsNav.addEventListener('pointerdown', (e) => {
       dragging = true; moved = false;
       startX = e.clientX; startScroll = tabsNav.scrollLeft;
-      tabsNav.setPointerCapture(e.pointerId);
+      // Pointer capture is grabbed lazily once a real drag is detected (see pointermove below),
+      // not here — capturing on every pointerdown redirects the subsequent `click` event's target
+      // to tabsNav itself (per the Pointer Events spec's capture-owner routing for compat mouse
+      // events), which silently ate every plain tap/click on a tab button before it ever reached
+      // that button's own click listener.
     });
     tabsNav.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       const dx = e.clientX - startX;
-      if (Math.abs(dx) > 4) { moved = true; tabsNav.classList.add('dragging'); }
-      tabsNav.scrollLeft = startScroll - dx;
+      if (!moved && Math.abs(dx) > 4) {
+        moved = true;
+        tabsNav.classList.add('dragging');
+        tabsNav.setPointerCapture(e.pointerId);
+      }
+      if (moved) tabsNav.scrollLeft = startScroll - dx;
     });
     const endDrag = () => { dragging = false; tabsNav.classList.remove('dragging'); };
     tabsNav.addEventListener('pointerup', endDrag);
@@ -3933,6 +3941,23 @@ function initApp() {
     tabsNav.addEventListener('pointercancel', endDrag);
     // Swallow the click that would otherwise fire on the tab button right after a drag.
     tabsNav.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  })();
+
+  // Pins header + hero-strip + tab bar as one stacked sticky group instead of only the header
+  // (header already had position:sticky on its own — the photo strip and tabs used to scroll away
+  // under it). The two "top" offsets are measured live via ResizeObserver rather than hardcoded,
+  // since header height changes with login state/invites badge/language and viewport width.
+  (function enableStackedStickyHeader() {
+    const headerEl = document.querySelector('header');
+    const heroStripEl = document.querySelector('.hero-strip');
+    if (!headerEl || !heroStripEl) return;
+    const root = document.documentElement.style;
+    const ro = new ResizeObserver(() => {
+      root.setProperty('--header-h', headerEl.offsetHeight + 'px');
+      root.setProperty('--hero-h', heroStripEl.offsetHeight + 'px');
+    });
+    ro.observe(headerEl);
+    ro.observe(heroStripEl);
   })();
 
   // ---------- Claude API call (via claude-server/, the local proxy that holds the API key) ----------
