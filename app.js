@@ -13,11 +13,11 @@ const SUPPORTED_LANGS = ['vi', 'ja', 'en'];
 // Every leaf is either a string or a function(...) => string (for messages needing interpolation).
 const I18N = {
   vi: {
-    appSubtitle: 'AI giúp cả nhóm quyết định cùng nhau · chạy bằng Claude API qua proxy riêng · dùng được cả từ điện thoại trong cùng mạng',
+    appSubtitle: 'Cùng cả nhóm quyết định chuyến đi nhanh chóng · dùng được cả từ điện thoại trong cùng mạng',
     hero: {
       eyebrow: 'Cẩm nang du lịch Okinawa',
       heading: 'Lên kế hoạch chuyến đi Okinawa dễ dàng hơn',
-      subtitle: 'Từ bãi biển, ẩm thực đến lịch trình từng ngày — AI giúp bạn lên kế hoạch phù hợp với sở thích của cả nhóm.',
+      subtitle: 'Từ bãi biển, ẩm thực đến lịch trình từng ngày — TravelAI lên kế hoạch phù hợp với sở thích của cả nhóm.',
       sunriseLabel: 'Giờ mặt trời mọc',
       sunriseValue: '6:30 sáng',
       seasonLabel: 'Mùa đẹp nhất',
@@ -26,12 +26,12 @@ const I18N = {
       themeValue: 'Vui vẻ, thoải mái'
     },
     connect: {
-      connecting: 'Đang kết nối tới claude-server...',
-      noApiKey: '⚠️ Kết nối được tới claude-server nhưng chưa có API key — mở <code>claude-server/config.json</code>, dán API key Anthropic vào field "apiKey", rồi khởi động lại server.',
-      ready: (model) => `✅ Đã kết nối, model "${model}" sẵn sàng qua Claude API.`,
-      failed: (base, err) => `⚠️ Không kết nối được tới ${base}. Kiểm tra: claude-server đã chạy chưa (<code>npm start</code> trong thư mục <code>claude-server/</code>), đúng địa chỉ chưa. Lỗi: ${err}`
+      connecting: 'Đang kết nối...',
+      noApiKey: '⚠️ Kết nối được tới máy chủ nhưng chưa có mã truy cập — mở <code>claude-server/config.json</code>, dán mã truy cập vào trường "apiKey", rồi khởi động lại máy chủ.',
+      ready: () => `✅ Đã kết nối, hệ thống đã sẵn sàng.`,
+      failed: (base, err) => `⚠️ Không kết nối được tới ${base}. Kiểm tra: máy chủ đã chạy chưa (<code>npm start</code> trong thư mục <code>claude-server/</code>), đúng địa chỉ chưa. Lỗi: ${err}`
     },
-    tabs: { planner: '🗺️ Lịch trình', group: '👥 Quyết định nhóm', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Vì sao TravelAI' },
+    tabs: { planner: '🗺️ Lịch trình', group: '👥 Quyết định nhóm', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera', diff: '🆚 Vì sao TravelAI' },
     common: {
       loadingGeneric: 'Đang tải...',
       mapLink: '📍 Xem bản đồ',
@@ -40,17 +40,17 @@ const I18N = {
       dayLabel: (n) => `Day ${n}`,
       noResult: 'Không có kết quả.',
       noChange: 'Không có thay đổi.',
-      dayCountMismatch: (actual, requested) => `⚠️ Bạn yêu cầu ${requested} ngày nhưng AI chỉ tạo được ${actual} ngày. Thử bấm "Tạo lịch trình" lại lần nữa.`,
-      aiFinal: '🤖 AI chốt:',
+      dayCountMismatch: (actual, requested) => `⚠️ Bạn yêu cầu ${requested} ngày nhưng hệ thống chỉ tạo được ${actual} ngày. Thử bấm "Tạo lịch trình" lại lần nữa.`,
+      aiFinal: '🤖 Kết luận:',
       copied: '✅ Đã copy lịch trình vào clipboard!',
       shareFailed: '⚠️ Không tự copy được — hãy chọn và copy đoạn văn bản dưới đây.',
       shareFallback: 'Chia sẻ native không được hỗ trợ trên http LAN/điện thoại này, nên app đã tự sao chép lịch trình vào clipboard.',
-      sharedVia: 'Tạo bằng AI Travel Companion 🗺️',
+      sharedVia: 'Tạo bằng TravelAI 🗺️',
       criteriaHeader: 'Tiêu chí',
       scoreHeader: 'Điểm',
       changesHeader: 'Thay đổi',
       newItineraryHeader: 'Lịch trình mới',
-      plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ AI không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là suy đoán chung của AI — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.',
+      plannerDisclaimer: '📍 Bấm "Xem bản đồ" để xem địa chỉ, giờ mở cửa thật và số điện thoại (nếu quán có đăng). ⚠️ Hệ thống không có dữ liệu thời gian thực nên <strong>không biết chắc quán có mở cửa vào giờ đó không</strong>, và thứ tự/khoảng cách di chuyển giữa các điểm chỉ là dự đoán chung — <strong>không dựa trên dữ liệu giao thông hay bản đồ thời gian thực</strong>. Luôn kiểm tra qua Maps trước khi đến.',
       unlimitedBudget: 'không giới hạn',
       soloTraveler: 'một mình',
       close: 'Đóng',
@@ -58,11 +58,11 @@ const I18N = {
       free: 'Miễn phí'
     },
     errors: {
-      timeout: 'AI không phản hồi sau 60 giây — model có thể đang tải lần đầu (chậm hơn bình thường) hoặc máy đang quá tải. Thử lại, hoặc đổi model nhẹ hơn.',
+      timeout: 'Hệ thống không phản hồi sau 60 giây — có thể đang khởi động lần đầu (chậm hơn bình thường) hoặc đang quá tải. Vui lòng thử lại.',
       cannotConnect: (base) => `Không gọi được tới ${base}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`,
-      visionCannotConnect: (base) => `Không gọi được tới ${base}. Kiểm tra claude-server đã chạy chưa (npm start trong thư mục claude-server/).`,
-      noJson: 'AI không trả về dữ liệu dạng JSON như yêu cầu — model có thể quá nhỏ để tuân theo định dạng. Thử lại hoặc đổi sang model khác.',
-      malformedJson: 'AI trả về JSON không hợp lệ (bị lỗi cú pháp giữa chừng). Thử lại hoặc đổi sang model khác.'
+      visionCannotConnect: (base) => `Không gọi được tới ${base}. Kiểm tra máy chủ đã chạy chưa (npm start trong thư mục claude-server/).`,
+      noJson: 'Hệ thống không trả về dữ liệu đúng định dạng yêu cầu. Vui lòng thử lại.',
+      malformedJson: 'Hệ thống trả về dữ liệu không hợp lệ. Vui lòng thử lại.'
     },
     planner: {
       title: 'Tạo lịch trình tự động',
@@ -83,8 +83,8 @@ const I18N = {
       costSummaryTitle: '💰 Chi phí ước tính',
       costPerPersonLabel: 'Mỗi người',
       costTotalLabel: (count) => `Tổng cho ${count} người`,
-      costDisclaimer: 'Ước tính từ AI dựa trên hiểu biết chung, chưa phải giá thật đã kiểm chứng — chỉ để chuẩn bị chi phí, không tính vé máy bay/khách sạn.',
-      priceInferredTooltip: 'AI ban đầu ghi hoạt động này miễn phí, nhưng có vẻ không hợp lý (ăn uống tại quán) nên hệ thống tự thay bằng mức giá tối thiểu hợp lý hơn.'
+      costDisclaimer: 'Chi phí là ước tính tham khảo, chưa phải giá thật đã kiểm chứng — chỉ để chuẩn bị ngân sách, không tính vé máy bay/khách sạn.',
+      priceInferredTooltip: 'Hoạt động này ban đầu được ghi miễn phí, nhưng có vẻ không hợp lý (ăn uống tại quán) nên hệ thống tự thay bằng mức giá tối thiểu hợp lý hơn.'
     },
     group: {
       title: 'Chấm điểm địa điểm cho cả nhóm',
@@ -92,7 +92,7 @@ const I18N = {
       placeEmptyOption: '-- Chọn địa điểm từ lịch trình --',
       placeNoItinerary: '-- Chưa có lịch trình, hãy tạo ở tab Lịch trình trước --',
       placeRequiredError: 'Vui lòng chọn địa điểm cần chấm điểm trước khi bấm "Chấm điểm phù hợp".',
-      scoreHint: '👆 Bấm "Chấm điểm phù hợp" để xem nhận xét AI cho địa điểm này.',
+      scoreHint: '👆 Bấm "Chấm điểm phù hợp" để xem nhận xét chi tiết cho địa điểm này.',
       swapBtn: '🔄 Đổi địa điểm',
       swapLoading: 'Đang tìm địa điểm thay thế & chấm điểm lại...',
       swapNoCandidates: 'Hãy bấm "Chấm điểm phù hợp" trước để có dữ liệu tham khảo, rồi mới đổi địa điểm.',
@@ -102,13 +102,13 @@ const I18N = {
       addMemberBtn: '+ Thêm thành viên',
       runBtn: 'Chấm điểm phù hợp',
       loading: 'Đang tra cứu dữ liệu & chấm điểm...',
-      memberNamePlaceholder: 'Tên (VD: A)',
+      memberNamePlaceholder: 'Tên (VD: Lan)',
       memberPrefPlaceholder: 'Sở thích (VD: Hải sản, thích chụp ảnh)',
-      defaultMembers: [['A', 'Hải sản'], ['B', 'Check-in, chụp ảnh'], ['C', 'Shopping'], ['D', 'Có trẻ em'], ['E', 'Orion Beer']],
+      defaultMembers: [['Lan', 'Hải sản'], ['Minh', 'Check-in, chụp ảnh'], ['An', 'Shopping'], ['Nam', 'Có trẻ em'], ['Mai', 'Orion Beer']],
       systemPrompt: 'Bạn là AI Group Matching Engine, đánh giá mức độ phù hợp của một địa điểm du lịch với sở thích từng thành viên trong nhóm, rồi mô phỏng ngắn gọn góc nhìn của từng người như một cuộc tranh luận thật trước khi AI chốt đề xuất. Nếu có "Dữ liệu tham khảo" bên dưới (giờ mở cửa, giá, đánh giá thật), hãy ưu tiên dùng thay vì đoán. Trả lời DUY NHẤT bằng JSON hợp lệ (giữ nguyên tên field tiếng Anh như trong schema, chỉ viết NỘI DUNG bằng tiếng Việt) theo schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"1 câu nêu góc nhìn/lo ngại của người này về địa điểm, xưng theo tên"}],"recommendation":"1-2 câu AI chốt phương án dung hòa cả nhóm, giải thích ngắn gọn vì sao"}\nĐiểm số theo thang 1-10, suy ra tiêu chí từ sở thích từng thành viên. Mỗi người trong "debate" phải có ý kiến khác nhau, phản ánh đúng sở thích riêng của họ (có thể khen hoặc chê tùy sở thích).',
       userPrompt: (place, members, context) => `Địa điểm: ${place}\nThành viên và sở thích:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\nDữ liệu tham khảo (RAG, từ knowledge base thật):\n${context}` : ''}`,
       ragUsed: (sources) => `📚 Đã dùng dữ liệu từ: ${sources}`,
-      ragNone: '📚 Không tìm thấy dữ liệu liên quan trong knowledge base (RAG server tắt hoặc chưa index) — AI sẽ tự suy đoán.',
+      ragNone: '📚 Không tìm thấy dữ liệu liên quan trong knowledge base (RAG server tắt hoặc chưa index) — hệ thống sẽ tự suy đoán.',
       satisfactionTitle: '📊 Điểm hài lòng của nhóm',
       overallLabel: 'Chung',
       lowestWhy: (name) => `${name} đang có điểm thấp nhất — xem lý do trong phần xung đột bên dưới.`,
@@ -127,7 +127,7 @@ const I18N = {
         matchTag: (name) => `${name} hợp sở thích với địa điểm này`
       },
       compromiseTitle: '💡 3 phương án thay vì 1 lựa chọn trung bình hoá',
-      aiPick: '✓ AI đề xuất',
+      aiPick: '✓ Đề xuất tốt nhất',
       optionLabel: (label) => `Phương án ${label}`,
       optionPro: (name, score) => `${name} hài lòng nhất (${score}%)`,
       optionCon: (name, score) => `${name} hài lòng ít nhất (${score}%)`,
@@ -198,8 +198,8 @@ const I18N = {
       checklistBudget: 'Ngân sách',
       checklistGroup: 'Nhóm đi cùng',
       checklistNotes: 'Ghi chú/sở thích',
-      forceBuildBtn: 'Tạo lịch trình luôn (AI tự điền phần còn thiếu)',
-      autoDestinationFallback: 'một điểm đến du lịch nổi tiếng do AI tự chọn phù hợp'
+      forceBuildBtn: 'Tạo lịch trình luôn (tự động điền phần còn thiếu)',
+      autoDestinationFallback: 'một điểm đến du lịch nổi tiếng phù hợp'
     },
     heal: {
       title: 'Lịch trình tự thay đổi',
@@ -253,7 +253,7 @@ const I18N = {
       summaryTraffic: (text) => `Kẹt xe / tắc đường: ${text}`,
       summaryOverbook: (text) => `Địa điểm đã kín chỗ: ${text}`,
       summaryHealth: (text) => `Vấn đề sức khỏe trong chuyến đi: ${text}`,
-      impactAiTitle: '🧠 AI phân tích mức ảnh hưởng theo thành viên',
+      impactAiTitle: '🧠 Phân tích mức ảnh hưởng theo thành viên',
       impactAiSummary: 'Đánh giá tổng quan:',
       impactAiReason: 'Lý do:',
       impactAiAdvice: 'Gợi ý điều chỉnh:',
@@ -263,7 +263,7 @@ const I18N = {
       userPrompt: (itin, event) => `Itinerary:\n${itin.map(i => '- ' + i).join('\n')}\nSituation: ${event}`
     },
     camera: {
-      title: 'AI hiểu qua camera',
+      title: 'Nhận diện qua camera',
       modeLabel: 'Chế độ',
       modeFood: '🍜 Món ăn',
       modeLandmark: '🏯 Địa danh',
@@ -271,25 +271,25 @@ const I18N = {
       runBtn: 'Phân tích ảnh',
       step1: 'Đang nhìn ảnh (bước 1/2)...',
       step2: 'Đang phân tích & viết câu trả lời (bước 2/2)...',
-      noCaption: (model) => `${model} không trả về mô tả nào cho ảnh này — thử ảnh khác.`,
-      fallbackUnknown: (model) => `${model} chưa xác định được nội dung ảnh rõ ràng. Đây là fallback an toàn: ảnh có thể quá mờ hoặc thiếu sáng. Hãy thử chụp lại với ánh sáng tốt hơn, không che chữ trên ảnh.`,
-      fallbackFood: (guess) => `AI vision chưa đọc đủ chi tiết để khẳng định món ăn chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một món ăn'} — thử chụp ảnh gần hơn, góc chụp rõ hơn và tránh ánh sáng quá tối.`,
-      fallbackLandmark: (guess) => `AI vision chưa nhận diện được địa danh này một cách chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một địa danh/công trình'} — thử chụp hình rộng hơn, rõ biển tên.`,
+      noCaption: () => `Hệ thống không trả về mô tả nào cho ảnh này — thử ảnh khác.`,
+      fallbackUnknown: () => `Hệ thống chưa xác định được nội dung ảnh rõ ràng. Ảnh có thể quá mờ hoặc thiếu sáng — hãy thử chụp lại với ánh sáng tốt hơn, không che chữ trên ảnh.`,
+      fallbackFood: (guess) => `Hệ thống chưa đọc đủ chi tiết để khẳng định món ăn chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một món ăn'} — thử chụp ảnh gần hơn, góc chụp rõ hơn và tránh ánh sáng quá tối.`,
+      fallbackLandmark: (guess) => `Hệ thống chưa nhận diện được địa danh này một cách chắc chắn. Dựa trên mô tả hiện có, đây có thể là ${guess || 'một địa danh/công trình'} — thử chụp hình rộng hơn, rõ biển tên.`,
       fallbackAdvice: 'Nếu ảnh không ổn, hãy chụp lại ở góc sáng đủ, không che chữ trên biển hiệu/menu, và ưu tiên dùng ảnh rõ nét hơn.',
-      disclaimer: (model) => `⚠️ AI vision (${model}) vẫn có thể nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.`,
+      disclaimer: () => `⚠️ Tính năng nhận diện hình ảnh vẫn có thể nhận diện sai, đặc biệt với chữ trên ảnh (menu, biển hiệu) và món/địa danh ít phổ biến. Coi đây là gợi ý tham khảo, không phải kết luận chắc chắn.`,
       systemPromptFood: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 món ăn. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là món gì. 2) Thành phần nhìn thấy. 3) Gợi ý 1-2 món tương tự đáng thử. KHÔNG bịa giá tiền/calories chính xác — nếu nhắc tới phải ghi rõ là ước tính. Nếu mô tả quá mơ hồ để đoán món, hãy nói thẳng là không chắc. Ngắn gọn, không markdown.',
       systemPromptLandmark: 'Bạn nhận được mô tả bằng tiếng Anh (từ 1 AI vision) về ảnh 1 địa danh/công trình. Dựa vào đó, viết bằng tiếng Việt: 1) Đây có thể là địa danh gì. 2) Vài nét lịch sử/văn hóa nếu bạn biết chắc. 3) Loại điểm tham quan tương tự gần đó. Nếu mô tả quá mơ hồ để nhận diện, nói thẳng là không chắc thay vì đoán bừa. Ngắn gọn, không markdown.',
       userPrompt: (caption) => `Mô tả từ AI vision: "${caption}"`
     },
     diff: {
-      title: 'AI Travel Planner vs. TravelAI',
+      title: 'Công cụ lập lịch trình thông thường vs. TravelAI',
       subtitle: 'Không chỉ lên lịch trình — TravelAI giúp cả nhóm ra quyết định cùng nhau, và cho bạn thấy vì sao.',
-      tradTitle: 'AI Travel Planner truyền thống',
+      tradTitle: 'Công cụ lập lịch trình truyền thống',
       tradItems: [
         'Tối ưu theo sở thích của 1 người dùng nhập vào',
         'Ra đúng 1 lịch trình, chấp nhận hoặc bỏ qua',
         'Im lặng khi các thành viên trong nhóm bất đồng',
-        '"AI đã quyết định" — không giải thích vì sao'
+        '"Hệ thống đã quyết định" — không giải thích vì sao'
       ],
       usTitle: 'TravelAI',
       usItems: [
@@ -300,10 +300,10 @@ const I18N = {
       ],
       mission: '"TravelAI không lên lịch trình — nó giúp nhóm du lịch ra quyết định tốt hơn cùng nhau, và cho từng thành viên thấy rõ tiếng nói của họ đã ảnh hưởng tới kết quả thế nào."',
       exampleTitle: '📊 Ví dụ thật từ chính bộ máy chấm điểm',
-      exampleOldTag: 'Kiểu AI cá nhân hoá truyền thống',
-      exampleOldText: '3 người tìm chỗ ăn ở Naha (thích hải sản / ăn chay / không quan trọng) — AI chọn nơi "trung bình an toàn": cả 3 người đều chỉ hài lòng 60%, không ai ghét nhưng cũng chẳng ai thực sự thích.',
+      exampleOldTag: 'Kiểu cá nhân hoá truyền thống',
+      exampleOldText: '3 người tìm chỗ ăn ở Naha (thích hải sản / ăn chay / không quan trọng) — hệ thống chọn nơi "trung bình an toàn": cả 3 người đều chỉ hài lòng 60%, không ai ghét nhưng cũng chẳng ai thực sự thích.',
       exampleNewTag: 'TravelAI',
-      exampleNewText: 'Cùng dữ liệu đó, TravelAI tìm ra phương án khiến người thích hải sản đạt 78% hài lòng — đồng thời hiện rõ người ăn chay chỉ đạt 35% để nhóm tự cân nhắc đánh đổi, thay vì AI âm thầm quyết định thay cả nhóm.'
+      exampleNewText: 'Cùng dữ liệu đó, TravelAI tìm ra phương án khiến người thích hải sản đạt 78% hài lòng — đồng thời hiện rõ người ăn chay chỉ đạt 35% để nhóm tự cân nhắc đánh đổi, thay vì hệ thống âm thầm quyết định thay cả nhóm.'
     },
     auth: {
       subtitle: 'Đăng nhập để tiếp tục',
@@ -391,11 +391,11 @@ const I18N = {
     geocodeLang: 'vi'
   },
   ja: {
-    appSubtitle: 'グループ全員で決める旅行をAIがサポート · 専用プロキシ経由でClaude APIを使用 · 同じネットワーク内ならスマホからも利用可',
+    appSubtitle: 'グループ全員で決める旅行をサポート · 同じネットワーク内ならスマホからも利用可',
     hero: {
       eyebrow: '沖縄旅行ガイド',
       heading: '沖縄旅行を、もっと簡単に計画しよう',
-      subtitle: 'ビーチ、グルメ、毎日の予定まで —— AIがグループ全員に合った旅行プランを提案します。',
+      subtitle: 'ビーチ、グルメ、毎日の予定まで —— TravelAIがグループ全員に合った旅行プランを提案します。',
       sunriseLabel: '日の出時刻',
       sunriseValue: '6:30',
       seasonLabel: 'おすすめの季節',
@@ -404,12 +404,12 @@ const I18N = {
       themeValue: 'リラックス&南国気分'
     },
     connect: {
-      connecting: 'claude-serverに接続中...',
-      noApiKey: '⚠️ claude-serverには接続できましたが、APIキーが未設定です。<code>claude-server/config.json</code> を開き、「apiKey」欄にAnthropicのAPIキーを貼り付けてからサーバーを再起動してください。',
-      ready: (model) => `✅ 接続済み、モデル「${model}」がClaude API経由で使用可能です。`,
-      failed: (base, err) => `⚠️ ${base} に接続できません。claude-serverが起動しているか（<code>claude-server/</code> フォルダで <code>npm start</code>）、アドレスが正しいか確認してください。エラー内容：${err}`
+      connecting: '接続中...',
+      noApiKey: '⚠️ サーバーには接続できましたが、アクセスキーが未設定です。<code>claude-server/config.json</code> を開き、「apiKey」欄にアクセスキーを貼り付けてからサーバーを再起動してください。',
+      ready: () => `✅ 接続済み、システムが利用可能です。`,
+      failed: (base, err) => `⚠️ ${base} に接続できません。サーバーが起動しているか（<code>claude-server/</code> フォルダで <code>npm start</code>）、アドレスが正しいか確認してください。エラー内容：${err}`
     },
-    tabs: { planner: '🗺️ 旅程', group: '👥 グループ決定', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラAI', diff: '🆚 TravelAIの違い' },
+    tabs: { planner: '🗺️ 旅程', group: '👥 グループ決定', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラ', diff: '🆚 TravelAIの違い' },
     common: {
       loadingGeneric: '読み込み中...',
       mapLink: '📍 地図を見る',
@@ -418,17 +418,17 @@ const I18N = {
       dayLabel: (n) => `${n}日目`,
       noResult: '結果がありません。',
       noChange: '変更はありません。',
-      dayCountMismatch: (actual, requested) => `⚠️ ${requested}日間を指定しましたが、AIは${actual}日分しか作成しませんでした。もう一度「旅程を作成」を試してください。`,
-      aiFinal: '🤖 AIの結論：',
+      dayCountMismatch: (actual, requested) => `⚠️ ${requested}日間を指定しましたが、${actual}日分しか作成されませんでした。もう一度「旅程を作成」を試してください。`,
+      aiFinal: '🤖 結論：',
       copied: '✅ 旅程をクリップボードにコピーしました！',
       shareFailed: '⚠️ 自動コピーできませんでした — 下のテキストを選択してコピーしてください。',
       shareFallback: 'このLAN HTTP/モバイル環境ではネイティブ共有が使えないため、アプリが旅程をクリップボードに自動コピーしました。',
-      sharedVia: 'AI Travel Companionで作成 🗺️',
+      sharedVia: 'TravelAIで作成 🗺️',
       criteriaHeader: '項目',
       scoreHeader: 'スコア',
       changesHeader: '変更点',
       newItineraryHeader: '新しい旅程',
-      plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ このAIはリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離はAIの一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。',
+      plannerDisclaimer: '📍 「地図を見る」で実際の住所・営業時間・電話番号（掲載があれば）を確認できます。⚠️ 本サービスはリアルタイム情報を持たないため、<strong>実際の営業時間は保証できません</strong>。また移動順序や距離は一般的な推測であり、<strong>実際の交通・地図データには基づいていません</strong>。出発前に必ずMapsで確認してください。',
       unlimitedBudget: '無制限',
       soloTraveler: '一人旅',
       close: '閉じる',
@@ -436,11 +436,11 @@ const I18N = {
       free: '無料'
     },
     errors: {
-      timeout: 'AIが60秒以内に応答しませんでした — モデルの初回読み込みに時間がかかっているか、端末の負荷が高い可能性があります。再試行するか、より軽量なモデルに変更してください。',
+      timeout: 'システムが60秒以内に応答しませんでした — 初回起動に時間がかかっているか、端末の負荷が高い可能性があります。再試行してください。',
       cannotConnect: (base) => `${base} に接続できませんでした。右上の「接続確認」で診断してください。`,
-      visionCannotConnect: (base) => `${base} に接続できませんでした。claude-serverが起動しているか確認してください（claude-server/ で npm start）。`,
-      noJson: 'AIが要求されたJSON形式でデータを返しませんでした — モデルが小さすぎて形式に従えない可能性があります。再試行するか、別のモデルに変更してください。',
-      malformedJson: 'AIが返したJSONが不正な形式です（途中で構文エラー）。再試行するか、別のモデルに変更してください。'
+      visionCannotConnect: (base) => `${base} に接続できませんでした。サーバーが起動しているか確認してください（claude-server/ で npm start）。`,
+      noJson: 'システムが要求された形式でデータを返しませんでした。再試行してください。',
+      malformedJson: 'システムが返したデータが不正な形式です。再試行してください。'
     },
     planner: {
       title: '旅程を自動作成',
@@ -461,8 +461,8 @@ const I18N = {
       costSummaryTitle: '💰 概算費用',
       costPerPersonLabel: '一人あたり',
       costTotalLabel: (count) => `${count}人分の合計`,
-      costDisclaimer: '一般的な知識に基づくAIの概算であり、確認済みの実価格ではありません — 予算準備の目安として。航空券・宿泊費は含みません。',
-      priceInferredTooltip: 'AIは当初この項目を無料としていましたが、飲食を伴う内容のため不自然と判断し、より妥当な最低額に自動修正しました。'
+      costDisclaimer: '一般的な知識に基づく概算であり、確認済みの実価格ではありません — 予算準備の目安として。航空券・宿泊費は含みません。',
+      priceInferredTooltip: 'この項目は当初無料とされていましたが、飲食を伴う内容のため不自然と判断し、より妥当な最低額に自動修正しました。'
     },
     group: {
       title: 'グループ全員向けにスポットを採点',
@@ -470,7 +470,7 @@ const I18N = {
       placeEmptyOption: '-- 旅程からスポットを選択 --',
       placeNoItinerary: '-- 旅程がまだありません。先に旅程タブで作成してください --',
       placeRequiredError: '「適合度を採点」を押す前に、採点するスポットを選択してください。',
-      scoreHint: '👆「適合度を採点」を押すと、このスポットについてのAIコメントが見られます。',
+      scoreHint: '👆「適合度を採点」を押すと、このスポットについてのコメントが見られます。',
       swapBtn: '🔄 スポットを変更',
       swapLoading: '代わりのスポットを探して再採点中...',
       swapNoCandidates: '先に「適合度を採点」を押して参考データを取得してから、スポットを変更してください。',
@@ -480,13 +480,13 @@ const I18N = {
       addMemberBtn: '+ メンバーを追加',
       runBtn: '適合度を採点',
       loading: '採点中...',
-      memberNamePlaceholder: '名前（例：A）',
+      memberNamePlaceholder: '名前（例：さくら）',
       memberPrefPlaceholder: '好み（例：魚介類、写真撮影が好き）',
-      defaultMembers: [['A', '魚介類'], ['B', '写真映え・チェックイン重視'], ['C', 'ショッピング'], ['D', '子供連れ'], ['E', 'オリオンビール']],
+      defaultMembers: [['さくら', '魚介類'], ['たくみ', '写真映え・チェックイン重視'], ['ゆい', 'ショッピング'], ['りく', '子供連れ'], ['あおい', 'オリオンビール']],
       systemPrompt: 'あなたはAI Group Matching Engineです。ある旅行スポットが、グループの各メンバーの好みにどれだけ合っているかを評価し、実際の議論のように各メンバーの視点を短くシミュレートしてから、AIとしての提案をまとめてください。下に「参考データ」があれば（営業時間・料金・実際のレビューなど）、推測より優先して使ってください。必ずJSONのみで回答してください（スキーマの英語フィールド名はそのまま維持し、内容は日本語で記述）。スキーマ：\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"このスポットについてのこの人の視点・懸念を1文で、本人の立場で述べる"}],"recommendation":"グループ全員が納得できる落としどころをAIとして1〜2文で提案し、簡潔に理由も述べる"}\nスコアは1〜10段階で、各メンバーの好みから項目を推測してください。"debate"内の各メンバーは、それぞれの好みを反映した異なる意見を持つようにしてください（好みに応じて肯定的にも否定的にもなり得ます）。',
       userPrompt: (place, members, context) => `スポット：${place}\nメンバーと好み：\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\n参考データ（RAG、実際のナレッジベースより）：\n${context}` : ''}`,
       ragUsed: (sources) => `📚 使用したデータ元：${sources}`,
-      ragNone: '📚 ナレッジベースに関連データが見つかりませんでした（RAGサーバーが停止しているか未インデックス）— AIが推測して回答します。',
+      ragNone: '📚 ナレッジベースに関連データが見つかりませんでした（RAGサーバーが停止しているか未インデックス）— システムが推測して回答します。',
       satisfactionTitle: '📊 グループ満足度スコア',
       overallLabel: '全体',
       lowestWhy: (name) => `${name}のスコアが最も低い — 理由は下の「衝突」で確認できます。`,
@@ -505,7 +505,7 @@ const I18N = {
         matchTag: (name) => `${name}の好みとこのスポットが合っている`
       },
       compromiseTitle: '💡 平均化した1案ではなく、3つの選択肢',
-      aiPick: '✓ AIのおすすめ',
+      aiPick: '✓ おすすめ',
       optionLabel: (label) => `オプション${label}`,
       optionPro: (name, score) => `${name}が最も満足（${score}%）`,
       optionCon: (name, score) => `${name}が最も不満（${score}%）`,
@@ -576,8 +576,8 @@ const I18N = {
       checklistBudget: '予算',
       checklistGroup: '同行者',
       checklistNotes: 'メモ・好み',
-      forceBuildBtn: 'このまま旅程を作成する（足りない部分はAIが補います）',
-      autoDestinationFallback: 'AIが選ぶ人気の旅行先'
+      forceBuildBtn: 'このまま旅程を作成する（足りない部分は自動で補います）',
+      autoDestinationFallback: '人気の旅行先'
     },
     heal: {
       title: '旅程の自動リカバリー',
@@ -631,7 +631,7 @@ const I18N = {
       summaryTraffic: (text) => `渋滞・交通障害: ${text}`,
       summaryOverbook: (text) => `満席・予約不可: ${text}`,
       summaryHealth: (text) => `体調トラブル: ${text}`,
-      impactAiTitle: '🧠 メンバー別の影響をAI分析',
+      impactAiTitle: '🧠 メンバー別の影響を分析',
       impactAiSummary: '総合評価:',
       impactAiReason: '理由:',
       impactAiAdvice: '調整提案:',
@@ -641,7 +641,7 @@ const I18N = {
       userPrompt: (itin, event) => `Itinerary:\n${itin.map(i => '- ' + i).join('\n')}\nSituation: ${event}`
     },
     camera: {
-      title: 'カメラでAI認識',
+      title: 'カメラで認識',
       modeLabel: 'モード',
       modeFood: '🍜 料理',
       modeLandmark: '🏯 観光地',
@@ -649,25 +649,25 @@ const I18N = {
       runBtn: '画像を分析',
       step1: '画像を確認中（ステップ1/2）...',
       step2: '分析して回答を作成中（ステップ2/2）...',
-      noCaption: (model) => `${model}がこの画像の説明を返しませんでした — 別の画像を試してください。`,
-      fallbackUnknown: (model) => `${model}はこの画像の中身をはっきり認識できませんでした。これは安全側のフォールバックです。画像がぼやけている、または暗すぎる可能性があります。明るい場所で再撮影し、看板やメニューの文字が隠れないようにしてください。`,
-      fallbackFood: (guess) => `Vision AIは料理の細部を十分に読み取れず、断定はできませんでした。現時点の情報からすると、これは${guess || '料理'}の可能性が高いです。より近くで、角度を変えて、明るく撮影した画像を試してください。`,
-      fallbackLandmark: (guess) => `Vision AIはこの場所を確実に識別できませんでした。現時点の情報からすると、これは${guess || '観光地・建造物'}の可能性が高いです。看板や全景を入れて再撮影してください。`,
+      noCaption: () => `この画像の説明を取得できませんでした — 別の画像を試してください。`,
+      fallbackUnknown: () => `この画像の中身をはっきり認識できませんでした。画像がぼやけている、または暗すぎる可能性があります。明るい場所で再撮影し、看板やメニューの文字が隠れないようにしてください。`,
+      fallbackFood: (guess) => `料理の細部を十分に読み取れず、断定はできませんでした。現時点の情報からすると、これは${guess || '料理'}の可能性が高いです。より近くで、角度を変えて、明るく撮影した画像を試してください。`,
+      fallbackLandmark: (guess) => `この場所を確実に識別できませんでした。現時点の情報からすると、これは${guess || '観光地・建造物'}の可能性が高いです。看板や全景を入れて再撮影してください。`,
       fallbackAdvice: '画像がうまく読めない場合は、曖昧な画角を避け、建物名・看板・食べ物の輪郭がはっきり見える写真を選びましょう。',
-      disclaimer: (model) => `⚠️ Vision AI（${model}）は誤認識しやすく、特に画像内の文字（メニューや看板）やマイナーな料理・観光地では精度が落ちます。参考程度に留め、断定的な結論とはみなさないでください。`,
+      disclaimer: () => `⚠️ 画像認識機能は誤認識しやすく、特に画像内の文字（メニューや看板）やマイナーな料理・観光地では精度が落ちます。参考程度に留め、断定的な結論とはみなさないでください。`,
       systemPromptFood: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の料理と考えられるか。2) 見える材料。3) 似ていて試す価値のある料理を1〜2つ提案。価格やカロリーを正確に断定しないでください — 触れる場合は概算であることを明記してください。説明が曖昧すぎて判断できない場合は、正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
       systemPromptLandmark: '英語で書かれた画像の説明（Vision AIによるもの）を受け取ります。それをもとに日本語で次を書いてください：1) これは何の観光地・建造物と考えられるか。2) 確かな情報があれば歴史・文化的背景を少し。3) 近くにありそうな似た種類の観光スポット。説明が曖昧すぎて識別できない場合は、当てずっぽうで答えず正直に「確信が持てない」と伝えてください。簡潔に、Markdownなしで。',
       userPrompt: (caption) => `Vision AIによる説明：「${caption}」`
     },
     diff: {
-      title: '従来のAI旅行プランナー vs. TravelAI',
+      title: '従来の旅行プランナー vs. TravelAI',
       subtitle: '旅程を作るだけでなく、グループ全員が一緒に決断できるよう、その理由まで見せます。',
-      tradTitle: '従来のAI Travel Planner',
+      tradTitle: '従来の旅行プランナー',
       tradItems: [
         '入力した1人のユーザーの好みだけを最適化',
         '旅程は1つだけ — 受け入れるか諦めるか',
         'グループ内で意見が割れても何も示さない',
-        '「AIが決めました」— 理由の説明がない'
+        '「システムが決めました」— 理由の説明がない'
       ],
       usTitle: 'TravelAI',
       usItems: [
@@ -678,10 +678,10 @@ const I18N = {
       ],
       mission: '「TravelAIは旅程を作るだけのツールではありません。旅行グループがより良い決断を一緒に下せるよう支援し、一人ひとりの声が結果にどう反映されたかを明確に示します。」',
       exampleTitle: '📊 実際のスコアリングエンジンによる実例',
-      exampleOldTag: '従来型の個人最適化AI',
-      exampleOldText: '那覇で食事場所を探す3人（海鮮好き／ベジタリアン／こだわりなし）— 従来のAIは「無難な平均」を選び、3人とも満足度はわずか60%。誰も不満はないが、誰も本当に満足していない。',
+      exampleOldTag: '従来型の個人最適化',
+      exampleOldText: '那覇で食事場所を探す3人（海鮮好き／ベジタリアン／こだわりなし）— 従来のプランナーは「無難な平均」を選び、3人とも満足度はわずか60%。誰も不満はないが、誰も本当に満足していない。',
       exampleNewTag: 'TravelAI',
-      exampleNewText: '同じデータでTravelAIは、海鮮好きのメンバーが78%の満足度を得られる選択肢を見つけ出し、同時にベジタリアンのメンバーは35%であることも明示する — AIが勝手にグループの代わりに決めるのではなく、グループ自身がトレードオフを判断できるようにする。'
+      exampleNewText: '同じデータでTravelAIは、海鮮好きのメンバーが78%の満足度を得られる選択肢を見つけ出し、同時にベジタリアンのメンバーは35%であることも明示する — システムが勝手にグループの代わりに決めるのではなく、グループ自身がトレードオフを判断できるようにする。'
     },
     auth: {
       subtitle: '続けるにはログインしてください',
@@ -769,11 +769,11 @@ const I18N = {
     geocodeLang: 'ja'
   },
   en: {
-    appSubtitle: 'The AI that helps your group decide together · runs on Claude API via a local proxy · usable from your phone on the same network',
+    appSubtitle: 'Decide your trip together as a group · usable from your phone on the same network',
     hero: {
       eyebrow: 'Okinawa Travel Guide',
       heading: 'Plan your Okinawa trip, made simple',
-      subtitle: 'From beaches and food to a day-by-day schedule — AI helps you build a trip that fits your whole group.',
+      subtitle: 'From beaches and food to a day-by-day schedule — TravelAI builds a trip that fits your whole group.',
       sunriseLabel: 'Sunrise time',
       sunriseValue: '6:30 AM',
       seasonLabel: 'Best season',
@@ -782,12 +782,12 @@ const I18N = {
       themeValue: 'Relaxed & easygoing'
     },
     connect: {
-      connecting: 'Connecting to claude-server...',
-      noApiKey: '⚠️ Connected to claude-server, but no API key is set yet — open <code>claude-server/config.json</code>, paste an Anthropic API key into the "apiKey" field, then restart the server.',
-      ready: (model) => `✅ Connected, model "${model}" is ready via the Claude API.`,
-      failed: (base, err) => `⚠️ Couldn't connect to ${base}. Check that claude-server is running (<code>npm start</code> in the <code>claude-server/</code> folder) and the address is correct. Error: ${err}`
+      connecting: 'Connecting...',
+      noApiKey: '⚠️ Connected to the server, but no access key is set yet — open <code>claude-server/config.json</code>, paste an access key into the "apiKey" field, then restart the server.',
+      ready: () => `✅ Connected, the system is ready.`,
+      failed: (base, err) => `⚠️ Couldn't connect to ${base}. Check that the server is running (<code>npm start</code> in the <code>claude-server/</code> folder) and the address is correct. Error: ${err}`
     },
-    tabs: { planner: '🗺️ Itinerary', group: '👥 Group Decision', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera AI', diff: '🆚 Why TravelAI' },
+    tabs: { planner: '🗺️ Itinerary', group: '👥 Group Decision', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera', diff: '🆚 Why TravelAI' },
     common: {
       loadingGeneric: 'Loading...',
       mapLink: '📍 View map',
@@ -796,17 +796,17 @@ const I18N = {
       dayLabel: (n) => `Day ${n}`,
       noResult: 'No results.',
       noChange: 'No changes.',
-      dayCountMismatch: (actual, requested) => `⚠️ You asked for ${requested} days but the AI only generated ${actual}. Try clicking "Create itinerary" again.`,
-      aiFinal: '🤖 AI\'s call:',
+      dayCountMismatch: (actual, requested) => `⚠️ You asked for ${requested} days but the system only generated ${actual}. Try clicking "Create itinerary" again.`,
+      aiFinal: '🤖 Final take:',
       copied: '✅ Itinerary copied to clipboard!',
       shareFailed: '⚠️ Could not auto-copy — select and copy the text below manually.',
       shareFallback: 'Native sharing is not supported on this LAN HTTP/mobile browser, so the app copied the itinerary to the clipboard instead.',
-      sharedVia: 'Made with AI Travel Companion 🗺️',
+      sharedVia: 'Made with TravelAI 🗺️',
       criteriaHeader: 'Criteria',
       scoreHeader: 'Score',
       changesHeader: 'Changes',
       newItineraryHeader: 'Updated itinerary',
-      plannerDisclaimer: '📍 Click "View map" to see the real address, opening hours, and phone number (if listed). ⚠️ This AI has no real-time data, so it <strong>cannot confirm whether a place is actually open at that time</strong>, and the ordering/distance between stops is just the AI\'s general guess — <strong>not based on real traffic or map data</strong>. Always double-check on Maps before you go.',
+      plannerDisclaimer: '📍 Click "View map" to see the real address, opening hours, and phone number (if listed). ⚠️ This has no real-time data, so it <strong>cannot confirm whether a place is actually open at that time</strong>, and the ordering/distance between stops is just a general guess — <strong>not based on real traffic or map data</strong>. Always double-check on Maps before you go.',
       unlimitedBudget: 'unlimited',
       soloTraveler: 'solo',
       close: 'Close',
@@ -814,11 +814,11 @@ const I18N = {
       free: 'Free'
     },
     errors: {
-      timeout: "The AI didn't respond within 60 seconds — the model might be loading for the first time (slower than usual), or the machine is under heavy load. Try again, or switch to a lighter model.",
+      timeout: "The system didn't respond within 60 seconds — it might be starting up for the first time (slower than usual), or under heavy load. Please try again.",
       cannotConnect: (base) => `Couldn't reach ${base}. Click "Check connection" up top to diagnose.`,
-      visionCannotConnect: (base) => `Couldn't reach ${base}. Check that claude-server is running (npm start in the claude-server/ folder).`,
-      noJson: "The AI didn't return the JSON it was asked for — the model might be too small to follow the format. Try again or switch to a different model.",
-      malformedJson: 'The AI returned invalid JSON (a syntax error partway through). Try again or switch to a different model.'
+      visionCannotConnect: (base) => `Couldn't reach ${base}. Check that the server is running (npm start in the claude-server/ folder).`,
+      noJson: "The system didn't return data in the expected format. Please try again.",
+      malformedJson: 'The system returned invalid data. Please try again.'
     },
     planner: {
       title: 'Create an itinerary',
@@ -839,8 +839,8 @@ const I18N = {
       costSummaryTitle: '💰 Estimated cost',
       costPerPersonLabel: 'Per person',
       costTotalLabel: (count) => `Total for ${count} people`,
-      costDisclaimer: "AI estimate from general knowledge, not a verified real price — just to help you prepare a budget. Doesn't include flights or accommodation.",
-      priceInferredTooltip: "The AI originally marked this as free, but that didn't seem realistic for something food/drink-related, so a more reasonable minimum was substituted automatically."
+      costDisclaimer: "Estimated cost from general knowledge, not a verified real price — just to help you prepare a budget. Doesn't include flights or accommodation.",
+      priceInferredTooltip: "This activity was originally marked as free, but that didn't seem realistic for something food/drink-related, so a more reasonable minimum was substituted automatically."
     },
     group: {
       title: 'Score a place for the whole group',
@@ -848,7 +848,7 @@ const I18N = {
       placeEmptyOption: '-- Select a place from the itinerary --',
       placeNoItinerary: '-- No itinerary yet, create one in the Itinerary tab first --',
       placeRequiredError: 'Please select a place to score before clicking "Score fit".',
-      scoreHint: '👆 Click "Score fit" to see the AI\'s take on this place.',
+      scoreHint: '👆 Click "Score fit" to see detailed feedback on this place.',
       swapBtn: '🔄 Swap place',
       swapLoading: 'Finding a replacement place & re-scoring...',
       swapNoCandidates: 'Click "Score fit" first to load reference data, then swap the place.',
@@ -858,13 +858,13 @@ const I18N = {
       addMemberBtn: '+ Add member',
       runBtn: 'Score fit',
       loading: 'Scoring...',
-      memberNamePlaceholder: 'Name (e.g. A)',
+      memberNamePlaceholder: 'Name (e.g. Emma)',
       memberPrefPlaceholder: 'Preference (e.g. seafood, loves photos)',
-      defaultMembers: [['A', 'Seafood'], ['B', 'Check-ins, photos'], ['C', 'Shopping'], ['D', 'Traveling with kids'], ['E', 'Orion Beer']],
+      defaultMembers: [['Emma', 'Seafood'], ['Liam', 'Check-ins, photos'], ['Sophia', 'Shopping'], ['Noah', 'Traveling with kids'], ['Olivia', 'Orion Beer']],
       systemPrompt: 'You are the AI Group Matching Engine. Assess how well a travel spot fits each group member\'s preferences, then briefly simulate each person\'s perspective like a real discussion before the AI settles on a recommendation. If "Reference data" is given below (real opening hours, prices, reviews), prefer it over guessing. Reply with ONLY valid JSON (keep the English field names exactly as in the schema, write the CONTENT in English) matching this schema:\n{"criteria":[{"name":"Food","score":9}],"debate":[{"name":"A","comment":"One sentence giving this person\'s perspective/concern about the place, in their own voice"}],"recommendation":"1-2 sentences where the AI settles on a compromise that works for the whole group, with a brief reason"}\nScore on a 1-10 scale, inferring criteria from each member\'s preferences. Each person in "debate" should have a different opinion reflecting their own preference (can be positive or negative depending on their taste).',
       userPrompt: (place, members, context) => `Place: ${place}\nMembers and preferences:\n${members.map(m => `- ${m.name}: ${m.pref}`).join('\n')}${context ? `\n\nReference data (RAG, from the real knowledge base):\n${context}` : ''}`,
       ragUsed: (sources) => `📚 Used data from: ${sources}`,
-      ragNone: '📚 No related data found in the knowledge base (RAG server is off or not indexed yet) — the AI will guess instead.',
+      ragNone: '📚 No related data found in the knowledge base (RAG server is off or not indexed yet) — the system will guess instead.',
       satisfactionTitle: '📊 Group satisfaction score',
       overallLabel: 'Overall',
       lowestWhy: (name) => `${name} has the lowest score — see why in the conflict below.`,
@@ -883,7 +883,7 @@ const I18N = {
         matchTag: (name) => `${name}'s preference matches this place`
       },
       compromiseTitle: '💡 Three options instead of one averaged pick',
-      aiPick: '✓ AI pick',
+      aiPick: '✓ Top pick',
       optionLabel: (label) => `Option ${label}`,
       optionPro: (name, score) => `${name} is most satisfied (${score}%)`,
       optionCon: (name, score) => `${name} is least satisfied (${score}%)`,
@@ -954,8 +954,8 @@ const I18N = {
       checklistBudget: 'Budget',
       checklistGroup: 'Travel group',
       checklistNotes: 'Notes/preferences',
-      forceBuildBtn: "Build it anyway (AI fills in what's missing)",
-      autoDestinationFallback: "a popular destination of the AI's choosing"
+      forceBuildBtn: "Build it anyway (fills in what's missing automatically)",
+      autoDestinationFallback: "a popular destination"
     },
     heal: {
       title: 'Self-healing itinerary',
@@ -1009,7 +1009,7 @@ const I18N = {
       summaryTraffic: (text) => `Traffic disruption: ${text}`,
       summaryOverbook: (text) => `Venue overbooked: ${text}`,
       summaryHealth: (text) => `Health issue during the trip: ${text}`,
-      impactAiTitle: '🧠 AI impact analysis by member',
+      impactAiTitle: '🧠 Impact analysis by member',
       impactAiSummary: 'Overall assessment:',
       impactAiReason: 'Reason:',
       impactAiAdvice: 'Adjustment advice:',
@@ -1019,7 +1019,7 @@ const I18N = {
       userPrompt: (itin, event) => `Itinerary:\n${itin.map(i => '- ' + i).join('\n')}\nSituation: ${event}`
     },
     camera: {
-      title: 'AI understands via camera',
+      title: 'Understands your photos',
       modeLabel: 'Mode',
       modeFood: '🍜 Food',
       modeLandmark: '🏯 Landmark',
@@ -1027,25 +1027,25 @@ const I18N = {
       runBtn: 'Analyze image',
       step1: 'Looking at the image (step 1/2)...',
       step2: 'Analyzing and writing a reply (step 2/2)...',
-      noCaption: (model) => `${model} returned no description for this image — try a different image.`,
-      fallbackUnknown: (model) => `${model} could not confidently identify the image. This is a safe fallback: the photo may be blurry or poorly lit. Try taking a sharper photo with better lighting, and avoid blocking any text.`,
-      fallbackFood: (guess) => `The vision model could not read enough detail to be certain. Based on the current description, this is likely ${guess || 'a dish'} — try a closer, brighter shot and avoid glare or dark corners for better recognition.`,
-      fallbackLandmark: (guess) => `The vision model could not confidently identify this place. Based on the current description, this is likely ${guess || 'a landmark/building'} — try a wider shot with visible signage.`,
+      noCaption: () => `No description was returned for this image — try a different image.`,
+      fallbackUnknown: () => `The image content could not be confidently identified. This is a safe fallback: the photo may be blurry or poorly lit. Try taking a sharper photo with better lighting, and avoid blocking any text.`,
+      fallbackFood: (guess) => `Not enough detail could be read to be certain. Based on the current description, this is likely ${guess || 'a dish'} — try a closer, brighter shot and avoid glare or dark corners for better recognition.`,
+      fallbackLandmark: (guess) => `This place could not be confidently identified. Based on the current description, this is likely ${guess || 'a landmark/building'} — try a wider shot with visible signage.`,
       fallbackAdvice: 'If the image is still unclear, capture a cleaner photo with more contrast, visible signage, and better lighting.',
-      disclaimer: (model) => `⚠️ The vision AI (${model}) can misidentify things easily, especially text in the image (menus, signs) and less common dishes/landmarks. Treat this as a reference suggestion, not a firm conclusion.`,
+      disclaimer: () => `⚠️ Image recognition can misidentify things easily, especially text in the image (menus, signs) and less common dishes/landmarks. Treat this as a reference suggestion, not a firm conclusion.`,
       systemPromptFood: "You receive an English description (from a vision AI) of a photo of a dish. Based on it, write in English: 1) What this dish might be. 2) Visible ingredients. 3) 1-2 similar dishes worth trying. Do NOT make up exact prices/calories — if you mention them, clearly label them as estimates. If the description is too vague to guess, say plainly that you're not sure. Keep it brief, no markdown.",
       systemPromptLandmark: "You receive an English description (from a vision AI) of a photo of a landmark/structure. Based on it, write in English: 1) What this landmark might be. 2) A bit of history/culture if you're confident about it. 3) Similar types of attractions likely nearby. If the description is too vague to identify, say plainly that you're not sure instead of guessing. Keep it brief, no markdown.",
       userPrompt: (caption) => `Description from vision AI: "${caption}"`
     },
     diff: {
-      title: 'Traditional AI Travel Planner vs. TravelAI',
+      title: 'Traditional Trip Planners vs. TravelAI',
       subtitle: "It's not just about building an itinerary — TravelAI helps the whole group decide together, and shows you why.",
-      tradTitle: 'Traditional AI Travel Planner',
+      tradTitle: 'Traditional trip planners',
       tradItems: [
         "Optimizes for one traveler's stated preferences",
         'One itinerary — take it or leave it',
         'Stays silent when the group disagrees',
-        '"AI decided" — no reasoning shown'
+        '"The system decided" — no reasoning shown'
       ],
       usTitle: 'TravelAI',
       usItems: [
@@ -1056,10 +1056,10 @@ const I18N = {
       ],
       mission: '"TravelAI doesn\'t plan trips — it helps travel groups make better decisions together, and shows every member exactly how their voice shaped the result."',
       exampleTitle: '📊 A real example from the actual scoring engine',
-      exampleOldTag: 'Traditional personalized AI',
-      exampleOldText: "3 people looking for a place to eat in Naha (a seafood lover / a vegetarian / no strong preference) — a typical AI picks the \"safe average\": all 3 land at just 60% satisfaction. Nobody's unhappy, but nobody's genuinely happy either.",
+      exampleOldTag: 'Traditional personalization',
+      exampleOldText: "3 people looking for a place to eat in Naha (a seafood lover / a vegetarian / no strong preference) — a typical planner picks the \"safe average\": all 3 land at just 60% satisfaction. Nobody's unhappy, but nobody's genuinely happy either.",
       exampleNewTag: 'TravelAI',
-      exampleNewText: "With the same data, TravelAI surfaces an option where the seafood lover reaches 78% satisfaction — while clearly showing the vegetarian member only reaches 35%, so the group decides the trade-off themselves instead of the AI quietly deciding for them."
+      exampleNewText: "With the same data, TravelAI surfaces an option where the seafood lover reaches 78% satisfaction — while clearly showing the vegetarian member only reaches 35%, so the group decides the trade-off themselves instead of the system quietly deciding for them."
     },
     auth: {
       subtitle: 'Log in to continue',
