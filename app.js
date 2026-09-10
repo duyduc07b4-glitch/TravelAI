@@ -3943,6 +3943,23 @@ function initApp() {
     tabsNav.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
   })();
 
+  // Pins header + hero-strip + tab bar as one stacked sticky group instead of only the header
+  // (header already had position:sticky on its own — the photo strip and tabs used to scroll away
+  // under it). The two "top" offsets are measured live via ResizeObserver rather than hardcoded,
+  // since header height changes with login state/invites badge/language and viewport width.
+  (function enableStackedStickyHeader() {
+    const headerEl = document.querySelector('header');
+    const heroStripEl = document.querySelector('.hero-strip');
+    if (!headerEl || !heroStripEl) return;
+    const root = document.documentElement.style;
+    const ro = new ResizeObserver(() => {
+      root.setProperty('--header-h', headerEl.offsetHeight + 'px');
+      root.setProperty('--hero-h', heroStripEl.offsetHeight + 'px');
+    });
+    ro.observe(headerEl);
+    ro.observe(heroStripEl);
+  })();
+
   // ---------- Claude API call (via claude-server/, the local proxy that holds the API key) ----------
   /**
    * Calls claude-server's /chat with streaming enabled so callers can show tokens as they arrive

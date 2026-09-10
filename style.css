@@ -104,7 +104,17 @@ button.small{padding:5px 10px; font-size:12px;}
 
 /* Horizontal running photo strip — replaces the hero banner, main focus is the mobile layout. */
 .hero-strip{
-  max-width:1120px; margin:18px auto 0; overflow:hidden; border-radius:26px; box-shadow:var(--shadow);
+  max-width:1120px; margin:18px auto 0; border-radius:26px; box-shadow:var(--shadow);
+  position:sticky; top:var(--header-h, 84px); z-index:9;
+  /* Opaque so that once this is pinned above scrolled-past content, the mask's faded edges
+     (below) reveal this solid color instead of whatever panel text is now scrolling underneath. */
+  background:var(--bg-deep);
+}
+/* The left/right fade-to-transparent mask lives on this inner wrapper, not on .hero-strip itself —
+   masking .hero-strip directly would punch the same transparent holes through its own background,
+   defeating the point of giving it one. */
+.hero-strip-mask{
+  overflow:hidden; border-radius:26px;
   -webkit-mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
   mask-image:linear-gradient(to right, transparent, black 6%, black 94%, transparent);
 }
@@ -126,8 +136,9 @@ button.small{padding:5px 10px; font-size:12px;}
 main{max-width:1120px; margin:0 auto; padding:20px 24px 80px;}
 nav.tabs{
   display:flex; margin-bottom:20px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; cursor:grab;
-  background:rgba(255,255,255,0.8); backdrop-filter:blur(6px); box-shadow:var(--shadow-sm);
+  background:rgba(255,255,255,0.92); backdrop-filter:blur(6px); box-shadow:var(--shadow-sm);
   border:1px solid var(--border); border-bottom:2px solid var(--border); border-radius:14px; padding:6px 6px 0;
+  position:sticky; top:calc(var(--header-h, 84px) + var(--hero-h, 150px)); z-index:8;
 }
 nav.tabs::-webkit-scrollbar{display:none;}
 nav.tabs.dragging{cursor:grabbing; user-select:none;}
@@ -443,6 +454,7 @@ table.score-table th{background:var(--panel2); color:var(--muted); font-weight:5
   header{padding:14px 16px 0;}
   .topbar-shell{padding:14px 14px 12px;}
   .hero-strip{max-width:none; margin:14px 0 0; border-radius:0;}
+  .hero-strip-mask{border-radius:0;}
   header h1{font-size:16px;}
   .apikey-row{width:100%;}
   .lang-switch{order:2; width:100%; margin-top:2px;}
