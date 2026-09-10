@@ -297,9 +297,10 @@ const I18N = {
     auth: {
       subtitle: 'Đăng nhập để tiếp tục',
       usernameLabel: 'Tên đăng nhập',
+      usernamePlaceholder: 'Nhập tên đăng nhập',
       passwordLabel: 'Mật khẩu',
+      passwordPlaceholder: 'Nhập mật khẩu',
       loginBtn: 'Đăng nhập',
-      demoHint: 'Tài khoản demo: admin1 / user1 / user2 — mật khẩu 123123',
       logoutBtn: 'Đăng xuất',
       sessionExpired: 'Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.',
       missingFields: 'Nhập đủ tên đăng nhập và mật khẩu.',
@@ -663,9 +664,10 @@ const I18N = {
     auth: {
       subtitle: '続けるにはログインしてください',
       usernameLabel: 'ユーザー名',
+      usernamePlaceholder: 'ユーザー名を入力',
       passwordLabel: 'パスワード',
+      passwordPlaceholder: 'パスワードを入力',
       loginBtn: 'ログイン',
-      demoHint: 'デモ用アカウント：admin1 / user1 / user2 — パスワード 123123',
       logoutBtn: 'ログアウト',
       sessionExpired: 'セッションの有効期限が切れました。もう一度ログインしてください。',
       missingFields: 'ユーザー名とパスワードを入力してください。',
@@ -1029,9 +1031,10 @@ const I18N = {
     auth: {
       subtitle: 'Log in to continue',
       usernameLabel: 'Username',
+      usernamePlaceholder: 'Enter your username',
       passwordLabel: 'Password',
+      passwordPlaceholder: 'Enter your password',
       loginBtn: 'Log in',
-      demoHint: 'Demo accounts: admin1 / user1 / user2 — password 123123',
       logoutBtn: 'Log out',
       sessionExpired: 'Your session has expired — please log in again.',
       missingFields: 'Enter both a username and a password.',
@@ -3254,7 +3257,9 @@ function initApp() {
   // there is no real security here (plaintext-in-transit over local HTTP, server-side hashing
   // only) — this is a demo login for a hackathon prototype, not a production auth system.
   function authBase() {
-    return (safeLoadString(STORAGE_KEYS.authUrl) || 'http://localhost:8900').replace(/\/+$/, '');
+    const savedUrl = safeLoadString(STORAGE_KEYS.authUrl);
+    if (savedUrl) return savedUrl.replace(/\/+$/, '');
+    return `http://${window.location.hostname || 'localhost'}:8900`;
   }
 
   let authToken = null;
