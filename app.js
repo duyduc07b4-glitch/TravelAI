@@ -3919,13 +3919,21 @@ function initApp() {
     tabsNav.addEventListener('pointerdown', (e) => {
       dragging = true; moved = false;
       startX = e.clientX; startScroll = tabsNav.scrollLeft;
-      tabsNav.setPointerCapture(e.pointerId);
+      // Pointer capture is grabbed lazily once a real drag is detected (see pointermove below),
+      // not here — capturing on every pointerdown redirects the subsequent `click` event's target
+      // to tabsNav itself (per the Pointer Events spec's capture-owner routing for compat mouse
+      // events), which silently ate every plain tap/click on a tab button before it ever reached
+      // that button's own click listener.
     });
     tabsNav.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       const dx = e.clientX - startX;
-      if (Math.abs(dx) > 4) { moved = true; tabsNav.classList.add('dragging'); }
-      tabsNav.scrollLeft = startScroll - dx;
+      if (!moved && Math.abs(dx) > 4) {
+        moved = true;
+        tabsNav.classList.add('dragging');
+        tabsNav.setPointerCapture(e.pointerId);
+      }
+      if (moved) tabsNav.scrollLeft = startScroll - dx;
     });
     const endDrag = () => { dragging = false; tabsNav.classList.remove('dragging'); };
     tabsNav.addEventListener('pointerup', endDrag);
