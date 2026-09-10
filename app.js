@@ -3910,6 +3910,31 @@ function initApp() {
     });
   });
 
+  // Lets a mouse (not just touch/trackpad) drag the tab bar sideways when it doesn't fit on one
+  // line — plain `overflow-x:auto` only reacts to wheel/touch/scrollbar, not click-and-drag.
+  (function enableTabsDragScroll() {
+    const tabsNav = document.querySelector('nav.tabs');
+    if (!tabsNav) return;
+    let dragging = false, startX = 0, startScroll = 0, moved = false;
+    tabsNav.addEventListener('pointerdown', (e) => {
+      dragging = true; moved = false;
+      startX = e.clientX; startScroll = tabsNav.scrollLeft;
+      tabsNav.setPointerCapture(e.pointerId);
+    });
+    tabsNav.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 4) { moved = true; tabsNav.classList.add('dragging'); }
+      tabsNav.scrollLeft = startScroll - dx;
+    });
+    const endDrag = () => { dragging = false; tabsNav.classList.remove('dragging'); };
+    tabsNav.addEventListener('pointerup', endDrag);
+    tabsNav.addEventListener('pointerleave', endDrag);
+    tabsNav.addEventListener('pointercancel', endDrag);
+    // Swallow the click that would otherwise fire on the tab button right after a drag.
+    tabsNav.addEventListener('click', (e) => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  })();
+
   // ---------- Claude API call (via claude-server/, the local proxy that holds the API key) ----------
   /**
    * Calls claude-server's /chat with streaming enabled so callers can show tokens as they arrive
