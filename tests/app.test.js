@@ -410,7 +410,7 @@ describe('renderPlannerHtml', () => {
     // (small, local) model only generated 1 day of activities.
     const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Beach'] }] }, 'Okinawa', 'vi', 4);
     assert.match(html, /class="error-box"/);
-    assert.match(html, /yêu cầu 4 ngày nhưng AI chỉ tạo được 1 ngày/);
+    assert.match(html, /yêu cầu 4 ngày nhưng hệ thống chỉ tạo được 1 ngày/);
   });
   test('does not warn when the day count matches what was requested', () => {
     const html = renderPlannerHtml({ days: [{ day: 1, activities: ['Beach'] }] }, 'Okinawa', 'vi', 1);
@@ -602,13 +602,13 @@ describe('formatPlannerShareText', () => {
     assert.match(text, /Naha Airport/);
     assert.match(text, /Churaumi Aquarium/);
     assert.match(text, /Estimated cost: 80000 JPY\./);
-    assert.match(text, /Tạo bằng AI Travel Companion/);
+    assert.match(text, /Tạo bằng TravelAI/);
   });
   test('localizes the day labels and attribution line (ja)', () => {
     const text = formatPlannerShareText(data, 'Okinawa', 'ja');
     assert.match(text, /1日目/);
     assert.match(text, /2日目/);
-    assert.match(text, /AI Travel Companionで作成/);
+    assert.match(text, /TravelAIで作成/);
   });
   test('skips malformed day entries instead of throwing', () => {
     const text = formatPlannerShareText({ days: [null, { day: 2, activities: [] }, { day: 3, activities: ['Beach'] }] }, 'X', 'en');
@@ -618,7 +618,7 @@ describe('formatPlannerShareText', () => {
   test('omits the summary line when there is no summary', () => {
     const text = formatPlannerShareText({ days: [{ day: 1, activities: ['Beach'] }] }, 'X', 'en');
     assert.match(text, /Beach/);
-    assert.match(text, /Made with AI Travel Companion/);
+    assert.match(text, /Made with TravelAI/);
   });
 });
 

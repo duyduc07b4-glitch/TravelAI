@@ -61,8 +61,8 @@ const I18N = {
       timeout: 'Hệ thống không phản hồi sau 60 giây — có thể đang khởi động lần đầu (chậm hơn bình thường) hoặc đang quá tải. Vui lòng thử lại.',
       cannotConnect: (base) => `Không gọi được tới ${base}. Bấm "Kiểm tra kết nối" ở góc trên để chẩn đoán.`,
       visionCannotConnect: (base) => `Không gọi được tới ${base}. Kiểm tra máy chủ đã chạy chưa (npm start trong thư mục claude-server/).`,
-      noJson: 'Hệ thống không trả về dữ liệu đúng định dạng yêu cầu. Vui lòng thử lại.',
-      malformedJson: 'Hệ thống trả về dữ liệu không hợp lệ. Vui lòng thử lại.'
+      noJson: 'Hệ thống không trả về dữ liệu dạng JSON. Vui lòng thử lại.',
+      malformedJson: 'Hệ thống trả về JSON không hợp lệ. Vui lòng thử lại.'
     },
     planner: {
       title: 'Tạo lịch trình tự động',
@@ -439,8 +439,8 @@ const I18N = {
       timeout: 'システムが60秒以内に応答しませんでした — 初回起動に時間がかかっているか、端末の負荷が高い可能性があります。再試行してください。',
       cannotConnect: (base) => `${base} に接続できませんでした。右上の「接続確認」で診断してください。`,
       visionCannotConnect: (base) => `${base} に接続できませんでした。サーバーが起動しているか確認してください（claude-server/ で npm start）。`,
-      noJson: 'システムが要求された形式でデータを返しませんでした。再試行してください。',
-      malformedJson: 'システムが返したデータが不正な形式です。再試行してください。'
+      noJson: 'JSON形式でデータを返しませんでした。再試行してください。',
+      malformedJson: 'JSONが不正な形式です。再試行してください。'
     },
     planner: {
       title: '旅程を自動作成',
@@ -817,8 +817,8 @@ const I18N = {
       timeout: "The system didn't respond within 60 seconds — it might be starting up for the first time (slower than usual), or under heavy load. Please try again.",
       cannotConnect: (base) => `Couldn't reach ${base}. Click "Check connection" up top to diagnose.`,
       visionCannotConnect: (base) => `Couldn't reach ${base}. Check that the server is running (npm start in the claude-server/ folder).`,
-      noJson: "The system didn't return data in the expected format. Please try again.",
-      malformedJson: 'The system returned invalid data. Please try again.'
+      noJson: "The system didn't return the JSON data in the expected format. Please try again.",
+      malformedJson: 'The system returned invalid JSON. Please try again.'
     },
     planner: {
       title: 'Create an itinerary',
