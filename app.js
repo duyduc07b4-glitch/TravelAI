@@ -4059,16 +4059,26 @@ function initApp() {
 
   // Collapses the hero photo strip once the page is scrolled past the top, instead of leaving it
   // pinned there forever alongside the header/tabs — it's decorative, and staying pinned ate
-  // permanent screen space. The ResizeObserver above already watches this element's height, so
-  // collapsing it via CSS (max-height) also drives --hero-h back toward 0, which is what makes the
-  // (also-sticky) tab bar slide up to sit flush under the header instead of leaving a gap.
+  // permanent screen space. The tab bar right after it (also sticky, offset by --hero-h) naturally
+  // slides up as this shrinks, via the ResizeObserver above keeping --hero-h in sync — no separate
+  // JS coordination needed for that part.
   (function enableHeroStripAutoHide() {
     const heroStripEl = document.querySelector('.hero-strip');
     if (!heroStripEl) return;
     const SCROLL_HIDE_THRESHOLD = 24;
-    const update = () => heroStripEl.classList.toggle('hero-strip-collapsed', window.scrollY > SCROLL_HIDE_THRESHOLD);
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      heroStripEl.classList.toggle('hero-strip-collapsed', window.scrollY > SCROLL_HIDE_THRESHOLD);
+    };
     update();
-    window.addEventListener('scroll', update, { passive: true });
+    // rAF-throttled: a scroll gesture can fire dozens of 'scroll' events per second, but there's
+    // only ever one meaningful state change to make per rendered frame.
+    window.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(update);
+    }, { passive: true });
   })();
 
   // ---------- Claude API call (via claude-server/, the local proxy that holds the API key) ----------
