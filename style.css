@@ -105,10 +105,19 @@ button.small{padding:5px 10px; font-size:12px;}
 /* Horizontal running photo strip — replaces the hero banner, main focus is the mobile layout. */
 .hero-strip{
   max-width:1120px; margin:18px auto 0; border-radius:26px; box-shadow:var(--shadow);
-  position:sticky; top:var(--header-h, 84px); z-index:9;
+  position:sticky; top:var(--header-h, 84px); z-index:9; overflow:hidden;
   /* Opaque so that once this is pinned above scrolled-past content, the mask's faded edges
      (below) reveal this solid color instead of whatever panel text is now scrolling underneath. */
   background:var(--bg-deep);
+  max-height:220px; opacity:1;
+  transition:max-height .25s ease, opacity .2s ease, margin-top .25s ease, box-shadow .2s ease;
+}
+/* Collapsed once the page is scrolled past the top (see enableHeroStripAutoHide in app.js) — the
+   photo strip disappears instead of staying pinned forever, and the tab bar (also sticky, offset by
+   --hero-h which this collapse drives toward 0 via the ResizeObserver already watching this element)
+   slides up to sit flush under the header. */
+.hero-strip.hero-strip-collapsed{
+  max-height:0; opacity:0; margin-top:0; box-shadow:none;
 }
 /* The left/right fade-to-transparent mask lives on this inner wrapper, not on .hero-strip itself —
    masking .hero-strip directly would punch the same transparent holes through its own background,
