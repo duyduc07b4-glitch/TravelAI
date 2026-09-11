@@ -368,10 +368,12 @@ describe('extractJson', () => {
     // going through the I18N dictionary — 'en' silently got Vietnamese text.
     assert.throws(() => extractJson('I cannot help with that.', 'en'), /didn't return the JSON/);
   });
-  test('throws a localized error on malformed JSON', () => {
-    assert.throws(() => extractJson('{"days": [1, 2,]}', 'vi'), /JSON không hợp lệ/);
-    assert.throws(() => extractJson('{"days": [1, 2,]}', 'ja'), /JSONが不正な形式/);
-    assert.throws(() => extractJson('{"days": [1, 2,]}', 'en'), /invalid JSON/);
+  test('throws a localized error on malformed JSON that the repair pass can\'t fix', () => {
+    // An unquoted key isn't something repairJsonText attempts to guess around (unlike a trailing
+    // comma or a raw newline in a string) — this should still surface as a real error.
+    assert.throws(() => extractJson('{"days": [1, 2], note: "hi"}', 'vi'), /JSON không hợp lệ/);
+    assert.throws(() => extractJson('{"days": [1, 2], note: "hi"}', 'ja'), /JSONが不正な形式/);
+    assert.throws(() => extractJson('{"days": [1, 2], note: "hi"}', 'en'), /invalid JSON/);
   });
   test('recovers from a raw newline typed inside a string value', () => {
     // A model writing "multi-line-feeling" text sometimes types a literal newline instead of
@@ -381,6 +383,10 @@ describe('extractJson', () => {
       extractJson('{"summary":"Line one\nLine two"}', 'vi'),
       { summary: 'Line one\nLine two' }
     );
+  });
+  test('recovers from a trailing comma before a closing bracket/brace', () => {
+    assert.deepEqual(extractJson('{"days": [1, 2,]}', 'vi'), { days: [1, 2] });
+    assert.deepEqual(extractJson('{"days": [1, 2], "note": "hi",}', 'vi'), { days: [1, 2], note: 'hi' });
   });
 });
 
