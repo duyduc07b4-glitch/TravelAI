@@ -144,6 +144,9 @@ const I18N = {
       needPlanFirst: 'Hãy tạo lịch trình ở tab "Lịch trình" trước khi dùng Quyết định nhóm.',
       costPerPerson: (perPerson) => `≈ ${perPerson} yên/người`,
       costTotal: (total, count) => `tổng ≈ ${total} yên cho ${count} người`,
+      priceFree: 'Miễn phí',
+      priceRangeExact: (range) => `${range} yên/người`,
+      priceRangeEstimated: (range) => `~${range} yên/người (ước lượng)`,
       whyTitle: (name) => `🧾 Vì sao chọn "${name}"?`,
       reasonPrefMatch: (count, total) => `${count}/${total} thành viên có sở thích khớp với địa điểm này`,
       reasonBudget: (price) => `Mức giá: ${price}`,
@@ -522,6 +525,9 @@ const I18N = {
       needPlanFirst: 'グループ決定を使う前に、「旅程」タブで旅程を作成してください。',
       costPerPerson: (perPerson) => `≈ ${perPerson}円/人`,
       costTotal: (total, count) => `合計 ≈ ${total}円（${count}人分）`,
+      priceFree: '無料',
+      priceRangeExact: (range) => `${range}円/人`,
+      priceRangeEstimated: (range) => `約${range}円/人（概算）`,
       whyTitle: (name) => `🧾 なぜ「${name}」を選んだのか？`,
       reasonPrefMatch: (count, total) => `${total}人中${count}人の好みがこのスポットと一致`,
       reasonBudget: (price) => `価格帯：${price}`,
@@ -900,6 +906,9 @@ const I18N = {
       needPlanFirst: 'Build an itinerary on the "Itinerary" tab before using Group Decision.',
       costPerPerson: (perPerson) => `≈ ¥${perPerson}/person`,
       costTotal: (total, count) => `≈ ¥${total} total for ${count} people`,
+      priceFree: 'Free',
+      priceRangeExact: (range) => `¥${range}/person`,
+      priceRangeEstimated: (range) => `~¥${range}/person (estimated)`,
       whyTitle: (name) => `🧾 Why "${name}"?`,
       reasonPrefMatch: (count, total) => `${count} of ${total} members' preferences match this place`,
       reasonBudget: (price) => `Price range: ${price}`,
@@ -1670,6 +1679,29 @@ function extractChunkContent(line) {
 }
 
 /**
+ * Best-effort cleanup for a raw (unescaped) newline/tab typed inside a JSON string value — invalid
+ * per the JSON spec, but a natural thing for a model to type when its text feels multi-line. Walks
+ * the text tracking string/escape state (same scan as findFirstJsonObject) so it only touches
+ * characters actually inside a string, rather than reformatting the whole blob. Deliberately does
+ * NOT paper over other malformed-JSON cases (e.g. a trailing comma) — those should still surface as
+ * the "malformed JSON" error rather than being silently guessed at.
+ */
+function repairJsonText(text) {
+  let out = '', inString = false, escapeNext = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (escapeNext) { out += ch; escapeNext = false; continue; }
+    if (ch === '\\') { out += ch; escapeNext = true; continue; }
+    if (ch === '"') { inString = !inString; out += ch; continue; }
+    if (inString && ch === '\n') { out += '\\n'; continue; }
+    if (inString && ch === '\r') { out += '\\r'; continue; }
+    if (inString && ch === '\t') { out += '\\t'; continue; }
+    out += ch;
+  }
+  return out;
+}
+
+/**
  * Extracts and parses a JSON object from an LLM text response.
  * Throws a user-facing Error (localized) on failure, not a raw JSON.parse error.
  */
@@ -1685,6 +1717,9 @@ function extractJson(text, lang) {
   }
   try {
     return JSON.parse(found);
+  } catch (e) { /* fall through to the repair pass below */ }
+  try {
+    return JSON.parse(repairJsonText(found));
   } catch (e) {
     throw new Error(tr(lang, 'errors.malformedJson'));
   }
@@ -1908,11 +1943,20 @@ function isFoodKnowledgeEntry(entry) {
   return !!(entry && entry.cuisine);
 }
 
-/** Scores one knowledge entry (restaurant/attraction) against one member's tags. Returns {score 0-100, reasons[]}. */
-function scoreEntryForMember(entry, tags, lang) {
+/**
+ * Scores one knowledge entry (restaurant/attraction) against one member's tags. Returns {score 0-100, reasons[]}.
+ * `activityText` (optional) is the actual itinerary line this entry was matched to (e.g. "Ăn trưa
+ * hải sản tại 海のイスキア") — included in the haystack alongside the entry's own fields because
+ * RAG metadata is often too generic or plain wrong to match on alone (OSM auto-tags plenty of real
+ * seafood spots as "Quán cà phê"/cafe), while the itinerary text the AI actually wrote usually
+ * names the cuisine/activity explicitly. Without it, a member whose preference is a perfect match
+ * for what the day plan says can still score as a coin-flip because the matched entry's own
+ * cuisine/notes fields happen not to repeat that word.
+ */
+function scoreEntryForMember(entry, tags, lang, activityText) {
   let score = 60;
   const reasons = [];
-  const haystack = [entry.name, entry.cuisine, entry.type, entry.notes].filter(Boolean).join(' ').toLowerCase();
+  const haystack = [entry.name, entry.cuisine, entry.type, entry.notes, activityText].filter(Boolean).join(' ').toLowerCase();
   const price = parsePriceYen(entry.priceRange || entry.ticketPrice);
   const kidFriendly = String(entry.kidFriendly).toLowerCase() === 'true';
 
@@ -1944,11 +1988,11 @@ function scoreEntryForMember(entry, tags, lang) {
   return { score, reasons };
 }
 
-/** Per-member + overall satisfaction for one knowledge entry. members: [{name, pref}]. */
-function computeGroupSatisfaction(members, entry, lang) {
+/** Per-member + overall satisfaction for one knowledge entry. members: [{name, pref}]. `activityText`: see scoreEntryForMember. */
+function computeGroupSatisfaction(members, entry, lang, activityText) {
   const perMember = (members || []).map(m => {
     const tags = extractPreferenceTags(m.pref, lang);
-    const { score, reasons } = scoreEntryForMember(entry || {}, tags, lang);
+    const { score, reasons } = scoreEntryForMember(entry || {}, tags, lang, activityText);
     return { name: m.name, score, tags, reasons };
   });
   const overall = perMember.length ? Math.round(perMember.reduce((s, m) => s + m.score, 0) / perMember.length) : 0;
@@ -1957,8 +2001,8 @@ function computeGroupSatisfaction(members, entry, lang) {
 }
 
 /** Detects a visible preference conflict for one entry: some members score high, others score low. */
-function detectPreferenceConflicts(members, entry, lang) {
-  const { perMember } = computeGroupSatisfaction(members, entry, lang);
+function detectPreferenceConflicts(members, entry, lang, activityText) {
+  const { perMember } = computeGroupSatisfaction(members, entry, lang, activityText);
   const high = perMember.filter(m => m.score >= 70);
   const low = perMember.filter(m => m.score <= 45);
   if (!high.length || !low.length) return [];
@@ -2068,12 +2112,38 @@ function generateCompromiseOptions(candidates, members, lang, place) {
   });
 }
 
+/**
+ * Reformats a knowledge-base price field (priceRange/ticketPrice) for the current UI language.
+ * The knowledge base is authored once, in Vietnamese — a string like "~400-800 yên/người (ước
+ * lượng theo loại quán)" or "Miễn phí" — so displaying it verbatim under a Japanese/English label
+ * ("価格帯：~400-800 yên/người...") reads as mixed-language. In 'vi' this returns the raw text
+ * unchanged (no reformatting needed, no risk of losing nuance for the language it was written in);
+ * for 'ja'/'en' it re-derives just the numbers (and whether OSM marked it a rough estimate) and
+ * rebuilds a fully localized line, at the cost of dropping any extra Vietnamese commentary in the
+ * source string (e.g. "giá có thể thay đổi theo năm") — a shorter fully-localized line beats a
+ * longer mixed-language one. Returns null when nothing usable is found (unparseable, no "free"
+ * wording either) so the caller can skip the line instead of showing raw Vietnamese in another
+ * language's UI.
+ */
+function formatEntryPriceForDisplay(rawPrice, lang) {
+  const raw = String(rawPrice || '').trim();
+  if (!raw) return null;
+  if (lang === 'vi' || !SUPPORTED_LANGS.includes(lang)) return raw;
+  if (/miễn phí|free/i.test(raw)) return tr(lang, 'group.priceFree');
+  const nums = raw.match(/\d[\d,]*/g);
+  if (!nums || !nums.length) return null;
+  const clean = (n) => n.replace(/,/g, '');
+  const range = nums.length >= 2 ? `${clean(nums[0])}-${clean(nums[1])}` : clean(nums[0]);
+  const isEstimate = /ước lượng|~/.test(raw);
+  return tr(lang, isEstimate ? 'group.priceRangeEstimated' : 'group.priceRangeExact', range);
+}
+
 /** Structured reasoning bullets for Explainable AI (Feature 4) — built from real RAG fields, not the LLM. */
 function buildReasoningReceipt(entry, group, members, lang) {
   const lines = [];
   const strongCount = group.perMember.filter(m => m.score >= 70).length;
   if (members && members.length) lines.push(tr(lang, 'group.reasonPrefMatch', strongCount, members.length));
-  const price = entry.priceRange || entry.ticketPrice;
+  const price = formatEntryPriceForDisplay(entry.priceRange || entry.ticketPrice, lang);
   if (price) lines.push(tr(lang, 'group.reasonBudget', price));
   if (String(entry.kidFriendly).toLowerCase() === 'true') lines.push(tr(lang, 'group.reasonKidFriendly'));
   if (entry.rating) lines.push(tr(lang, 'group.reasonRating', entry.rating));
@@ -2986,8 +3056,19 @@ function computeItinerarySatisfaction(members, activities, lang) {
   if (!members || !members.length || !list.length) return null;
   const perMember = members.map(m => {
     const tags = extractPreferenceTags(m.pref, lang);
-    const total = list.reduce((sum, activityText) => sum + scoreEntryForMember({ name: activityText }, tags, lang).score, 0);
-    return { name: m.name, score: Math.round(total / list.length) };
+    const scored = list.map(activityText => scoreEntryForMember({ name: activityText }, tags, lang));
+    // Averaging every activity's score (including the many that have nothing to do with this
+    // member's preference — hotel check-in, transfers, generic sightseeing) drowns out the few
+    // that actually match: even a trip full of seafood dinners for a seafood lover barely nudges
+    // the average above the neutral-60 baseline once diluted by 15+ unrelated stops. Averaging
+    // only the activities that actually triggered a reason (a real match, positive or negative)
+    // reflects "how well do the *relevant* parts of this trip suit me" instead — an activity that
+    // has nothing to do with anyone's stated preference is uninformative noise, not a vote for 60%.
+    const relevant = scored.filter(s => s.reasons.length > 0);
+    const score = relevant.length
+      ? Math.max(5, Math.min(100, Math.round(60 + relevant.reduce((sum, s) => sum + (s.score - 60), 0) / relevant.length)))
+      : 60;
+    return { name: m.name, score };
   });
   const overall = Math.round(perMember.reduce((s, m) => s + m.score, 0) / perMember.length);
   return { overall, perMember };
@@ -3244,7 +3325,7 @@ const AppCore = {
   looksLikeFoodOrDrinkActivity, correctedActivityPrice,
   formatYen, estimateEntryCostPerPerson, isFoodKnowledgeEntry,
   parseKnowledgeChunk, extractPreferenceTags, scoreEntryForMember, computeGroupSatisfaction,
-  detectPreferenceConflicts, generateCompromiseOptions, buildReasoningReceipt, pickPrimaryKnowledgeEntry,
+  detectPreferenceConflicts, generateCompromiseOptions, buildReasoningReceipt, formatEntryPriceForDisplay, pickPrimaryKnowledgeEntry,
   renderSatisfactionScoreHtml, renderConflictCardsHtml, renderCompromiseOptionsHtml, renderReasoningReceiptHtml,
   dedupePlanItems, flattenActivities, normalizeHealedText,
   normalizeTimeSlot, formatSlotLabel, parseSelfHealingInput, buildSelfHealingPromptLines,
@@ -3391,14 +3472,24 @@ function initApp() {
   loginCloseBtn.addEventListener('click', closeLoginModal);
   loginOverlay.addEventListener('click', (e) => { if (e.target === loginOverlay) closeLoginModal(); });
 
-  /** Re-renders the last generated itinerary without the blur, now that we're logged in — the content itself never changed, only whether it's obscured. */
-  function unlockLastPlannerResult() {
+  /**
+   * Re-renders the last generated itinerary against the current login state + language, instead of
+   * leaving whatever HTML was baked in at generation time on screen forever. Used both right after
+   * login (drop the blur) and after a language switch (the chrome around the plan — day headers,
+   * "Xem bản đồ" links, risk badges — is all T()-driven and was otherwise stuck in whatever language
+   * was active when the plan was generated; the LLM-authored activity text itself can't be
+   * retranslated without another AI call, so that part still reflects the generation-time language).
+   */
+  function rerenderLastPlannerResult() {
     if (!lastGeneratedTrip || !lastGeneratedTrip.data) return;
     const { destination, days, data } = lastGeneratedTrip;
     const risks = detectTravelRisks(flattenActivities(data), lastGeneratedTrip, null, currentLang);
     const pResultEl = document.getElementById('p-result');
-    if (pResultEl) pResultEl.innerHTML = `<div class="result-box">${renderPlannerHtml(data, destination, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}</div>`;
-    showInviteBox(lastGeneratedTrip);
+    if (pResultEl) {
+      const innerHtml = `${renderPlannerHtml(data, destination, currentLang, days)}${renderRiskPanelHtml(risks, currentLang)}`;
+      pResultEl.innerHTML = `<div class="result-box">${currentUser ? innerHtml : withLoginGateHtml(innerHtml)}</div>`;
+    }
+    if (currentUser) showInviteBox(lastGeneratedTrip);
   }
 
   /** Shows/hides the logged-in header bits based on current auth state; the login modal itself is opened on demand (header button, a blurred result's lock button, or a forced session-expired prompt) rather than blocking the app up front. Pass a message to force the modal open with that error (e.g. session expired). */
@@ -3417,7 +3508,7 @@ function initApp() {
         }
       }
       refreshInvitesBadge();
-      unlockLastPlannerResult();
+      rerenderLastPlannerResult();
       updateTabLockUI();
       // History is per-account (see the "Trip history" section) — looked up fresh via
       // getElementById, not a closed-over const, since applyAuthUI() can run (via the
@@ -3880,6 +3971,7 @@ function initApp() {
       checkConnection(); // re-runs so any visible status message (if one is showing) switches language too
       if (recognition) recognition.lang = T('speechLang');
       applyStaticTranslations();
+      rerenderLastPlannerResult();
     });
   });
 
@@ -3963,6 +4055,20 @@ function initApp() {
     });
     ro.observe(headerEl);
     ro.observe(heroStripEl);
+  })();
+
+  // Collapses the hero photo strip once the page is scrolled past the top, instead of leaving it
+  // pinned there forever alongside the header/tabs — it's decorative, and staying pinned ate
+  // permanent screen space. The ResizeObserver above already watches this element's height, so
+  // collapsing it via CSS (max-height) also drives --hero-h back toward 0, which is what makes the
+  // (also-sticky) tab bar slide up to sit flush under the header instead of leaving a gap.
+  (function enableHeroStripAutoHide() {
+    const heroStripEl = document.querySelector('.hero-strip');
+    if (!heroStripEl) return;
+    const SCROLL_HIDE_THRESHOLD = 24;
+    const update = () => heroStripEl.classList.toggle('hero-strip-collapsed', window.scrollY > SCROLL_HIDE_THRESHOLD);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
   })();
 
   // ---------- Claude API call (via claude-server/, the local proxy that holds the API key) ----------
@@ -4441,7 +4547,11 @@ function initApp() {
     const user = tr(currentLang, 'planner.userPrompt', dest, days, startDate, budget, group, notes, members, ragContext);
 
     try {
-      const rawData = await callClaude(system, user, { json: true, onChunk: streamPreview(pResult, T('planner.loading')) });
+      // No onChunk here (unlike heal/camera below) — the planner's raw output is pure JSON, and
+      // streaming that to screen mid-generation just shows the model "thinking out loud" in brace
+      // soup instead of a clean loading state; the spinner set by setLoading() above stays put
+      // until the parsed, rendered result replaces it.
+      const rawData = await callClaude(system, user, { json: true });
       const data = resolvePlannerVenues(rawData, ragCandidates, members, currentLang);
       updateTripStateFromPlannerData(data, { destination: dest, days, startDate, budget, group, notes });
       const risks = detectTravelRisks(flattenActivities(data), { budget, days, group, notes }, null, currentLang)
@@ -4505,8 +4615,8 @@ function initApp() {
   /** Computes + renders Group Decision (Satisfaction Score, Conflicts, Compromise Options, Explainable AI receipt) — all deterministic, no LLM call. */
   function renderGroupDecision(candidates, place, members) {
     const entry = pickPrimaryKnowledgeEntry(candidates, place);
-    const group = computeGroupSatisfaction(members, entry, currentLang);
-    const conflicts = detectPreferenceConflicts(members, entry, currentLang);
+    const group = computeGroupSatisfaction(members, entry, currentLang, place);
+    const conflicts = detectPreferenceConflicts(members, entry, currentLang, place);
     const options = generateCompromiseOptions(candidates, members, currentLang, place);
     lastCompromiseOptions = options;
     // If place/members changed enough that the group's earlier pick no longer appears among the

@@ -373,6 +373,15 @@ describe('extractJson', () => {
     assert.throws(() => extractJson('{"days": [1, 2,]}', 'ja'), /JSONが不正な形式/);
     assert.throws(() => extractJson('{"days": [1, 2,]}', 'en'), /invalid JSON/);
   });
+  test('recovers from a raw newline typed inside a string value', () => {
+    // A model writing "multi-line-feeling" text sometimes types a literal newline instead of
+    // escaping it — invalid JSON, but common enough in practice to be worth repairing rather
+    // than failing the whole generation over.
+    assert.deepEqual(
+      extractJson('{"summary":"Line one\nLine two"}', 'vi'),
+      { summary: 'Line one\nLine two' }
+    );
+  });
 });
 
 describe('renderPlannerHtml', () => {
