@@ -5397,7 +5397,10 @@ function initApp() {
       const promptLines = buildSelfHealingPromptLines(parsedInput.days, currentLang);
       const promptInput = promptLines.length ? promptLines : itin;
       const user = tr(currentLang, 'heal.userPrompt', promptInput, event);
-      const ai = await callClaude(system, user, { json: true, onChunk: streamPreview(hResult, T('heal.loading')) });
+      // No onChunk (see the planner's call for the same reasoning) — raw JSON streaming to
+      // screen mid-generation reads as the model "thinking out loud" rather than a clean loading
+      // state; setLoading() above already has the spinner in place.
+      const ai = await callClaude(system, user, { json: true });
       data = normalizeSelfHealingAiResult(baseData, ai);
     } catch (err) {
       data = baseData;
