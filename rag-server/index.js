@@ -9,6 +9,35 @@ app.use((req, res, next) => {
   next();
 });
 
+function tokenize(text) {
+  return (text || '').toLowerCase().match(/[\p{L}\p{N}]+/gu) || [];
+}
+
+function lexicalSimilarity(question, text) {
+  const questionTokens = new Set(tokenize(question));
+  const textTokens = new Set(tokenize(text));
+  if (!questionTokens.size || !textTokens.size) return 0;
+
+  let overlap = 0;
+  for (const token of questionTokens) {
+    if (textTokens.has(token)) overlap += 1;
+  }
+  return overlap / questionTokens.size;
+}
+
+async function rankStore(store, question) {
+  try {
+    const qEmbedding = await embed(question);
+    return store
+      .map((e) => ({ ...e, score: cosineSimilarity(qEmbedding, e.embedding) }))
+      .sort((a, b) => b.score - a.score);
+  } catch (err) {
+    return store
+      .map((e) => ({ ...e, score: lexicalSimilarity(question, e.text) }))
+      .sort((a, b) => b.score - a.score);
+  }
+}
+
 app.get('/health', (req, res) => {
   const store = loadStore();
   res.json({ ok: true, indexedChunks: store.length });
@@ -23,14 +52,12 @@ app.post('/search', async (req, res) => {
     const store = loadStore();
     if (store.length === 0) return res.json({ results: [] });
 
-    const qEmbedding = await embed(question);
-    const ranked = store
-      .map((e) => ({ ...e, score: cosineSimilarity(qEmbedding, e.embedding) }))
-      .sort((a, b) => b.score - a.score)
+    const ranked = await rankStore(store, question);
+    const results = ranked
       .slice(0, config.topK)
       .map(({ source, text, score }) => ({ source, text, score }));
 
-    res.json({ results: ranked });
+    res.json({ results });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -47,11 +74,7 @@ app.post('/query', async (req, res) => {
     let sources = [];
 
     if (store.length > 0) {
-      const qEmbedding = await embed(question);
-      const ranked = store
-        .map((e) => ({ ...e, score: cosineSimilarity(qEmbedding, e.embedding) }))
-        .sort((a, b) => b.score - a.score)
-        .slice(0, config.topK);
+      const ranked = (await rankStore(store, question)).slice(0, config.topK);
       context = ranked.map((r) => `[${r.source}]\n${r.text}`).join('\n\n');
       sources = ranked.map((r) => r.source);
     }

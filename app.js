@@ -13,7 +13,7 @@ const SUPPORTED_LANGS = ['vi', 'ja', 'en'];
 // Every leaf is either a string or a function(...) => string (for messages needing interpolation).
 const I18N = {
   vi: {
-    appSubtitle: 'Cùng cả nhóm quyết định chuyến đi nhanh chóng · dùng được cả từ điện thoại trong cùng mạng',
+    appSubtitle: 'Cùng cả nhóm quyết định chuyến đi nhanh chóng',
     hero: {
       eyebrow: 'Cẩm nang du lịch Okinawa',
       heading: 'Lên kế hoạch chuyến đi Okinawa dễ dàng hơn',
@@ -31,7 +31,7 @@ const I18N = {
       ready: () => `✅ Đã kết nối, hệ thống đã sẵn sàng.`,
       failed: (base, err) => `⚠️ Không kết nối được tới ${base}. Kiểm tra: máy chủ đã chạy chưa (<code>npm start</code> trong thư mục <code>claude-server/</code>), đúng địa chỉ chưa. Lỗi: ${err}`
     },
-    tabs: { planner: '🗺️ Lịch trình', group: '👥 Quyết định nhóm', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Camera', diff: '🆚 Vì sao TravelAI' },
+    tabs: { planner: '🗺️ Lịch trình', group: '👥 Quyết định nhóm', voice: '🎙️ Trợ lý giọng nói', heal: '🌧️ Self-Healing', camera: '📷 Hướng dẫn viên AI', diff: '🆚 Vì sao TravelAI' },
     common: {
       loadingGeneric: 'Đang tải...',
       mapLink: '📍 Xem bản đồ',
@@ -391,7 +391,7 @@ const I18N = {
     geocodeLang: 'vi'
   },
   ja: {
-    appSubtitle: 'グループ全員で決める旅行をサポート · 同じネットワーク内ならスマホからも利用可',
+    appSubtitle: 'グループ全員で決める旅行をサポート',
     hero: {
       eyebrow: '沖縄旅行ガイド',
       heading: '沖縄旅行を、もっと簡単に計画しよう',
@@ -409,7 +409,7 @@ const I18N = {
       ready: () => `✅ 接続済み、システムが利用可能です。`,
       failed: (base, err) => `⚠️ ${base} に接続できません。サーバーが起動しているか（<code>claude-server/</code> フォルダで <code>npm start</code>）、アドレスが正しいか確認してください。エラー内容：${err}`
     },
-    tabs: { planner: '🗺️ 旅程', group: '👥 グループ決定', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 カメラ', diff: '🆚 TravelAIの違い' },
+    tabs: { planner: '🗺️ 旅程', group: '👥 グループ決定', voice: '🎙️ 音声アシスタント', heal: '🌧️ 自動リカバリー', camera: '📷 AIガイド', diff: '🆚 TravelAIの違い' },
     common: {
       loadingGeneric: '読み込み中...',
       mapLink: '📍 地図を見る',
@@ -769,7 +769,7 @@ const I18N = {
     geocodeLang: 'ja'
   },
   en: {
-    appSubtitle: 'Decide your trip together as a group · usable from your phone on the same network',
+    appSubtitle: 'Decide your trip together as a group',
     hero: {
       eyebrow: 'Okinawa Travel Guide',
       heading: 'Plan your Okinawa trip, made simple',
@@ -787,7 +787,7 @@ const I18N = {
       ready: () => `✅ Connected, the system is ready.`,
       failed: (base, err) => `⚠️ Couldn't connect to ${base}. Check that the server is running (<code>npm start</code> in the <code>claude-server/</code> folder) and the address is correct. Error: ${err}`
     },
-    tabs: { planner: '🗺️ Itinerary', group: '👥 Group Decision', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 Camera', diff: '🆚 Why TravelAI' },
+    tabs: { planner: '🗺️ Itinerary', group: '👥 Group Decision', voice: '🎙️ Voice Assistant', heal: '🌧️ Self-Healing', camera: '📷 AI Guide', diff: '🆚 Why TravelAI' },
     common: {
       loadingGeneric: 'Loading...',
       mapLink: '📍 View map',
