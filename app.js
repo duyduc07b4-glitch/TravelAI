@@ -1679,12 +1679,16 @@ function extractChunkContent(line) {
 }
 
 /**
- * Best-effort cleanup for a raw (unescaped) newline/tab typed inside a JSON string value — invalid
- * per the JSON spec, but a natural thing for a model to type when its text feels multi-line. Walks
- * the text tracking string/escape state (same scan as findFirstJsonObject) so it only touches
- * characters actually inside a string, rather than reformatting the whole blob. Deliberately does
- * NOT paper over other malformed-JSON cases (e.g. a trailing comma) — those should still surface as
- * the "malformed JSON" error rather than being silently guessed at.
+ * Best-effort cleanup for the LLM JSON mistakes that show up in practice often enough to be worth
+ * guessing around rather than failing the whole generation over:
+ *  - a raw (unescaped) newline/tab typed inside a string value — invalid per the JSON spec, but a
+ *    natural thing for a model to type when its text feels multi-line;
+ *  - a trailing comma before a closing `}`/`]` — invalid JSON, but something models (especially
+ *    smaller/non-Anthropic ones behind a gateway) produce often enough that failing outright on it
+ *    was doing more harm than good.
+ * Walks the text tracking string/escape state (same scan as findFirstJsonObject) so the newline/tab
+ * fix only touches characters actually inside a string, and the trailing-comma strip only fires
+ * outside one (a comma inside a quoted string is legitimate content, not a JSON delimiter).
  */
 function repairJsonText(text) {
   let out = '', inString = false, escapeNext = false;
@@ -1696,6 +1700,12 @@ function repairJsonText(text) {
     if (inString && ch === '\n') { out += '\\n'; continue; }
     if (inString && ch === '\r') { out += '\\r'; continue; }
     if (inString && ch === '\t') { out += '\\t'; continue; }
+    if (!inString && ch === ',') {
+      // Look ahead past whitespace: a comma immediately followed by a closing bracket is trailing.
+      let j = i + 1;
+      while (j < text.length && /\s/.test(text[j])) j++;
+      if (text[j] === '}' || text[j] === ']') continue; // drop the comma
+    }
     out += ch;
   }
   return out;
@@ -3490,6 +3500,13 @@ function initApp() {
       pResultEl.innerHTML = `<div class="result-box">${currentUser ? innerHtml : withLoginGateHtml(innerHtml)}</div>`;
     }
     if (currentUser) showInviteBox(lastGeneratedTrip);
+    // The itinerary HTML above isn't the only generated content sitting outside a data-i18n
+    // element: the satisfaction score, cost summary, and Group Decision panels are each their own
+    // <div>, populated once at generation time and never touched by applyStaticTranslations() —
+    // they all already re-render correctly from currentLang, they just weren't being re-invoked.
+    refreshPlannerSatisfactionLive();
+    refreshPlannerCostSummaryLive();
+    refreshGroupDecisionLive();
   }
 
   /** Shows/hides the logged-in header bits based on current auth state; the login modal itself is opened on demand (header button, a blurred result's lock button, or a forced session-expired prompt) rather than blocking the app up front. Pass a message to force the modal open with that error (e.g. session expired). */
@@ -4042,38 +4059,64 @@ function initApp() {
 
   // Pins header + hero-strip + tab bar as one stacked sticky group instead of only the header
   // (header already had position:sticky on its own — the photo strip and tabs used to scroll away
-  // under it). The two "top" offsets are measured live via ResizeObserver rather than hardcoded,
-  // since header height changes with login state/invites badge/language and viewport width.
+  // under it). --header-h/--hero-h reflect each element's real (constant — see below) box size,
+  // measured live via ResizeObserver since header height changes with login state/invites
+  // badge/language/viewport width, and the hero-strip's with viewport width (clamp()-sized cards).
+  // Neither element's real box size changes during the scroll-driven collapse any more (that's the
+  // whole point of doing it via transform below), so observing them is cheap and fires rarely.
+  let heroNaturalHeight = 0;
   (function enableStackedStickyHeader() {
     const headerEl = document.querySelector('header');
     const heroStripEl = document.querySelector('.hero-strip');
-    if (!headerEl || !heroStripEl) return;
+    if (!headerEl) return;
     const root = document.documentElement.style;
-    const ro = new ResizeObserver(() => {
+    const measure = () => {
       root.setProperty('--header-h', headerEl.offsetHeight + 'px');
-      root.setProperty('--hero-h', heroStripEl.offsetHeight + 'px');
-    });
+      if (heroStripEl) {
+        heroNaturalHeight = heroStripEl.offsetHeight;
+        root.setProperty('--hero-h', heroNaturalHeight + 'px');
+      }
+    };
+    // Seeded synchronously, not left to wait for the ResizeObserver's own (async, next-frame)
+    // first callback — enableHeroStripAutoHide below reads heroNaturalHeight, and a scroll landing
+    // in that brief window before the observer's first tick would compute against a stale (zero)
+    // height.
+    measure();
+    const ro = new ResizeObserver(measure);
     ro.observe(headerEl);
-    ro.observe(heroStripEl);
+    if (heroStripEl) ro.observe(heroStripEl);
   })();
 
-  // Collapses the hero photo strip once the page is scrolled past the top, instead of leaving it
-  // pinned there forever alongside the header/tabs — it's decorative, and staying pinned ate
-  // permanent screen space. The tab bar right after it (also sticky, offset by --hero-h) naturally
-  // slides up as this shrinks, via the ResizeObserver above keeping --hero-h in sync — no separate
-  // JS coordination needed for that part.
+  // Shrinks the hero photo strip as the page scrolls past the top, instead of leaving it pinned
+  // there forever (decorative, and permanently eating screen space) or popping it away at a fixed
+  // threshold. Driven directly off scrollY every animation frame — a "scrubbed" collapse tied 1:1
+  // to the scroll gesture itself, so it just reads as part of the scroll rather than a separate
+  // animation racing to keep up with it (which is what every earlier version of this — a CSS
+  // transition watched by a ResizeObserver, then a scrubbed max-height/opacity pair — still had:
+  // both an animated *height* on the strip and the tab bar's own reflow chasing it every frame,
+  // which is real layout work no matter how it's driven). This version changes neither element's
+  // actual box size at all: the strip is visually shrunk via `transform:scaleY()` (anchored at its
+  // top) and the tab bar is nudged up by the exact matching amount via `transform:translateY()` —
+  // both are compositor-only, they never touch layout, so there's nothing left for a slow scroll
+  // to visibly catch up on.
   (function enableHeroStripAutoHide() {
     const heroStripEl = document.querySelector('.hero-strip');
-    if (!heroStripEl) return;
-    const SCROLL_HIDE_THRESHOLD = 24;
+    const navEl = document.querySelector('nav.tabs');
+    if (!heroStripEl || !navEl) return;
+    const COLLAPSE_DISTANCE = 140; // px of scroll to fully collapse over — roughly the strip's own height
     let ticking = false;
     const update = () => {
       ticking = false;
-      heroStripEl.classList.toggle('hero-strip-collapsed', window.scrollY > SCROLL_HIDE_THRESHOLD);
+      const progress = Math.max(0, Math.min(1, window.scrollY / COLLAPSE_DISTANCE));
+      heroStripEl.style.transform = progress ? `scaleY(${(1 - progress).toFixed(4)})` : '';
+      heroStripEl.style.opacity = String(1 - progress);
+      heroStripEl.classList.toggle('hero-strip-collapsed', progress >= 1);
+      const shrinkPx = heroNaturalHeight * progress;
+      navEl.style.transform = shrinkPx ? `translateY(${(-shrinkPx).toFixed(1)}px)` : '';
     };
     update();
     // rAF-throttled: a scroll gesture can fire dozens of 'scroll' events per second, but there's
-    // only ever one meaningful state change to make per rendered frame.
+    // only ever one meaningful frame to paint.
     window.addEventListener('scroll', () => {
       if (ticking) return;
       ticking = true;

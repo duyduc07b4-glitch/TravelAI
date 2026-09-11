@@ -109,26 +109,20 @@ button.small{padding:5px 10px; font-size:12px;}
   /* Opaque so that once this is pinned above scrolled-past content, the mask's faded edges
      (below) reveal this solid color instead of whatever panel text is now scrolling underneath. */
   background:var(--bg-deep);
-  max-height:220px; opacity:1;
-  /* Only opacity animates. max-height/margin-top/box-shadow snap instantly (no transition on
-     them) the moment .hero-strip-collapsed toggles — deliberately, see below. */
-  transition:opacity .2s ease;
+  opacity:1;
+  transform-origin:top center;
+  /* No CSS transition here at all — see enableHeroStripAutoHide in app.js. transform/opacity are
+     written directly, every scroll frame, as a 1:1 function of scroll position (a "scrubbed"
+     collapse tied to the actual gesture, the same way native scrolling itself feels) instead of a
+     timed animation reacting to a threshold; a CSS transition on top of that would fight the JS
+     writes every frame instead of tracking the gesture precisely. Its real box height never
+     changes — the shrink is purely visual (scaleY), which is what keeps this off the layout/paint
+     path entirely, transform+opacity are compositor-only. */
 }
-/* Collapsed once the page is scrolled past the top (see enableHeroStripAutoHide in app.js). The
-   box's real size snaps to 0 in the same frame as the class toggle (not smoothly), while opacity
-   still fades over 200ms — two things this buys:
-   1. The tab bar right after it in the document needs its own natural flow position to move up in
-      step, which needs this element's real layout size to actually change; snapping it instantly
-      means the ResizeObserver above reads the new (0) height in that same frame, so the tab bar's
-      --hero-h-derived offset updates in lockstep — no gap between them ever opens.
-   2. Nothing here animates a layout property over multiple frames any more, which is what made the
-      transition visibly janky before (each in-between frame forced a reflow of the tab bar right
-      below, compounded by it re-blurring its now-removed backdrop-filter at each new position).
-   A smoothly-shrinking strip would look nicer in isolation, but tying that smoothness to a live
-   layout size is exactly what caused both the stutter and the gap — instant-collapse-plus-fade
-   sidesteps both. */
+/* pointer-events is still toggled via this class (see enableHeroStripAutoHide) once fully
+   collapsed — trivial to compute in CSS, no reason to fight the cascade over it in JS too. */
 .hero-strip.hero-strip-collapsed{
-  max-height:0; opacity:0; margin-top:0; box-shadow:none;
+  pointer-events:none;
 }
 /* The left/right fade-to-transparent mask lives on this inner wrapper, not on .hero-strip itself —
    masking .hero-strip directly would punch the same transparent holes through its own background,
@@ -151,12 +145,11 @@ button.small{padding:5px 10px; font-size:12px;}
 main{max-width:1120px; margin:0 auto; padding:20px 24px 80px;}
 nav.tabs{
   display:flex; margin-bottom:20px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; cursor:grab;
-  /* No backdrop-filter here (a plain, already-92%-opaque background instead): this element
-     reflows every frame of the hero-strip's collapse animation right above it (its own natural
-     flow position shifts up as that shrinks) — backdrop-filter has to resample and re-blur
-     whatever's behind it at every new position, which is one of the single most expensive things
-     a browser can be asked to do on every animation frame. That resample cost, not the reflow
-     itself, was the real source of the visible stutter. */
+  /* No backdrop-filter here (a plain, already-92%-opaque background instead): this element is
+     nudged up via transform every frame of the hero-strip's collapse (see enableHeroStripAutoHide
+     in app.js) to track it, and backdrop-filter has to resample and re-blur whatever's behind it
+     at every new position — one of the single most expensive things a browser can be asked to do
+     on every animation frame, transform-only or not. */
   background:rgba(255,255,255,0.94); box-shadow:var(--shadow-sm);
   border:1px solid var(--border); border-bottom:2px solid var(--border); border-radius:14px; padding:6px 6px 0;
   position:sticky; top:calc(var(--header-h, 84px) + var(--hero-h, 150px)); z-index:8;
